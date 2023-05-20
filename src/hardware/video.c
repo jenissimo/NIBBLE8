@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <setjmp.h>
 
+uint32_t *frame;
+uint8_t *font;
+PaletteManager *manager;
+
 void initVideo()
 {
     frame = malloc(NIBBLE_WIDTH * NIBBLE_HEIGHT * sizeof(uint32_t));

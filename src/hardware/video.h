@@ -6,21 +6,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-uint32_t *frame;
-uint8_t *font;
-PaletteManager *manager;
+extern uint32_t *frame;
+extern uint8_t *font;
+extern PaletteManager *manager;
 static const uint8_t fullByteColors[4] = {0b00000000, 0b01010101, 0b10101010, 0b11111111};
-
-// TODO: Make dirty flag
-
-/*
-struct pixel {
-    int r;
-    int g;
-    int b;
-} pixel;
-struct pixel frame[NIBBLE_WIDTH*NIBBLE_HEIGHT];
-*/
 
 void initVideo(void);
 void destroyVideo(void);

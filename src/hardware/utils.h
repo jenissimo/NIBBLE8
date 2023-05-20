@@ -10,8 +10,8 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-clock_t begin_t;
-clock_t end_t;
+extern clock_t begin_t;
+extern clock_t end_t;
 
 void init_clock(void);
 void tick_clock(void);

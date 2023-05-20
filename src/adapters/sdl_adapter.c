@@ -17,6 +17,7 @@ SDL_Rect viewport;
 bool isFullscreen = false;
 
 int16_t audioBuffer[NUM_SAMPLES];
+uint32_t next_time;
 
 const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 Uint32 fpsLastTime = 0;
@@ -69,6 +70,7 @@ int nibble_sdl_init()
     synth_init(&synthState);
 
     // Open the audio device
+    /*
     SDL_AudioSpec desired_spec, obtained_spec;
 
     desired_spec.freq = SAMPLE_RATE;
@@ -86,6 +88,7 @@ int nibble_sdl_init()
 
     // Start audio playback
     SDL_PauseAudio(0);
+    */
 
     // Init iunput
     nibble_clear_keys();

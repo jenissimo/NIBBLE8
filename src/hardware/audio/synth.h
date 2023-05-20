@@ -2,6 +2,7 @@
 #define SYNTH_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 #include "filters.h"
@@ -56,7 +57,7 @@ typedef enum
     EFFECT_ARPEGGIO_SLOW,
 } NoteEffect;
 
-SynthState synthState;
+extern SynthState synthState;
 
 float w(float frequency);
 float osc(float frequency, float time, Oscillator type);

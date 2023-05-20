@@ -1,6 +1,8 @@
 #include "utils.h"
 
 #define TAU 6.2831853071795864769252867665590057683936
+clock_t begin_t;
+clock_t end_t;
 
 void init_clock()
 {

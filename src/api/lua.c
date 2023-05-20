@@ -1,5 +1,9 @@
 #include "lua.h"
 
+lua_State* currentVM;
+lua_State *lua;
+lua_State *app;
+
 void initLua()
 {
     lua = luaL_newstate(); // open Lua

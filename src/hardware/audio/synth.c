@@ -3,6 +3,7 @@
 
 double globalTime = 0.0;
 float timeStep = 1.0 / SAMPLE_RATE;
+SynthState synthState;
 
 // Converts frequency (Hz) to angular velocity
 float w(float frequency)

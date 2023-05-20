@@ -8,7 +8,7 @@
 #include "hardware/video.h"
 #include "hardware/utils.h"
 #include "api/lua.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 int run = 1;
 

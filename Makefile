@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -Wall -g
-LIBS_LIST = luajit sdl2 libpng
+CFLAGS = -Wall
+LIBS_LIST = lua5.3 sdl2 libpng
 CFLAGS += $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function
-LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs $(lib))) -lm
+LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 SRCDIR = src
 TOOLSDIR = tools
