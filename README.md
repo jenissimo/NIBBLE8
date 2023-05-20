@@ -10,7 +10,7 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
 
 ## License
 
-NIBBLE-8 is licensed under the [MIT License](#LICENCE).
+NIBBLE-8 is licensed under the [MIT License](https://github.com/jenissimo/NIBBLE-8/blob/main/LICENSE).
 
 ## Contact
 
