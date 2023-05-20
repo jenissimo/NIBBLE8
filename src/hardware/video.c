@@ -32,6 +32,7 @@ void loadPalettes()
     {
         printf("Error: Unable to create palette manager.\n");
     }
+    manager->current_palette = 1;
 }
 
 void print_char(int charIndex)

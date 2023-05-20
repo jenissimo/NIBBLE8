@@ -55,7 +55,15 @@ function Terminal:loadCart(path)
     if errorMsg ~= nil then
         self:printLn(errorMsg, 2)
     else
-        self:printLn("cart loaded sucessfully", 2)
+        local cartname
+        for i = #path, 1, -1 do
+            if sub(path, i, i) == "/" then
+                cartname = sub(path, i + 1)
+                break
+            end
+        end
+
+        self:printLn("cart "..cartname.." loaded sucessfully", 2)
     end
 end
 

@@ -49,6 +49,8 @@ static int l_sub(lua_State *L);
 static int l_sin(lua_State *L);
 static int l_cos(lua_State *L);
 static int l_atan2(lua_State *L);
+static int l_min(lua_State *L);
+static int l_max(lua_State *L);
 static int l_mid(lua_State *L);
 static int l_line(lua_State *L);
 static int l_rect(lua_State *L);

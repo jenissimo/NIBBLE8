@@ -68,6 +68,8 @@ void initCoreAPI()
     registerFunction("cos", l_cos);
     registerFunction("atan2", l_atan2);
     registerFunction("mid", l_mid);
+    registerFunction("min", l_min);
+    registerFunction("max", l_max);
 
     // OS
     registerFunction("key", l_key);
@@ -308,7 +310,7 @@ static int l_trace(lua_State *L)
     if (top >= 1)
     {
         const char *text = lua_tostring(L, 1);
-        nibble_trace(text ? text : "nil");
+        nibble_api_trace(text ? text : "nil");
         return 0;
     }
 
@@ -583,7 +585,7 @@ static int l_rnd(lua_State *L)
     if (top >= 1)
     {
         double x = lua_tonumber(L, 1);
-        double result = nibble_rnd(x);
+        double result = nibble_api_rnd(x);
 
         lua_pushnumber(L, result);
 
@@ -601,7 +603,7 @@ static int l_chr(lua_State *L)
     {
         int x = lua_tonumber(L, 1);
         char result[2] = "\0";
-        result[0] = nibble_chr(x);
+        result[0] = nibble_api_chr(x);
 
         // printf("chr(%d) = %s\n", x, result);
 
@@ -617,7 +619,7 @@ static int l_time(lua_State *L)
 {
     int top = lua_gettop(L);
 
-    double result = nibble_time();
+    double result = nibble_api_time();
     // printf("time() = %f\n", result);
     lua_pushnumber(L, result);
     return 1;
@@ -630,7 +632,7 @@ static int l_flr(lua_State *L)
     if (top >= 1)
     {
         double x = lua_tonumber(L, 1);
-        double result = nibble_flr(x);
+        double result = nibble_api_flr(x);
         // printf("flr(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
@@ -646,7 +648,7 @@ static int l_ceil(lua_State *L)
     if (top >= 1)
     {
         double x = lua_tonumber(L, 1);
-        double result = nibble_ceil(x);
+        double result = nibble_api_ceil(x);
         // printf("ceil(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
@@ -669,7 +671,7 @@ static int l_sub(lua_State *L)
         {
             end = lua_tonumber(L, 3); // lua is 1 based
         }
-        char *result = nibble_sub(text, start, end);
+        char *result = nibble_api_sub(text, start, end);
         // printf("sub(%s, %d, %d) = %s\n", text, start, end, result);
 
         lua_pushstring(L, result);
@@ -716,7 +718,7 @@ static int l_sin(lua_State *L)
     if (top >= 1)
     {
         double x = lua_tonumber(L, 1);
-        double result = nibble_sin(x);
+        double result = nibble_api_sin(x);
         // printf("sin(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
@@ -732,7 +734,7 @@ static int l_cos(lua_State *L)
     if (top >= 1)
     {
         double x = lua_tonumber(L, 1);
-        double result = nibble_cos(x);
+        double result = nibble_api_cos(x);
         // printf("cos(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
@@ -749,8 +751,42 @@ static int l_atan2(lua_State *L)
     {
         double x = lua_tonumber(L, 1);
         double y = lua_tonumber(L, 2);
-        double result = nibble_atan2(x, y);
+        double result = nibble_api_atan2(x, y);
         // printf("atan2(%f, %f) = %f\n", x, y, result);
+        lua_pushnumber(L, result);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int l_min(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 2)
+    {
+        double x = lua_tonumber(L, 1);
+        double y = lua_tonumber(L, 2);
+        double result = nibble_api_min(x, y);
+        // printf("min(%f, %f) = %f\n", x, y, result);
+        lua_pushnumber(L, result);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int l_max(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 2)
+    {
+        double x = lua_tonumber(L, 1);
+        double y = lua_tonumber(L, 2);
+        double result = nibble_api_max(x, y);
+        // printf("max(%f, %f) = %f\n", x, y, result);
         lua_pushnumber(L, result);
         return 1;
     }

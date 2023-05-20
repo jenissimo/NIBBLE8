@@ -13,32 +13,32 @@ void tick_clock()
     end_t = clock();
 }
 
-double nibble_rnd(int x)
+double nibble_api_rnd(int x)
 {
     return (double)rand() / RAND_MAX * (x);
 }
 
-char nibble_chr(int x)
+char nibble_api_chr(int x)
 {
     return (char)x;
 }
 
-int nibble_flr(double x)
+int nibble_api_flr(double x)
 {
     return (int)floor(x);
 }
 
-int nibble_ceil(double x)
+int nibble_api_ceil(double x)
 {
     return (int)ceil(x);
 }
 
-double nibble_time(void)
+double nibble_api_time(void)
 {
     return ((double)(end_t - begin_t) / CLOCKS_PER_SEC) * 10;
 }
 
-char *nibble_sub(char *str, int start, int end)
+char *nibble_api_sub(char *str, int start, int end)
 {
     char *result;
     int i = 0;
@@ -58,24 +58,34 @@ char *nibble_sub(char *str, int start, int end)
     return result;
 }
 
-double nibble_sin(double x)
+double nibble_api_sin(double x)
 {
     return -sin(x * 3.1415 * 2);
 }
 
-double nibble_cos(double x)
+double nibble_api_cos(double x)
 {
     return cos(x * 3.1415 * 2);
 }
 
-double nibble_atan2(double x, double y)
+double nibble_api_atan2(double x, double y)
 {
     return 0.75 + atan2((double)x, (double)y) / TAU;
 }
 
-void nibble_trace(char *text)
+void nibble_api_trace(char *text)
 {
     printf("%s\n", text);
+}
+
+double nibble_api_min(double x, double y)
+{
+    return MIN(x, y);
+}
+
+double nibble_api_max(double x, double y)
+{
+    return MAX(x, y);
 }
 
 double nibble_api_mid(double x, double y, double z)

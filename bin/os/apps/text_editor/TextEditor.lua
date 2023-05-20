@@ -9,17 +9,11 @@ local SYNTAX_SCHEME = {
     ["COMMENT"] = 1,
     ["DEFAULT"] = 3
 }
-local KEYWORDS = {
-    "function", "class", "super", "for", "do", "local", "while", "if", "then",
-    "else", "elseif", "return", "continue", "break", "true", "false", "print",
-    "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
-    "fset", "mget", "mset", "peek", "poke", "peek4", "poke4", "peek2", "poke2",
-    "circ", "circfill", "rect", "rectfill", "line"
-}
-local TERMINATORS = {
-    "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",
-    " "
-}
+local KEYWORDS = {"function", "class", "super", "for", "do", "local", "while", "if", "then", "else", "elseif", "return",
+                  "continue", "break", "true", "false", "print", "begin", "end", "cls", "trace", "pset", "pget", "sget",
+                  "sset", "fget", "palt", "spr", "sspr", "fset", "mget", "mset", "peek", "poke", "peek4", "poke4",
+                  "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line"}
+local TERMINATORS = {"\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/", " "}
 
 function TextEditor.new(text, x, y, width, height)
     local self = setmetatable({}, TextEditor)
@@ -34,12 +28,24 @@ end
 
 function TextEditor:init(text)
     self.text = text or ""
-    self.cursor = {x = 0, y = 0, visible = true}
+    self.cursor = {
+        x = 0,
+        y = 0,
+        visible = true
+    }
     self.lines = split(text or "", "\n")
     self.rows_on_screen = ceil(self.height / 6)
     self.cols_on_screen = ceil(self.width / 4)
-    self.scroll = {x = 0, y = 0}
-    self.selection = {x1 = nil, y1 = nil, x2 = nil, y2 = nil}
+    self.scroll = {
+        x = 0,
+        y = 0
+    }
+    self.selection = {
+        x1 = nil,
+        y1 = nil,
+        x2 = nil,
+        y2 = nil
+    }
     self.colors = {}
     self.syntax_highlighting_dirty = true
     self.selecting = false
@@ -86,8 +92,7 @@ function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
     end
 
     -- Check for Text Input
-    local inputText = UTILS.handle_text_input(key_code, ctrl_pressed,
-                                              shift_pressed)
+    local inputText = UTILS.handle_text_input(key_code, ctrl_pressed, shift_pressed)
     if #inputText > 0 then
         self:appendText(inputText)
         return
@@ -196,17 +201,23 @@ function TextEditor:setPosition(x, y)
     self.y = y
 end
 
-function TextEditor:getPosition() return self.x, self.y end
+function TextEditor:getPosition()
+    return self.x, self.y
+end
 
 function TextEditor:setSize(width, height)
     self.width = width
     self.height = height
 end
 
-function TextEditor:getSize() return self.width, self.height end
+function TextEditor:getSize()
+    return self.width, self.height
+end
 
 function TextEditor:isSelected(x, y)
-    if self.selection.x1 == nil then return false end
+    if self.selection.x1 == nil then
+        return false
+    end
 
     local x1 = self.selection.x1
     local x2 = self.selection.x2
@@ -226,11 +237,17 @@ function TextEditor:isSelected(x, y)
     end
 
     if y == y1 and y == y2 then
-        if x >= x1 and x <= x2 then return true end
+        if x >= x1 and x <= x2 then
+            return true
+        end
     elseif y == y1 then
-        if x >= x1 then return true end
+        if x >= x1 then
+            return true
+        end
     elseif y == y2 then
-        if x <= x2 then return true end
+        if x <= x2 then
+            return true
+        end
     elseif y > y1 and y < y2 then
         return true
     end
@@ -248,9 +265,13 @@ function TextEditor:redrawText()
 
     local index = 0
     for i = self.scroll.y + 1, self.scroll.y + 1 + self.rows_on_screen, 1 do
-        if i > #self.lines then break end
+        if i > #self.lines then
+            break
+        end
         for j = self.scroll.x + 1, self.scroll.x + self.cols_on_screen + 1, 1 do
-            if j > #self.lines[i] then break end
+            if j > #self.lines[i] then
+                break
+            end
 
             local color
 
@@ -260,20 +281,15 @@ function TextEditor:redrawText()
                 color = self.colors[i][j]
             end
 
-            if self.cursor.x + self.scroll.x == j - 1 and self.cursor.y +
-                self.scroll.y == i - 1 and self.cursor.visible then
+            if self.cursor.x + self.scroll.x == j - 1 and self.cursor.y + self.scroll.y == i - 1 and self.cursor.visible then
                 color = 3
             end
 
             if self:isSelected(j - 1, i - 1) == true then
                 -- trace("Selected: " .. str(j - 1) .. ", " .. str(i - 1))
-                print(sub(self.lines[i], j, j),
-                      self.x + (j - self.scroll.x - 1) * 4, index * 6 + self.y,
-                      3, 1)
+                print(sub(self.lines[i], j, j), self.x + (j - self.scroll.x - 1) * 4, index * 6 + self.y, 3, 1)
             else
-                print(sub(self.lines[i], j, j),
-                      self.x + (j - self.scroll.x - 1) * 4, index * 6 + self.y,
-                      color, 0)
+                print(sub(self.lines[i], j, j), self.x + (j - self.scroll.x - 1) * 4, index * 6 + self.y, color, 0)
             end
 
         end
@@ -305,8 +321,7 @@ function TextEditor:selectAll()
     self.selection.x2 = #self.lines[#self.lines]
     self.selection.y2 = #self.lines - 1
 
-    trace(self.selection.x1 .. ", " .. self.selection.y1 .. " - " ..
-              self.selection.x2 .. ", " .. self.selection.y2)
+    trace(self.selection.x1 .. ", " .. self.selection.y1 .. " - " .. self.selection.x2 .. ", " .. self.selection.y2)
 end
 
 function TextEditor:clearSelection()
@@ -354,14 +369,18 @@ end
 -- TODO: Rewrite check for shift
 function TextEditor:checkSelectionStart()
     if self.selecting then
-        if self.selection.x1 == nil then self:startSelection() end
+        if self.selection.x1 == nil then
+            self:startSelection()
+        end
     else
         self:clearSelection()
     end
 end
 
 function TextEditor:checkSelectionUpdate()
-    if self.selecting then self:selectText() end
+    if self.selecting then
+        self:selectText()
+    end
 end
 
 function TextEditor:homeCursor()
@@ -379,12 +398,12 @@ function TextEditor:endCursor()
 
     self:checkSelectionStart()
 
-    if line == nil then return end
+    if line == nil then
+        return
+    end
 
-    if (line_len > self.cols_on_screen) or
-        ((self.cursor.x + self.scroll.x) > self.cols_on_screen) then
-        self.scroll.x = flr(line_len / self.cols_on_screen) *
-                            self.cols_on_screen
+    if (line_len > self.cols_on_screen) or ((self.cursor.x + self.scroll.x) > self.cols_on_screen) then
+        self.scroll.x = flr(line_len / self.cols_on_screen) * self.cols_on_screen
         self:setCursor(line_len % self.cols_on_screen, self.cursor.y)
     else
         self:setCursor(line_len, self.cursor.y)
@@ -396,7 +415,9 @@ end
 function TextEditor:moveCursorToLineStart()
     local line = self.lines[self.cursor.y + self.scroll.y]
 
-    if not line then return end
+    if not line then
+        return
+    end
 
     local foundNonWhitespace = false
 
@@ -455,6 +476,36 @@ function TextEditor:pageDown()
     self:checkSelectionUpdate()
 end
 
+function TextEditor:adjustCursorPositionAndScroll(x, y)
+    -- adjust cursor position if it's outside the visible screen area
+    if x < self.scroll.x then
+        x = self.scroll.x
+    elseif x > self.scroll.x + self.cols_on_screen - 1 then
+        x = self.scroll.x + self.cols_on_screen - 1
+    end
+
+    if y < self.scroll.y then
+        y = self.scroll.y
+    elseif y > self.scroll.y + self.rows_on_screen - 1 then
+        y = self.scroll.y + self.rows_on_screen - 1
+    end
+
+    -- adjust scroll position if cursor is outside visible screen area
+    if x < self.scroll.x then
+        self.scroll.x = x
+    elseif x > self.scroll.x + self.cols_on_screen - 1 then
+        self.scroll.x = x - self.cols_on_screen + 1
+    end
+    if y < self.scroll.y then
+        self.scroll.y = y
+    elseif y > self.scroll.y + self.rows_on_screen - 1 then
+        self.scroll.y = y - self.rows_on_screen + 1
+    end
+    
+    self.cursor.x = x
+    self.cursor.y = y
+end
+
 function TextEditor:moveCursor(xDir, yDir)
     local newX = self.cursor.x + xDir
     local newY = self.cursor.y + yDir
@@ -462,8 +513,9 @@ function TextEditor:moveCursor(xDir, yDir)
 
     self:checkSelectionStart()
 
-    if xDir < 0 and self.cursor.x + self.scroll.x <= 0 and self.cursor.y +
-        self.scroll.y <= 0 then return end
+    if xDir < 0 and self.cursor.x + self.scroll.x <= 0 and self.cursor.y + self.scroll.y <= 0 then
+        return
+    end
 
     if line == nil and yDir < 0 then
         self:homeCursor()
@@ -479,8 +531,7 @@ function TextEditor:moveCursor(xDir, yDir)
         return
     end
 
-    if (newX + self.scroll.x > #line) and
-        (newY + self.scroll.y + 1 < #self.lines) then
+    if (newX + self.scroll.x > #line) and (newY + self.scroll.y + 1 < #self.lines) then
         self:setCursor(newX, newY + 1)
         self:homeCursor()
         return
@@ -516,19 +567,22 @@ function TextEditor:removeChar(dir, x, y)
     local line = self.lines[lineIndex]
     local newLine = ""
 
-    if dir == 0 or dir > 0 then return end
+    if dir == 0 or dir > 0 then
+        return
+    end
 
     if dir == -1 then
         if self.scroll.x + self.cursor.x == 0 then
-            if self.scroll.y + self.cursor.y == 0 then return end
+            if self.scroll.y + self.cursor.y == 0 then
+                return
+            end
             self:moveCursor(0, -1)
             self:endCursor()
             newLine = self.lines[lineIndex - 1] .. line
             self.lines[lineIndex - 1] = newLine
             table.remove(self.lines, lineIndex)
         else
-            newLine = sub(line, 1, self.scroll.x + self.cursor.x - 1) ..
-                          sub(line, self.scroll.x + self.cursor.x + 1)
+            newLine = sub(line, 1, self.scroll.x + self.cursor.x - 1) .. sub(line, self.scroll.x + self.cursor.x + 1)
             self.lines[lineIndex] = newLine
             self:moveCursor(dir, 0)
         end
@@ -541,8 +595,7 @@ function TextEditor:removeChar(dir, x, y)
             self.lines[lineIndex] = newLine
             table.remove(self.lines, lineIndex + 1)
         else
-            newLine = sub(line, 1, self.scroll.x + self.cursor.x) ..
-                          sub(line, self.scroll.x + self.cursor.x + 2)
+            newLine = sub(line, 1, self.scroll.x + self.cursor.x) .. sub(line, self.scroll.x + self.cursor.x + 2)
             self.lines[lineIndex] = newLine
         end
     end
@@ -551,7 +604,9 @@ function TextEditor:removeChar(dir, x, y)
 end
 
 function TextEditor:removeSelectedText()
-    if self.selection.x1 == nil then return end
+    if self.selection.x1 == nil then
+        return
+    end
 
     -- Invert the selection
     local startX, endX, startY, endY
@@ -576,8 +631,7 @@ function TextEditor:removeSelectedText()
     end
 
     trace("Remove selected text")
-    trace(str(startX) .. " " .. str(startY) .. " " .. str(endX) .. " " ..
-              str(endY))
+    trace(str(startX) .. " " .. str(startY) .. " " .. str(endX) .. " " .. str(endY))
 
     local line
     local line1
@@ -600,12 +654,15 @@ function TextEditor:removeSelectedText()
         self.lines[startY + 1] = line1 .. line2
     end
 
+    self:adjustCursorPositionAndScroll(startX, startY)
     self:clearSelection()
     self.syntax_highlighting_dirty = true
 end
 
 function TextEditor:copy()
-    if self.selection.x1 == nil then return end
+    if self.selection.x1 == nil then
+        return
+    end
 
     -- Invert the selection
     local startX, endX, startY, endY
@@ -656,7 +713,9 @@ end
 
 function TextEditor:paste()
     local text = get_clipboard_text()
-    if text == nil then return end
+    if text == nil then
+        return
+    end
     local newLines = split(text, "\n")
     trace("Lines count: " .. str(#newLines))
 
@@ -676,9 +735,15 @@ function TextEditor:paste()
 end
 
 function TextEditor:appendText(str, x, y)
-    if #str == 0 then return end
-    if x == nil then x = self.cursor.x end
-    if y == nil then y = self.cursor.y end
+    if #str == 0 then
+        return
+    end
+    if x == nil then
+        x = self.cursor.x
+    end
+    if y == nil then
+        y = self.cursor.y
+    end
 
     local lineIndex = self.scroll.y + y + 1
     local line = self.lines[lineIndex]
@@ -687,8 +752,7 @@ function TextEditor:appendText(str, x, y)
     if x == 0 then
         newLine = str .. line
     else
-        newLine = sub(line, 1, self.scroll.x + x) .. str ..
-                      sub(line, self.scroll.x + x + 1)
+        newLine = sub(line, 1, self.scroll.x + x) .. str .. sub(line, self.scroll.x + x + 1)
     end
 
     self.lines[lineIndex] = newLine
@@ -697,7 +761,9 @@ function TextEditor:appendText(str, x, y)
 end
 
 function TextEditor:peek(line, index)
-    if index > #line then return nil end
+    if index > #line then
+        return nil
+    end
     return sub(line, index, index)
 end
 
@@ -708,8 +774,7 @@ function TextEditor:match(line, index, values, terminateValues)
     for valueIndex = 1, #values do
         found = true
         for charIndex = 1, #values[valueIndex] do
-            if self:peek(line, index + charIndex - 1) ~=
-                self:peek(values[valueIndex], charIndex) then
+            if self:peek(line, index + charIndex - 1) ~= self:peek(values[valueIndex], charIndex) then
                 found = false
                 break
             end
@@ -718,8 +783,12 @@ function TextEditor:match(line, index, values, terminateValues)
         if found == true then
             resultIndex = index + #values[valueIndex]
 
-            if resultIndex >= #line then return resultIndex end
-            if terminateValues == nil then return resultIndex end
+            if resultIndex >= #line then
+                return resultIndex
+            end
+            if terminateValues == nil then
+                return resultIndex
+            end
 
             for j = 1, #terminateValues do
                 if self:peek(line, resultIndex) == terminateValues[j] then
@@ -744,7 +813,9 @@ function TextEditor:highlightLine(lineIndex)
             repeat
                 self.colors[lineIndex][nextIndex] = SYNTAX_SCHEME.STRING
                 nextIndex = nextIndex + 1
-                if nextIndex > #line then break end
+                if nextIndex > #line then
+                    break
+                end
             until sub(line, nextIndex, nextIndex) == "\""
             self.colors[lineIndex][nextIndex] = SYNTAX_SCHEME.STRING
             nextIndex = nextIndex + 1
@@ -753,7 +824,9 @@ function TextEditor:highlightLine(lineIndex)
             while sub(line, nextIndex, nextIndex) ~= "'" do
                 self.colors[lineIndex][nextIndex] = SYNTAX_SCHEME.STRING
                 nextIndex = nextIndex + 1
-                if nextIndex > #line then break end
+                if nextIndex > #line then
+                    break
+                end
             end
         elseif char == "-" and self:peek(line, i + 1) == "-" then
             for j = i, #line do
@@ -784,10 +857,13 @@ function TextEditor:mousep(x, y, button)
         -- if so, set cursor position
         local desiredCursorX = math.floor((x - self.x) / 4)
         local desiredCursorY = math.floor((y - self.y) / 6)
-        if desiredCursorY + self.scroll.y > #self.lines then return end
+        if desiredCursorY + self.scroll.y > #self.lines then
+            return
+        end
 
-        if desiredCursorX + self.scroll.x >
-            #self.lines[desiredCursorY + self.scroll.y + 1] then return end
+        if desiredCursorX + self.scroll.x > #self.lines[desiredCursorY + self.scroll.y + 1] then
+            return
+        end
 
         self:setCursor(desiredCursorX, desiredCursorY)
     end
@@ -804,7 +880,9 @@ function TextEditor:highlightSyntax()
     self.colors = {}
     for i = self.scroll.y + 1, self.scroll.y + self.rows_on_screen + 1 do
         local line = self.lines[i]
-        if line == nil then break end
+        if line == nil then
+            break
+        end
         self.colors[i] = {}
         self:highlightLine(i)
     end
@@ -828,8 +906,7 @@ function TextEditor:getText()
 end
 
 function TextEditor:drawStatusBar()
-    local status = "line: " .. str(self.cursor.y + self.scroll.y + 1) .. "/" ..
-                       str(#self.lines)
+    local status = "line: " .. str(self.cursor.y + self.scroll.y + 1) .. "/" .. str(#self.lines)
 
     rectfill(0, 113, 160, 7, 2)
     print(status, 1, 114, 0)

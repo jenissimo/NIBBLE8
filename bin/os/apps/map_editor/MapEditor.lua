@@ -1,8 +1,6 @@
 local MapEditor = {}
 MapEditor.__index = MapEditor
 
-local KEYCODE = {KEY_Z = "z"}
-
 function MapEditor.drawPencilIcon(x, y, color)
     rectfill(x, y + 5, 13, 5, color)
     line(x + 12, y + 4, x + 15, y + 1, color)
@@ -167,7 +165,7 @@ function MapEditor:mousep(x, y, button)
         local mapX = math.floor((x - self.x + self.scrollX) / 8)
         local mapY = math.floor((y - self.y + self.scrollY) / 8)
         local prevSpriteIndex = nibble_api_mget(mapX, mapY)
-        nibble_api_mset(mapX, mapY, 1) -- Set sprite number, for example, 1
+        mset(mapX, mapY, 1) -- Set sprite number, for example, 1
 
         -- Record the action in the history stack
         self.historyIndex = self.historyIndex + 1
