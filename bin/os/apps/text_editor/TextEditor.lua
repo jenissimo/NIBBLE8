@@ -92,6 +92,18 @@ function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
         end
     end
 
+    if (key_code == KEYCODE.KEY_PAGEUP) then
+        trace("PGUP")
+        self.selecting = shift_pressed
+        self:pageUp()
+        return
+    elseif (key_code == KEYCODE.KEY_PAGEDOWN) then
+        trace("PGDN")
+        self.selecting = shift_pressed
+        self:pageDown()
+        return
+    end
+
     -- Check for Text Input
     local inputText = UTILS.handle_text_input(key_code, ctrl_pressed, shift_pressed)
     if #inputText > 0 then
@@ -506,7 +518,7 @@ function TextEditor:adjustCursorPositionAndScroll(x, y)
     elseif y > self.scroll.y + self.rows_on_screen - 1 then
         self.scroll.y = y - self.rows_on_screen + 1
     end
-    
+
     self.cursor.x = x
     self.cursor.y = y
 end
