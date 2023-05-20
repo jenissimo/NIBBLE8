@@ -1,5 +1,9 @@
 #include "input.h"
 
+uint8_t nibble_keymap[512];
+int8_t nibble_keymap_p[512];
+ButtonState buttonState;
+
 uint8_t nibble_api_key(int key)
 {
     return nibble_keymap[key];

@@ -49,6 +49,7 @@ function TextEditor:init(text)
     self.colors = {}
     self.syntax_highlighting_dirty = true
     self.selecting = false
+    self.cursorBlink = 0
 end
 
 function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
@@ -178,19 +179,23 @@ function TextEditor:update()
         self:highlightSyntax()
         self.syntax_highlighting_dirty = false
     end
+
+    self.cursorBlink = self.cursorBlink + 1
+
+    if self.selection.x1 == nil then
+        if self.cursorBlink % 20 == 0 then
+            self.cursor.visible = not self.cursor.visible
+        end
+    else
+        self.cursor.visible = false
+    end
+
 end
 
 function TextEditor:draw()
     rectfill(self.x - 1, self.y - 1, self.width + 1, self.height + 1, 0)
-    if self.selection.x1 == nil then
-        if flr(t() * 10) % 9 > 4 then
-            self:drawCursor()
-            self.cursor.visible = true
-        else
-            self.cursor.visible = false
-        end
-    else
-        self.cursor.visible = false
+    if self.cursor.visible == true then
+        self:drawCursor()
     end
     self:redrawText()
     self:drawStatusBar()

@@ -83,9 +83,9 @@ typedef union
     uint8_t data[sizeof(MemoryLayout)];
 } Memory;
 
-Memory memory;
-uint8_t *userLuaCode;
-uint8_t *clipboard;
+extern Memory memory;
+extern uint8_t *userLuaCode;
+extern uint8_t *clipboard;
 
 
 void initRAM(void);

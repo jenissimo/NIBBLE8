@@ -252,7 +252,7 @@ function Terminal:init() end
 
 function Terminal:update()
     self.cursorBlink = self.cursorBlink + 1
-    if self.cursorBlink % 30 == 0 then
+    if self.cursorBlink % 20 == 0 then
         self.cursorVisible = not self.cursorVisible
     end
 end

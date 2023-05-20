@@ -12,11 +12,10 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include "luajit.h"
 
-lua_State* currentVM;
-lua_State *lua;
-lua_State *app;
+extern lua_State* currentVM;
+extern lua_State *lua;
+extern lua_State *app;
 
 void initLua(void);
 void initCoreAPI(void);

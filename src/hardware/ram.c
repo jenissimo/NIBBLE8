@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "../nibble8.h"
 
+Memory memory;
+uint8_t *userLuaCode;
+uint8_t *clipboard;
+
 void initRAM()
 {
     //saveMemoryLayout();
@@ -35,10 +39,12 @@ void saveMemoryLayout()
 
 void dumpPart(char *name, void *start, int size)
 {
+    /*
     FILE *f = fopen(name, "wb");
     fwrite(start, 1, size * sizeof(uint8_t), f);
     fclose(f);
     printf("Dumped to %s %lu bytes\n", name, size * sizeof(uint8_t));
+    */
 }
 
 void dumpRAM()

@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-static uint32_t next_time;
+extern uint32_t next_time;
 
 uint32_t time_left(void);
 static void audio_callback(void *userdata, Uint8 *stream, int len);

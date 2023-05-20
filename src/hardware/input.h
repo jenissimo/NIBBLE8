@@ -23,9 +23,9 @@ typedef struct {
     bool previous[NUM_BUTTONS];
 } ButtonState;
 
-uint8_t nibble_keymap[512];
-int8_t nibble_keymap_p[512];
-ButtonState buttonState;
+extern uint8_t nibble_keymap[512];
+extern int8_t nibble_keymap_p[512];
+extern ButtonState buttonState;
 
 uint8_t nibble_api_key(int key);
 uint8_t nibble_api_keyp(int key);

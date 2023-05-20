@@ -18,8 +18,8 @@
 typedef char* (*GetClipboardTextFunc)();
 typedef int (*SetClipboardTextFunc)(const char *);
 
-GetClipboardTextFunc getClipboardText;
-GetClipboardTextFunc setClipboardText;
+extern GetClipboardTextFunc getClipboardText;
+extern GetClipboardTextFunc setClipboardText;
 
 // Other methods
 char *nibble_api_ls(char *path);

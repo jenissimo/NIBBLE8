@@ -1,5 +1,8 @@
 #include "os.h"
 
+GetClipboardTextFunc getClipboardText;
+GetClipboardTextFunc setClipboardText;
+
 char *nibble_api_ls(char *path)
 {
     DIR *dir;
