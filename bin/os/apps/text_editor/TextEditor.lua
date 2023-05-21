@@ -923,7 +923,8 @@ function TextEditor:getText()
 end
 
 function TextEditor:drawStatusBar()
-    local status = "line: " .. str(self.cursor.y + self.scroll.y + 1) .. "/" .. str(#self.lines)
+    local currentLine = flr(self.cursor.y + self.scroll.y + 1)
+    local status = "line: " .. str(currentLine) .. "/" .. str(#self.lines)
 
     rectfill(0, 113, 160, 7, 2)
     print(status, 1, 114, 0)

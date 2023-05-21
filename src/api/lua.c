@@ -638,7 +638,7 @@ static int l_flr(lua_State *L)
         double x = lua_tonumber(L, 1);
         double result = nibble_api_flr(x);
         // printf("flr(%f) = %f\n", x, result);
-        lua_pushnumber(L, result);
+        lua_pushinteger(L, result);
         return 1;
     }
 
@@ -654,7 +654,7 @@ static int l_ceil(lua_State *L)
         double x = lua_tonumber(L, 1);
         double result = nibble_api_ceil(x);
         // printf("ceil(%f) = %f\n", x, result);
-        lua_pushnumber(L, result);
+        lua_pushinteger(L, result);
         return 1;
     }
 
