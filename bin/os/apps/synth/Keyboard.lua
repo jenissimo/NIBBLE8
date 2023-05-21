@@ -30,7 +30,7 @@ function Keyboard:drawKeys()
 
     -- draw white keys
     for i, key in ipairs(KeyboardUtils.keys) do
-        local color, note = unpack(key)
+        local color, note = table.unpack(key)
 
         if color == 'white' then
             if self.pressed_key == note then

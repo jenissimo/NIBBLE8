@@ -34,7 +34,7 @@ function _init()
         {width = 9, iconfn = draw_brackets_icon, window = textEditor},
         {width = 7, iconfn = draw_alien_icon, window = spriteEditor},
         {width = 7, iconfn = draw_map_icon, window = mapEditor},
-        {width = 7, iconfn = draw_note_icon, window = musicTracker},
+        --{width = 7, iconfn = draw_note_icon, window = musicTracker},
         {width = 7, iconfn = draw_note_icon, window = synth}
     }
 end

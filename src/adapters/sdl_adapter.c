@@ -70,7 +70,6 @@ int nibble_sdl_init()
     synth_init(&synthState);
 
     // Open the audio device
-    /*
     SDL_AudioSpec desired_spec, obtained_spec;
 
     desired_spec.freq = SAMPLE_RATE;
@@ -88,7 +87,6 @@ int nibble_sdl_init()
 
     // Start audio playback
     SDL_PauseAudio(0);
-    */
 
     // Init iunput
     nibble_clear_keys();

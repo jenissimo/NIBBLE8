@@ -124,57 +124,61 @@ void nibble_api_palt_reset()
 
 void nibble_api_circ(int16_t xc, int16_t yc, int16_t r, uint8_t col)
 {
-    int x_pos = r;
-    int y_pos = 0;
-    int err = 0;
+    int x = r;
+    int y = 0;
+    int decisionOver2 = 1 - x;
 
-    while (x_pos >= y_pos)
+    while (y <= x)
     {
-        nibble_api_pset(xc + x_pos, yc + y_pos, col);
-        nibble_api_pset(xc + y_pos, yc + x_pos, col);
-        nibble_api_pset(xc - y_pos, yc + x_pos, col);
-        nibble_api_pset(xc - x_pos, yc + y_pos, col);
-        nibble_api_pset(xc - x_pos, yc - y_pos, col);
-        nibble_api_pset(xc - y_pos, yc - x_pos, col);
-        nibble_api_pset(xc + y_pos, yc - x_pos, col);
-        nibble_api_pset(xc + x_pos, yc - y_pos, col);
+        nibble_api_pset(xc + x, yc + y, col);
+        nibble_api_pset(xc + y, yc + x, col);
+        nibble_api_pset(xc - x, yc + y, col);
+        nibble_api_pset(xc - y, yc + x, col);
 
-        y_pos += 1;
-        err += 1 + 2 * y_pos;
-        if (2 * (err - x_pos) + 1 > 0)
+        nibble_api_pset(xc - x, yc - y, col);
+        nibble_api_pset(xc - y, yc - x, col);
+        nibble_api_pset(xc + x, yc - y, col);
+        nibble_api_pset(xc + y, yc - x, col);
+
+        y += 1;
+        if (decisionOver2 < 0)
         {
-            x_pos -= 1;
-            err += 1 - 2 * x_pos;
+            decisionOver2 = decisionOver2 + 2 * y + 1;
+        }
+        else
+        {
+            x = x - 1;
+            decisionOver2 = decisionOver2 + 2 * (y - x) + 1;
         }
     }
 }
 
 void nibble_api_circfill(int16_t xc, int16_t yc, int16_t r, uint8_t col)
 {
-    int x, y, P;
-    x = 0;
-    y = r;
-    P = 1 - r;
-
-    do
+    if (r == 0)
     {
-        nibble_api_line(xc + x, yc + y, xc - x, yc + y, col);
-        nibble_api_line(xc + x, yc - y, xc - x, yc - y, col);
-        nibble_api_line(xc + y, yc + x, xc - y, yc + x, col);
-        nibble_api_line(xc + y, yc - x, xc - y, yc - x, col);
-
-        if (P < 0)
+        nibble_api_pset(xc, yc, col);
+    }
+    else if (r == 1)
+    {
+        nibble_api_pset(xc, yc - 1, col);
+        nibble_api_hline(xc - 1, xc + 1, yc, col);
+        nibble_api_pset(xc, yc + 1, col);
+    }
+    else if (r > 0)
+    {
+        int x = -r, y = 0, err = 2 - 2 * r;
+        do
         {
-            x = x + 1;
-            P = P + (2 * x) + 1;
-        }
-        else
-        {
-            x = x + 1;
-            y = y - 1;
-            P = P + (2 * x) - (2 * y) + 1;
-        }
-    } while (x < y);
+            nibble_api_hline(xc - x, xc + x, yc + y, col);
+            nibble_api_hline(xc - x, xc + x, yc - y, col);
+            r = err;
+            if (r > x)
+                err += ++x * 2 + 1;
+            if (r <= y)
+                err += ++y * 2 + 1;
+        } while (x < 0);
+    }
 }
 
 void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
@@ -254,9 +258,12 @@ void nibble_api_hline(int16_t x1, int16_t x2, int16_t y, uint8_t color)
         x2 = temp;
     }
 
-    if (y < 0 || y >= NIBBLE_HEIGHT) return;
-    if (x1 < 0) x1 = 0;
-    if (x2 >= NIBBLE_WIDTH) x2 = NIBBLE_WIDTH - 1;
+    if (y < 0 || y >= NIBBLE_HEIGHT)
+        return;
+    if (x1 < 0)
+        x1 = 0;
+    if (x2 >= NIBBLE_WIDTH)
+        x2 = NIBBLE_WIDTH - 1;
 
     // Stage 1: Draw remaining pixels at the beginning of the line
     while (x1 < x2 && x1 % 4 != 0)
@@ -338,7 +345,7 @@ void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8
 
 void nibble_api_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, bool flip_x, bool flip_y)
 {
-    //printf("sspr: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
+    // printf("sspr: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
     for (int j = 0; j < dh; j++)
     {
         for (int i = 0; i < dw; i++)

@@ -69,7 +69,7 @@ function SpriteSelector:mousepressed(x, y, button)
         local row = flr((y - self.y) / spriteSize)
         local col = flr((x - self.x) / spriteSize)
 
-        self.selectedSprite = self.page * columns * rows + row * spritesPerRow + col
+        self.selectedSprite = flr(self.page * columns * rows + row * spritesPerRow + col)
         --self.selectedSprite = row * self.spritesHCount + col + self.page *
         --                          self.spritesHCount * self.spritesVCount
     end

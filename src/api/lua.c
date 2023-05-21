@@ -1065,7 +1065,7 @@ static int l_sget(lua_State *L)
         int16_t y = (int16_t)lua_tonumber(L, 2);
         uint8_t color = nibble_api_sget(x, y);
         // printf("sget(%d, %d) = %d\n", x, y, color);
-        lua_pushnumber(L, color);
+        lua_pushinteger(L, color);
         return 1;
     }
 
@@ -1082,7 +1082,7 @@ static int l_mget(lua_State *L)
         int16_t y = (int16_t)lua_tonumber(L, 2);
         uint8_t spriteIndex = nibble_api_mget(x, y);
         // printf("mget(%d, %d) = %d\n", x, y, spriteIndex);
-        lua_pushnumber(L, spriteIndex);
+        lua_pushinteger(L, spriteIndex);
         return 1;
     }
 
@@ -1316,7 +1316,7 @@ void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed)
     }
 
     lua_getglobal(currentVM, "_key");
-    lua_pushnumber(currentVM, key_code);
+    lua_pushinteger(currentVM, key_code);
     lua_pushboolean(currentVM, ctrl_pressed);
     lua_pushboolean(currentVM, shift_pressed);
     lua_pcall(currentVM, 3, 0, 0);
@@ -1331,7 +1331,7 @@ void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed)
     }
 
     lua_getglobal(currentVM, "_keyup");
-    lua_pushnumber(currentVM, key_code);
+    lua_pushinteger(currentVM, key_code);
     lua_pushboolean(currentVM, ctrl_pressed);
     lua_pushboolean(currentVM, shift_pressed);
     lua_pcall(currentVM, 3, 0, 0);
@@ -1346,8 +1346,8 @@ void callLuaMouseMove(int x, int y)
     }
 
     lua_getglobal(currentVM, "_mousem");
-    lua_pushnumber(currentVM, x);
-    lua_pushnumber(currentVM, y);
+    lua_pushinteger(currentVM, x);
+    lua_pushinteger(currentVM, y);
     lua_pcall(currentVM, 2, 0, 0);
     // printf("mouse_move(%d, %d)\n", x, y);
 }
@@ -1360,9 +1360,9 @@ void callLuaMousePress(int x, int y, int button)
     }
 
     lua_getglobal(currentVM, "_mousep");
-    lua_pushnumber(currentVM, x);
-    lua_pushnumber(currentVM, y);
-    lua_pushnumber(currentVM, button);
+    lua_pushinteger(currentVM, x);
+    lua_pushinteger(currentVM, y);
+    lua_pushinteger(currentVM, button);
     lua_pcall(currentVM, 3, 0, 0);
     // printf("mouse_press(%d, %d, %d)\n", x, y, button);
 }
@@ -1375,9 +1375,9 @@ void callLuaMouseRelease(int x, int y, int button)
     }
 
     lua_getglobal(currentVM, "_mouser");
-    lua_pushnumber(currentVM, x);
-    lua_pushnumber(currentVM, y);
-    lua_pushnumber(currentVM, button);
+    lua_pushinteger(currentVM, x);
+    lua_pushinteger(currentVM, y);
+    lua_pushinteger(currentVM, button);
     lua_pcall(currentVM, 3, 0, 0);
     // printf("mouse_release(%d, %d, %d)\n", x, y, button);
 }
