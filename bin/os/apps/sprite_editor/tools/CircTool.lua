@@ -42,39 +42,53 @@ function CircTool:onMouseMove(drawArea, x, y)
 end
 
 function CircTool:drawCirc(drawArea, x1, y1, x2, y2)
-    -- Calculate center and radius based on bounding box
-    local cx = flr((x1 + x2) / 2)
-    local cy = flr((y1 + y2) / 2)
-    local radius = flr(math.min(math.abs(x2 - x1), math.abs(y2 - y1)) / 2)
+    local cursor1 = drawArea:getCursorPos(x1, y1)
+    local cursor2 = drawArea:getCursorPos(x2, y2)
+    self:drawCircLocal(drawArea, cursor1.x, cursor1.y, cursor2.x, cursor2.y)
+end
 
-    -- Ensure radius is at least 1 to avoid drawing nothing
-    if radius < 1 then
-        radius = 1
-    end
+function CircTool:drawCircLocal(drawArea, x1, y1, x2, y2)
+    local width = x2 - x1
+    local height = y2 - y1
+    local centerX = x1 + width / 2
+    local centerY = y1 + height / 2
+    local widthRadius = width / 2
+    local heightRadius = height / 2
 
-    -- Midpoint circle algorithm
-    local x = radius
-    local y = 0
-    local err = 0
-
-    while x >= y do
-        self:setPixel(drawArea, cx + x, cy + y)
-        self:setPixel(drawArea, cx + y, cy + x)
-        self:setPixel(drawArea, cx - y, cy + x)
-        self:setPixel(drawArea, cx - x, cy + y)
-        self:setPixel(drawArea, cx - x, cy - y)
-        self:setPixel(drawArea, cx - y, cy - x)
-        self:setPixel(drawArea, cx + y, cy - x)
-        self:setPixel(drawArea, cx + x, cy - y)
-
-        if err <= 0 then
-            y = y + 1
-            err = err + 2 * y + 1
+    for y = y1, y2 do
+        for x = x1, x2 do
+            local dx = (x - centerX) / widthRadius
+            local dy = (y - centerY) / heightRadius
+            if dx * dx + dy * dy <= 1 then
+                self:setLocalPixel(drawArea, x, y)
+            end
         end
+    end
+end
 
-        if err > 0 then
-            x = x - 1
-            err = err - 2 * x + 1
+function CircTool:drawCircLocal2(drawArea, x1, y1, x2, y2)
+    local dx, dy = x2 - x1, y2 - y1
+    local radius = flr(math.sqrt(dx * dx + dy * dy))
+    local x, y = radius, 0
+    local decisionOver2 = 1 - x;
+
+    while y <= x do
+        self:setLocalPixel(drawArea, x1 + radius + x, y1 + radius + y);
+        self:setLocalPixel(drawArea, x1 + radius + y, y1 + radius + x);
+        self:setLocalPixel(drawArea, x1 + radius - x, y1 + radius + y);
+        self:setLocalPixel(drawArea, x1 + radius - y, y1 + radius + x);
+
+        self:setLocalPixel(drawArea, x1 + radius - x, y1 + radius - y);
+        self:setLocalPixel(drawArea, x1 + radius - y, y1 + radius - x);
+        self:setLocalPixel(drawArea, x1 + radius + x, y1 + radius - y);
+        self:setLocalPixel(drawArea, x1 + radius + y, y1 + radius - x);
+
+        y = y + 1;
+        if decisionOver2 < 0 then
+            decisionOver2 = decisionOver2 + 2 * y + 1;
+        else
+            x = x - 1;
+            decisionOver2 = decisionOver2 + 2 * (y - x) + 1;
         end
     end
 end

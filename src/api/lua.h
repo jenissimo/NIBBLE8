@@ -82,6 +82,7 @@ static int l_note_on(lua_State *L);
 static int l_note_off(lua_State *L);
 static int l_update_synth(lua_State *L);
 static int l_update_filter(lua_State *L);
+static int l_set_note(lua_State *L);
 
 void callLuaFunction(const char* name);
 void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed);

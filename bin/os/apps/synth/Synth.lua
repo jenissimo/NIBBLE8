@@ -8,6 +8,7 @@ local Keyboard = require("os/apps/synth/Keyboard")
 local WaveSelector = require("os/apps/synth/WaveSelector")
 local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
 local HGroup = require("os/apps/synth/HGroup")
+local ToggleSwitch = require("os/apps/synth/ToggleSwitch")
 
 local uiManager
 local keyboard
@@ -25,13 +26,13 @@ local knobD
 local knobS
 local knobR
 
-local knobDE
-local knobBU
 local knobCO
-local knobLP
-local knobNO
-local knobRE
-local knobDA
+local knobRES
+
+local highPassSwitch
+local lowPassSwitch
+local bandPassSwitch
+local notchSwitch
 
 function Synth.new(x, y)
     local self = setmetatable({}, Synth)
@@ -59,7 +60,8 @@ function Synth.new(x, y)
 end
 
 function Synth:initADSR()
-    modsGroup = HGroup.new(self.x+34, self.y+4, "mods", 2, {5,6,5,10}, uiManager)
+    modsGroup = HGroup.new(self.x + 34, self.y + 4, "mods", 2, {5, 6, 5, 10},
+                           uiManager)
     knobA = Knob.new(0, 0, 4, 0, 1, 0, 8, "a", self.updateConfig)
     knobD = Knob.new(0, 0, 4, 0, 1, 0.5, 8, "d", self.updateConfig)
     knobS = Knob.new(0, 0, 4, 0, 1, 0.5, 8, "s", self.updateConfig)
@@ -72,53 +74,75 @@ function Synth:initADSR()
 end
 
 function Synth:initFilters()
-    filterGroup = HGroup.new(self.x+34, self.y+47, "filters", 2, {5,6,5,10}, uiManager)
+    filterGroup = HGroup.new(self.x + 34, self.y + 47, "filters", 2,
+                             {5, 6, 5, 10}, uiManager)
 
-    knobCO = Knob.new(0, 64, 4, 0, 1, 0, 8, "co",function() update_filter(0, knobCO.value) end)
-    knobLP = Knob.new(0, 64, 4, 0, 1, 0, 8, "lp",function() update_filter(1, knobLP.value) end)
-    knobDE = Knob.new(0, 64, 4, 0, 1, 0, 8, "de",function() update_filter(2, knobDE.value) end)
-    knobBU = Knob.new(0, 64, 4, 0, 1, 0, 8, "bu",function() update_filter(3, knobBU.value) end)
-    knobNO = Knob.new(0, 64, 4, 0, 1, 0, 8, "no",function() update_filter(4, knobNO.value) end)
-    knobRE = Knob.new(0, 64, 4, 0, 1, 0, 8, "re",function() update_filter(5, knobRE.value) end)
-    knobDA = Knob.new(0, 64, 4, 0, 1, 0, 8, "da",function() update_filter(6, knobDA.value) end)
+    knobCO = Knob.new(0, 64, 4, 0, 1, 0.5, 8, "co", self.invalidateFilter)
+    knobRES = Knob.new(0, 64, 4, 0, 1, 0.5, 8, "res", self.invalidateFilter)
+    highPassSwitch = ToggleSwitch.new(0, 0, 10, 10, false, "HP",
+                                      self.invalidateFilter)
+    lowPassSwitch = ToggleSwitch.new(0, 0, 10, 10, false, "LP",
+                                     self.invalidateFilter)
+    bandPassSwitch = ToggleSwitch.new(0, 0, 10, 10, false, "BP",
+                                      self.invalidateFilter)
+    notchSwitch = ToggleSwitch.new(0, 0, 10, 10, false, "NT",
+                                   self.invalidateFilter)
 
     filterGroup:addElement(knobCO)
-    filterGroup:addElement(knobLP)
-    filterGroup:addElement(knobDE)
-    filterGroup:addElement(knobBU)
-    filterGroup:addElement(knobNO)
-    filterGroup:addElement(knobRE)
-    filterGroup:addElement(knobDA)
+    filterGroup:addElement(knobRES)
+    filterGroup:addElement(highPassSwitch)
+    filterGroup:addElement(lowPassSwitch)
+    filterGroup:addElement(bandPassSwitch)
+    filterGroup:addElement(notchSwitch)
     uiManager:addElement(filterGroup)
 end
 
+function Synth.invalidateFilter()
+    -- Define the bit positions for each filter type
+    local LP_BIT = 1 -- 0001
+    local BP_BIT = 2 -- 0010
+    local HP_BIT = 4 -- 0100
+    local NT_BIT = 8 -- 1000
+
+    -- Initialize the mode variable
+    local mode = 0
+
+    -- Set the appropriate bits based on the toggle switch states
+    if highPassSwitch.state then mode = mode | HP_BIT end
+    if lowPassSwitch.state then mode = mode | LP_BIT end
+    if bandPassSwitch.state then mode = mode | BP_BIT end
+    if notchSwitch.state then mode = mode | NT_BIT end
+
+    -- Call the update_filter function with the bit field mode
+    update_filter(knobCO.value, knobRES.value, mode)
+    trace("update_filter")
+
+end
+
 function Synth:initWave()
-    waveGroup = HGroup.new(self.x+4, self.y+4, "wave", 2, {8,7,8,7}, uiManager)
+    waveGroup = HGroup.new(self.x + 4, self.y + 4, "wave", 2, {8, 7, 8, 7},
+                           uiManager)
     waveSelector = WaveSelector.new(0, 0, Synth.updateConfig)
     waveGroup:addElement(waveSelector)
     uiManager:addElement(waveGroup)
 end
 
-function Synth.init()
-     slef:updateConfig()
-end
+function Synth.init() self:updateConfig() end
 
 function Synth:update() uiManager:update() end
 
 function Synth.updateConfig()
     trace("update config")
-    trace("update_synth: ".."osc: "..(waveSelector.selectedTab - 1)..", a: "..knobA.value..", d: "..knobD.value..", s: "..knobS.value..", r: "..knobR.value, 1)
-    update_synth(waveSelector.selectedTab - 1, knobA.value, knobD.value, knobS.value, knobR.value, 1);
-    --update_synth(waveSelector.selectedTab, knobA.value, knobD.value, knobS.value, knobR.value, 1);
-    --void nibble_api_update_filter(uint8_t filter, double value);
+    keyboard.currentInstrument = waveSelector.selectedTab - 1
+    trace("update_synth: " .. "osc: " .. (waveSelector.selectedTab - 1) ..
+              ", a: " .. knobA.value .. ", d: " .. knobD.value .. ", s: " ..
+              knobS.value .. ", r: " .. knobR.value, 1)
+    update_synth(waveSelector.selectedTab - 1, knobA.value, knobD.value,
+                 knobS.value, knobR.value, 1);
 end
 
 function Synth:draw()
-    --cls()
     rectfill(self.x, self.y, 160, 112, 0)
-    -- rectfill(self.x, self.y, 160, 112, 0)
-    --self:drawGroup(4, 4, 28, 68, "wave")
-    --self:drawGroup(3 + 54, 4, 44, 26, "mods")
     uiManager:draw()
     self:drawPanel()
 end
@@ -181,6 +205,12 @@ end
 
 function Synth:keyup(key_code, ctrl_pressed, shift_pressed)
     uiManager:keyup(key_code, ctrl_pressed, shift_pressed)
+    if key_code == KEYCODE.KEY_LEFTBRACKET then
+        trace("left bracket")
+        Synth.prevOctave()
+    elseif key_code == KEYCODE.KEY_RIGHTBRACKET then
+        Synth.nextOctave()
+    end
 end
 
 return Synth

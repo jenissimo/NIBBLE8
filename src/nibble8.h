@@ -45,6 +45,8 @@
    4 special bytes: one encoding the editor mode and filter switch positions, one for the speed, and two for the
    loop parameters (start, end). (64 * 68 = 4,352 bytes.)
 */
+#define NIBBLE_SFX_COUNT            64
+#define NIBBLE_SFX_MAX_NOTES        32
 #define NIBBLE_SFX_SIZE             4352 // 64 music frames (0-63), each frame uses 4 bytes represents 4 channels
 
 #define NIBBLE_DRAW_STATE_SIZE      64

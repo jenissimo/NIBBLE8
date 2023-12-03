@@ -30,20 +30,45 @@ function _init()
     lastWindow = textEditor
     spriteEditor.init()
 
-    tabs = {
-        {width = 9, iconfn = draw_brackets_icon, window = textEditor},
-        {width = 7, iconfn = draw_alien_icon, window = spriteEditor},
-        {width = 7, iconfn = draw_map_icon, window = mapEditor},
-        --{width = 7, iconfn = draw_note_icon, window = musicTracker},
-        {width = 7, iconfn = draw_note_icon, window = synth}
-    }
+    tabs = {{
+        width = 9,
+        iconfn = draw_brackets_icon,
+        window = textEditor
+    }, {
+        width = 7,
+        iconfn = draw_alien_icon,
+        window = spriteEditor
+    }, {
+        width = 7,
+        iconfn = draw_map_icon,
+        window = mapEditor
+    }, {
+        width = 7,
+        iconfn = draw_note_icon,
+        window = musicTracker
+    }, {
+        width = 7,
+        iconfn = draw_note_icon,
+        window = synth
+    }}
 end
 
-function _update() currentWindow:update() end
+function _update()
+    currentWindow:update()
+end
 
 function _draw()
-    if (currentWindow ~= terminal) then drawPanel() end
-    currentWindow:draw()
+    if currentWindow.draw then
+        currentWindow:draw()
+    end
+
+    if (currentWindow ~= terminal) then
+        drawPanel()
+    end
+    
+    if currentWindow.drawPost then
+        currentWindow:drawPost()
+    end
 end
 
 function _key(key_code, ctrl_pressed, shift_pressed)
@@ -155,9 +180,13 @@ function _mousep(x, y, button)
     end
 end
 
-function _mouser(x, y, button) currentWindow:mouser(x, y, button) end
+function _mouser(x, y, button)
+    currentWindow:mouser(x, y, button)
+end
 
-function _mousem(x, y, button) currentWindow:mousem(x, y) end
+function _mousem(x, y, button)
+    currentWindow:mousem(x, y)
+end
 
 function editFile(file)
     local text = read_file(file)
@@ -202,7 +231,9 @@ function saveCart(path)
         trace("writing cart: " .. (path or currentCartPath))
         save_cart((path or currentCartPath), textEditor:getText())
 
-        if path ~= nil then currentCartPath = path end
+        if path ~= nil then
+            currentCartPath = path
+        end
     else
         trace("cart path is nil")
     end

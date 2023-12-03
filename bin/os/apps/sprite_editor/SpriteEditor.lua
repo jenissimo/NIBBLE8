@@ -106,7 +106,7 @@ function sprite_editor:update()
     uiManager:update()
 end
 
-function sprite_editor:draw()
+function sprite_editor:drawPost()
     rectfill(sprite_editor.x, sprite_editor.y, 79, 113, 1)
 
     if spriteSelector.selectedSprite > 99 then

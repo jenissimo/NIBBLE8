@@ -98,6 +98,7 @@ void initCoreAPI()
     registerFunction("note_off", l_note_off);
     registerFunction("update_synth", l_update_synth);
     registerFunction("update_filter", l_update_filter);
+    registerFunction("set_note", l_set_note);
 
     // Load Custom Libs
     luaL_dostring(currentVM, "package.path = package.path .. \";lib/?.lua\" .. \";os/?.lua\"");
@@ -227,6 +228,7 @@ void closeLuaApp()
 
 void registerFunction(const char *name, lua_CFunction func)
 {
+    //printf("%s\n", name);
     lua_pushcfunction(currentVM, func);
     lua_setglobal(currentVM, name);
 }
@@ -1233,8 +1235,9 @@ static int l_note_on(lua_State *L)
     {
         uint8_t note = (int)lua_tonumber(L, 1);
         uint8_t octave = (int)lua_tonumber(L, 2);
-        nibble_api_note_on(note, octave);
-        // printf("note_on(%d, %d)\n", note, octave);
+        uint8_t instrument = (int)lua_tonumber(L, 3);
+        nibble_api_note_on(note, octave, instrument);
+        printf("note_on(%d, %d, %d)\n", note, octave, instrument);
         return 0;
     }
 
@@ -1248,6 +1251,26 @@ static int l_note_off(lua_State *L)
     nibble_api_note_off();
 
     return 0;
+}
+
+static int l_set_note(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 6)
+    {
+        uint8_t sfx_index = (int)lua_tonumber(L, 1);
+        uint8_t note_index = (int)lua_tonumber(L, 2);
+        uint8_t pitch = (int)lua_tonumber(L, 3);
+        uint8_t instrument = (int)lua_tonumber(L, 4);
+        uint8_t volume = (int)lua_tonumber(L, 5);
+        uint8_t effect = (int)lua_tonumber(L, 6);
+
+        nibble_api_set_note(sfx_index, note_index, pitch, instrument, volume, effect);
+        //printf("set_note(%d, %d, %d, %d, %d, %d)\n", sfx_index, note_index, pitch, instrument, volume, effect);
+
+        return 0;
+    }
 }
 
 static int l_update_synth(lua_State *L)
@@ -1273,11 +1296,13 @@ static int l_update_filter(lua_State *L)
 {
     int top = lua_gettop(L);
 
-    if (top >= 2)
+    if (top >= 3)
     {
-        uint8_t filter = (int)lua_tonumber(L, 1);
-        double value = (double)lua_tonumber(L, 2);
-        nibble_api_update_filter(filter, value);
+        float cutoff = (float)lua_tonumber(L, 1);
+        float resonance = (float)lua_tonumber(L, 2);
+        int16_t mode = (int16_t)lua_tonumber(L, 3);
+        printf("update_filter(%f, %f, %d)\n", cutoff, resonance, mode);
+        nibble_api_update_filter(cutoff, resonance, mode);
         return 0;
     }
 

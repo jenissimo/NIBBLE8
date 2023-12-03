@@ -37,9 +37,9 @@ function Tool:initPixels(drawArea)
     end
 end
 
-function Tool:isCursorInBounds(drawArea, cursor)
+function Tool:isInBounds(drawArea, x, y)
     local sprSize = drawArea:getSpriteSize()
-    if cursor.x < 0 or cursor.x >= sprSize or cursor.y < 0 or cursor.y >= sprSize then
+    if x < 0 or x >= sprSize or y < 0 or y >= sprSize then
         return false
     end
     return true
@@ -47,9 +47,16 @@ end
 
 function Tool:setPixel(drawArea, x, y)
     local cursor = drawArea:getCursorPos(x, y)
-    if self:isCursorInBounds(drawArea, cursor) then
+    if self:isInBounds(drawArea, cursor.x, cursor.y) then
         drawArea:setPixel(x, y)
         self.newPixels[cursor.y + 1][cursor.x + 1] = drawArea:getPixel(x, y)
+    end
+end
+
+function Tool:setLocalPixel(drawArea, x, y)
+    if self:isInBounds(drawArea, x, y) then
+        drawArea:setPixelLocal(x, y)
+        self.newPixels[y + 1][x + 1] = drawArea:getPixelLocal(x, y)
     end
 end
 

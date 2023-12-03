@@ -9,6 +9,7 @@ function Keyboard.new(x, y, octaves)
     local self = setmetatable(UIElement.new(x, y,
                                             4 * 7 * octaves + 7 * octaves + 3,
                                             21), Keyboard)
+    self.currentInstrument = 0
     self.octaves = octaves
     self.currentOctave = 1
     self.minOctave = 0
@@ -61,10 +62,10 @@ end
 function Keyboard:key(key_code, ctrl_pressed, shift_pressed)
     local key = KeyboardUtils.keyboardToPiano[key_code]
     if key and key ~= self.pressed_key then
-        --trace(key)
+        -- trace(key)
         self.pressed_key = key
         local octave = self.currentOctave + flr(key / 12) + 2
-        note_on(key % 12, octave)
+        note_on(key % 12, octave - 1, self.currentInstrument)
     end
 end
 
@@ -72,7 +73,6 @@ function Keyboard:keyup(key_code, ctrl_pressed, shift_pressed)
     local key = KeyboardUtils.keyboardToPiano[key_code]
     if key and key == self.pressed_key then
         self.pressed_key = nil
-        --trace(key)
         note_off()
     end
 end

@@ -5,24 +5,25 @@
 #include <string.h>
 #include "../nibble8.h"
 
-typedef struct DrawState {
+typedef struct DrawState
+{
     uint8_t drawPaletteMap[4];
-	uint8_t screenPaletteMap[4];
+    uint8_t screenPaletteMap[4];
 
     uint8_t clip_xb;
-	uint8_t clip_yb;
-	uint8_t clip_xe;
-	uint8_t clip_ye;
+    uint8_t clip_yb;
+    uint8_t clip_xe;
+    uint8_t clip_ye;
 
     uint8_t unknown05f24;
 
     uint8_t color;
 
     uint8_t text_x;
-	uint8_t text_y;
+    uint8_t text_y;
 
     int16_t camera_x;
-	int16_t camera_y;
+    int16_t camera_y;
 
     uint8_t drawMode;
 
@@ -42,7 +43,7 @@ typedef struct DrawState {
 
     uint8_t lineInvalid;
 
-    //hardware extension
+    // hardware extension
     uint8_t unknown05f36;
     uint8_t unknown05f37;
 
@@ -67,15 +68,32 @@ typedef struct MemoryLayout
     uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
 } MemoryLayout;
 
+typedef struct Note
+{
+    uint8_t custom : 1;     // note height (0-1)
+    uint8_t pitch : 6;     // note height (0-63)
+    uint8_t instrument : 3; // instrument index (0-7)
+    uint8_t volume : 3;     // note volume (0-7)
+    uint8_t effect : 3;     // effect index (0-7)
+} Note;
+
+typedef struct SFX
+{
+    uint8_t noteDuration;             // Note duration (0-255)
+    uint8_t loopStart;                // Loop start (0-63)
+    uint8_t loopEnd;                  // Loop end (0-63)
+    Note notes[NIBBLE_SFX_MAX_NOTES]; // Array of notes for this SFX
+} SFX;
+
 typedef union
 {
-    struct 
+    struct
     {
         uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
         uint8_t mapData[NIBBLE_MAP_SIZE];
         uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
         uint8_t musicData[NIBBLE_MUSIC_SIZE];
-        uint8_t sfxData[NIBBLE_SFX_SIZE];
+        SFX sfxData[NIBBLE_SFX_COUNT];
         DrawState drawState;
         uint8_t hardwareState[NIBBLE_HARDWARE_STATE_SIZE];
         uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
@@ -86,7 +104,6 @@ typedef union
 extern Memory memory;
 extern uint8_t *userLuaCode;
 extern uint8_t *clipboard;
-
 
 void initRAM(void);
 void saveMemoryLayout();

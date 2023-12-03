@@ -35,6 +35,11 @@ int nibble_api_ceil(double x)
     return (int)ceil(x);
 }
 
+int nibble_api_sqrt(int x)
+{
+    return (int)sqrt(x);
+}
+
 double nibble_api_time(void)
 {
     return ((double)(end_t - begin_t) / CLOCKS_PER_SEC) * 10;

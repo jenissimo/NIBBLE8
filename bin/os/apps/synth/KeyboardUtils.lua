@@ -2,9 +2,10 @@ local KeyboardUtils = {}
 
 KeyboardUtils.keys = {
     {'white', 0}, {'black', 1}, {'white', 2}, {'black', 3}, {'white', 4},
-    {'white', 5}, {'black', 6}, {'white', 7}, {'black', 8}, {'white', 9}, {'black', 10}, {'white', 11},
-    {'white', 12}, {'black', 13}, {'white', 14}, {'black', 15}, {'white', 16},
-    {'white', 17}, {'black', 18}, {'white', 19}, {'black', 20}, {'white', 21}, {'black', 22}, {'white', 23}
+    {'white', 5}, {'black', 6}, {'white', 7}, {'black', 8}, {'white', 9},
+    {'black', 10}, {'white', 11}, {'white', 12}, {'black', 13}, {'white', 14},
+    {'black', 15}, {'white', 16}, {'white', 17}, {'black', 18}, {'white', 19},
+    {'black', 20}, {'white', 21}, {'black', 22}, {'white', 23}
 }
 
 --
@@ -35,17 +36,25 @@ KeyboardUtils.keyboardToPiano = {
     [KEYCODE.KEY_6] = KeyboardUtils.keys[21][2],
     [KEYCODE.KEY_Y] = KeyboardUtils.keys[22][2],
     [KEYCODE.KEY_7] = KeyboardUtils.keys[23][2],
-    [KEYCODE.KEY_U] = KeyboardUtils.keys[24][2],
+    [KEYCODE.KEY_U] = KeyboardUtils.keys[24][2]
+}
+
+KeyboardUtils.noteNames = {
+    "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"
 }
 
 function KeyboardUtils.keyNumberToNoteName(keyNumber, octave)
-    local noteNames = {
-        "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"
-    }
-    local octaveOffset = math.floor(keyNumber / 12)
     local noteIndex = (keyNumber % 12) + 1
-    local noteName = noteNames[noteIndex]
-    return noteName .. (octave + octaveOffset)
+    local noteName = KeyboardUtils.noteNames[noteIndex]
+    if octave ~= nil then
+        local octaveOffset = math.floor(keyNumber / 12)
+        return noteName .. (octave + octaveOffset)
+    end
+    return noteName
+end
+
+function KeyboardUtils.keyCodeToPiano(key_code)
+    return (KeyboardUtils.keyboardToPiano[key_code] % 12) + 1
 end
 
 return KeyboardUtils

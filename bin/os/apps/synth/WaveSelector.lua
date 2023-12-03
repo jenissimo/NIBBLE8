@@ -4,7 +4,7 @@ local WaveSelector = setmetatable({}, UIElement)
 WaveSelector.__index = WaveSelector
 
 function WaveSelector.new(x, y, change_callback)
-    local tabsCount = 7
+    local tabsCount = 8
     local tabSpacing = 2
 
     local self = setmetatable(UIElement.new(x, y, 12, 8 * tabsCount +
@@ -19,7 +19,8 @@ function WaveSelector.new(x, y, change_callback)
         {name = "square", draw_fn = self.draw_square},
         {name = "pulse", draw_fn = self.draw_pulse},
         {name = "noise", draw_fn = self.draw_noise},
-        {name = "sine", draw_fn = self.draw_sine}
+        {name = "sine", draw_fn = self.draw_sine},
+        {name = "dark synth", draw_fn = self.draw_sine}
     }
     self.change_callback = change_callback
 

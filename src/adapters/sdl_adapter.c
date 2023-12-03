@@ -1,5 +1,5 @@
 #include "sdl_adapter.h"
-#include "../hardware/audio/synth.h"
+#include "../hardware/audio.h"
 #include "../hardware/video.h"
 #include "../hardware/palette_manager.h"
 #include "../hardware/input.h"
@@ -39,9 +39,8 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 {
     int16_t *audioStream = (int16_t *)stream;
     int audioLength = len / sizeof(int16_t);
-    ;
 
-    synth_update(&synthState, audioBuffer, audioLength);
+    nibble_audio_update(audioBuffer, audioLength);
     memcpy(audioStream, audioBuffer, len);
 }
 
@@ -66,9 +65,6 @@ int nibble_sdl_init()
         return 1;
     }
 
-    // Initialize synth and audio
-    synth_init(&synthState);
-
     // Open the audio device
     SDL_AudioSpec desired_spec, obtained_spec;
 
@@ -85,6 +81,8 @@ int nibble_sdl_init()
         return 1;
     }
 
+    memset(audioBuffer, 0, sizeof(audioBuffer));  // Empty our audio buffer
+    SDL_Delay(50);  // Add a short delay, say 50ms
     // Start audio playback
     SDL_PauseAudio(0);
 
