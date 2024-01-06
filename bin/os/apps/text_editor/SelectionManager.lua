@@ -42,6 +42,10 @@ function SelectionManager:selectText(textEditor)
         dirY = -1
     elseif key(KEYCODE.KEY_DOWN) == 1 then
         dirY = 1
+    elseif key(KEYCODE.KEY_HOME) == 1 then
+        dirX = -1
+    elseif key(KEYCODE.KEY_END) == 1 then
+        dirX = 1        
     end
 
     if dirX ~= 0 or dirY ~= 0 then
@@ -54,9 +58,9 @@ function SelectionManager:selectText(textEditor)
     end
 
     -- trace cursor pos
-    trace("x: " .. textEditor.cursor.x .. " y: " .. textEditor.cursor.y)
-    trace("x1: " .. textEditor.selection.x1 .. " x2: " .. textEditor.selection.x2)
-    trace("y1: " .. textEditor.selection.y1 .. " y2: " .. textEditor.selection.y2)
+    --trace("x: " .. textEditor.cursor.x .. " y: " .. textEditor.cursor.y)
+    --trace("x1: " .. textEditor.selection.x1 .. " x2: " .. textEditor.selection.x2)
+    --trace("y1: " .. textEditor.selection.y1 .. " y2: " .. textEditor.selection.y2)
 
     if textEditor.selection.x2 < 0 or textEditor.selection.y2 < 0 then
         self:clearSelection(textEditor)

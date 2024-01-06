@@ -1,19 +1,8 @@
 #include "utils.h"
+#include "../nibble8.h"
 
 #define TAU 6.2831853071795864769252867665590057683936
-clock_t begin_t;
-clock_t end_t;
-
-void init_clock()
-{
-    begin_t = clock();
-    end_t = clock();
-}
-
-void tick_clock()
-{
-    end_t = clock();
-}
+int nibble_frame_count = 0;
 
 double nibble_api_rnd(int x)
 {
@@ -42,7 +31,7 @@ int nibble_api_sqrt(int x)
 
 double nibble_api_time(void)
 {
-    return ((double)(end_t - begin_t) / CLOCKS_PER_SEC) * 10;
+    return (double)nibble_frame_count / (double)NIBBLE_FPS;
 }
 
 char *nibble_api_sub(char *str, int start, int end)

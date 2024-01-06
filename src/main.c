@@ -15,9 +15,9 @@ int run = 1;
 
 int main(int argc, char *argv[])
 {
-    uint32_t now_time;
-    uint32_t frame_time;
-    uint32_t last_time;
+    uint32_t now_time = 0;
+    uint32_t frame_time = 0;
+    uint32_t last_time = 0;
     uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
     printf("Welcome to NIBBLE-8!\n");
@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
     initVideo();
     initLua();
     nibble_sdl_init();
-    init_clock();
 
     next_time = SDL_GetTicks() + NIBBLE_FPS;
 
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i], "--debug") == 0)
         {
             debug_init("nibble8.log");
-            debug_log("Debug mode enabled.\n");
+            DEBUG_LOG("Debug mode enabled.\n");
         }
         else if (strcmp(argv[i], "--fullscreen") == 0)
         {
@@ -79,7 +78,7 @@ int main(int argc, char *argv[])
             }
             next_time += NIBBLE_FPS;
         }
-        tick_clock();
+        nibble_frame_count++;
     }
 
     destroyLua();

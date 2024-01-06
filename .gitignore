@@ -42,6 +42,9 @@
 *.idb
 *.pdb
 
+# Mac files
+*.DS_Store
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd
@@ -51,4 +54,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 bin/nibble8
-src/.DS_Store
+bin/nibble8.exe
+bin/font2bin
+bin/font2bin.exe

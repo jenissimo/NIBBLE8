@@ -67,6 +67,9 @@
         "__verbose_abort": "c",
         "stdint.h": "c",
         "audio.h": "c",
-        "synth.h": "c"
+        "synth.h": "c",
+        "utils.h": "c",
+        "debug.h": "c",
+        "nibble8.h": "c"
     }
 }

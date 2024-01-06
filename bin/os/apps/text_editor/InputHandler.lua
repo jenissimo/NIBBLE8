@@ -91,10 +91,12 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
         textEditor:moveCursor(0, rows_on_screen)
         return
     elseif (key_code == KEYCODE.KEY_HOME) then
+        trace("HOME")
         textEditor.selecting = shift_pressed
         textEditor:homeCursor()
         return
     elseif (key_code == KEYCODE.KEY_END) then
+        trace("END")
         textEditor.selecting = shift_pressed
         textEditor:endCursor()
         return
@@ -123,7 +125,7 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
     -- Check for delete
     if (key_code == KEYCODE.KEY_DELETE) then
         trace("Delete!")
-        if selection.x1 == nil then
+        if textEditor.selection.x1 == nil then
             textEditor:removeChar(1, textEditor.cursor.x, textEditor.cursor.y)
         else
             textEditor:removeSelectedText()

@@ -49,7 +49,7 @@ int nibble_sdl_init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        debug_log("SDL Initialization failed: %s", SDL_GetError());
+        DEBUG_LOG("SDL Initialization failed: %s", SDL_GetError());
         printf("Can't init: %s\n", SDL_GetError());
         system("pause");
         return 1;
@@ -79,7 +79,7 @@ int nibble_sdl_init()
 
     if (SDL_OpenAudio(&desired_spec, &obtained_spec) < 0)
     {
-        debug_log("Failed to open audio device: %s", SDL_GetError());
+        DEBUG_LOG("Failed to open audio device: %s", SDL_GetError());
         fprintf(stderr, "Failed to open audio device: %s\n", SDL_GetError());
         return 1;
     }
@@ -89,13 +89,14 @@ int nibble_sdl_init()
     // Start audio playback
     SDL_PauseAudio(0);
 
-    debug_log("SDL Initialized");
+    DEBUG_LOG("SDL Initialized");
 
     // Init iunput
     nibble_clear_keys();
     // init clipboard functions
     getClipboardText = SDL_GetClipboardText;
     setClipboardText = SDL_SetClipboardText;
+    freeClipboardText = SDL_free;
 
     screen = SDL_GetWindowSurface(window);
 

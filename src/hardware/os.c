@@ -2,6 +2,7 @@
 
 GetClipboardTextFunc getClipboardText;
 GetClipboardTextFunc setClipboardText;
+FreeClipboardTextFunc freeClipboardText;
 
 char *nibble_api_ls(char *path)
 {
@@ -116,7 +117,7 @@ ErrorCode nibble_api_load_cart(char *path)
     //printf("Loading cart from %s\n", path);
 
     // TODO: make error check here also
-    load_file_from_zip(path, "app.lua", (void **)&luaCode);
+    load_text_from_zip(path, "app.lua", (void **)&luaCode);
     load_file_from_zip(path, "spritesheet.png", (void **)&png_data);
     userLuaCode = luaCode;
     read_and_convert_png_from_buffer(memory.spriteSheetData, png_data, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
@@ -236,19 +237,14 @@ int nibble_api_save_cart(char *path, char *luaCode)
     return 0;
 }
 
-void load_file_from_zip(const char *zip_filename, const char *file_to_load, void **buffer)
+bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, void **buffer, size_t *buffer_size)
 {
-    mz_bool status;
     mz_zip_archive zip_archive;
-    mz_zip_archive_file_stat file_stat;
-
     memset(&zip_archive, 0, sizeof(zip_archive));
-
-    status = mz_zip_reader_init_file(&zip_archive, zip_filename, 0);
-    if (!status)
+    if (!mz_zip_reader_init_file(&zip_archive, zip_filename, 0))
     {
         printf("Failed to initialize zip reader for %s\n", zip_filename);
-        return;
+        return false;
     }
 
     int file_index = mz_zip_reader_locate_file(&zip_archive, file_to_load, NULL, 0);
@@ -256,25 +252,59 @@ void load_file_from_zip(const char *zip_filename, const char *file_to_load, void
     {
         printf("Failed to locate %s in %s\n", file_to_load, zip_filename);
         mz_zip_reader_end(&zip_archive);
-        return;
+        return false;
     }
 
-    if (!mz_zip_reader_file_stat(&zip_archive, 0, &file_stat))
+    mz_zip_archive_file_stat file_stat;
+    if (!mz_zip_reader_file_stat(&zip_archive, file_index, &file_stat))
     {
         printf("Zip file read error %s in %s\n", file_to_load, zip_filename);
         mz_zip_reader_end(&zip_archive);
-        return;
+        return false;
     }
 
     *buffer = mz_zip_reader_extract_file_to_heap(&zip_archive, file_to_load, &file_stat.m_uncomp_size, 0);
-    if (*buffer == NULL)
+    if (buffer_size) *buffer_size = file_stat.m_uncomp_size;
+
+    mz_zip_reader_end(&zip_archive);
+    return (*buffer != NULL);
+}
+
+void load_file_from_zip(const char *zip_filename, const char *file_to_load, void **buffer)
+{
+    size_t buffer_size;
+    if (extract_file_to_buffer(zip_filename, file_to_load, buffer, &buffer_size))
     {
-        printf("Failed to load %s into memory\n", file_to_load);
+        printf("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
     }
     else
     {
-        printf("%s loaded into memory successfully %d bytes\n", file_to_load, file_stat.m_uncomp_size);
+        printf("Failed to load %s into memory\n", file_to_load);
     }
+}
 
-    mz_zip_reader_end(&zip_archive);
+void load_text_from_zip(const char *zip_filename, const char *file_to_load, char **buffer)
+{
+    size_t buffer_size;
+    if (extract_file_to_buffer(zip_filename, file_to_load, (void**)buffer, &buffer_size))
+    {
+        char *textBuffer = malloc(buffer_size + 1);
+        if (textBuffer)
+        {
+            memcpy(textBuffer, *buffer, buffer_size);
+            textBuffer[buffer_size] = '\0';
+            mz_free(*buffer);
+            *buffer = textBuffer;
+            printf("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
+        }
+        else
+        {
+            printf("Failed to allocate memory for %s\n", file_to_load);
+            mz_free(*buffer);
+        }
+    }
+    else
+    {
+        printf("Failed to load %s into memory\n", file_to_load);
+    }
 }

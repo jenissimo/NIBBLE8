@@ -5,6 +5,8 @@
 #include <math.h>
 #include <memory.h>
 
+#include "../nibble8.h"
+#include "../debug/debug.h"
 #include "png.h"
 
 int find_closest_palette_index(const Palette *palette, uint8_t gray_value)
@@ -40,11 +42,12 @@ void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targ
    png_structp png_ptr;
    png_infop info_ptr;
 
-    printf("First 8 bytes in hex: ");
-    for (int i = 0; i < 8; i++) {
-        printf("%c", png_data[i]);
-    }
-    printf("\n");
+   printf("First 8 bytes in hex: ");
+   for (int i = 0; i < 8; i++)
+   {
+      printf("%c", png_data[i]);
+   }
+   printf("\n");
 
    if (png_sig_cmp(png_data, 0, 8))
    {
@@ -93,10 +96,30 @@ void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targ
    png_set_packing(png_ptr);
    png_read_update_info(png_ptr, info_ptr);
 
+   // Allocate memory for row pointers and ensure proper freeing
    png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
+   if (!row_pointers)
+   {
+      DEBUG_LOG("Failed to allocate memory for row pointers");
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return;
+   }
+
    for (int i = 0; i < height; i++)
    {
       row_pointers[i] = (png_byte *)malloc(png_get_rowbytes(png_ptr, info_ptr));
+      if (!row_pointers[i])
+      {
+         DEBUG_LOG("Failed to allocate memory for row %d", i);
+         // Free previously allocated rows before returning
+         for (int j = 0; j < i; j++)
+         {
+            free(row_pointers[j]);
+         }
+         free(row_pointers);
+         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+         return;
+      }
    }
 
    png_read_image(png_ptr, row_pointers);
@@ -135,12 +158,12 @@ void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targ
    // Free the grayscale_pixels array and row_pointers
    free(grayscale_pixels);
 
+   // Free allocated memory
    for (int i = 0; i < height; i++)
    {
       free(row_pointers[i]);
    }
    free(row_pointers);
-
    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 }
 
@@ -182,28 +205,28 @@ png_memory_write_state get_indexed_png(uint8_t *pixels, int width, int height, c
    // png_init_io(png_ptr, file);
 
    png_set_IHDR(png_ptr, info_ptr, width, height,
-                2, // Bit depth: 2 bits for a 2-bit indexed image
+                NIBBLE_BPP, // Bit depth: 2 bits for a 2-bit indexed image
                 PNG_COLOR_TYPE_PALETTE,
                 PNG_INTERLACE_NONE,
                 PNG_COMPRESSION_TYPE_DEFAULT,
                 PNG_FILTER_TYPE_DEFAULT);
 
-   png_color png_palette[4];
-   for (int i = 0; i < 4; i++)
+   png_color png_palette[NIBBLE_PALETTE_SIZE];
+   for (int i = 0; i < NIBBLE_PALETTE_SIZE; i++)
    {
       png_palette[i].red = palette->color[i][0];
       png_palette[i].green = palette->color[i][1];
       png_palette[i].blue = palette->color[i][2];
    }
 
-   png_set_PLTE(png_ptr, info_ptr, png_palette, 4);
+   png_set_PLTE(png_ptr, info_ptr, png_palette, NIBBLE_PALETTE_SIZE);
 
    png_set_write_fn(png_ptr, &state, png_write_callback, NULL);
    png_set_compression_level(png_ptr, Z_BEST_COMPRESSION);
 
    png_write_info(png_ptr, info_ptr);
 
-   int row_bytes = width / 4;
+   int row_bytes = width / NIBBLE_PALETTE_SIZE;
    png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
 
    for (int i = 0; i < height; i++)
@@ -222,55 +245,18 @@ png_memory_write_state get_indexed_png(uint8_t *pixels, int width, int height, c
 
 void write_indexed_png(const char *filename, uint8_t *pixels, int width, int height, const Palette *palette)
 {
+   png_memory_write_state state = get_indexed_png(pixels, width, height, palette);
+
+   // Write the PNG data from the memory buffer to the file
    FILE *file = fopen(filename, "wb");
    if (!file)
    {
-      printf("Error: Unable to open file '%s' for writing.\n", filename);
+      DEBUG_LOG("Failed to open file '%s'", filename);
+      free(state.data);
       return;
    }
 
-   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-   png_infop info_ptr = png_create_info_struct(png_ptr);
-   if (setjmp(png_jmpbuf(png_ptr)))
-   {
-      printf("Error: Failed to create PNG write and info structs.\n");
-      fclose(file);
-      return;
-   }
-
-   png_init_io(png_ptr, file);
-
-   png_set_IHDR(png_ptr, info_ptr, width, height,
-                2, // Bit depth: 2 bits for a 2-bit indexed image
-                PNG_COLOR_TYPE_PALETTE,
-                PNG_INTERLACE_NONE,
-                PNG_COMPRESSION_TYPE_DEFAULT,
-                PNG_FILTER_TYPE_DEFAULT);
-
-   png_color png_palette[4];
-   for (int i = 0; i < 4; i++)
-   {
-      png_palette[i].red = palette->color[i][0];
-      png_palette[i].green = palette->color[i][1];
-      png_palette[i].blue = palette->color[i][2];
-   }
-
-   png_set_PLTE(png_ptr, info_ptr, png_palette, 4);
-
-   png_write_info(png_ptr, info_ptr);
-
-   int row_bytes = width / 4;
-   png_bytep *row_pointers = (png_bytep *)malloc(sizeof(png_bytep) * height);
-
-   for (int i = 0; i < height; i++)
-   {
-      row_pointers[i] = pixels + i * row_bytes;
-   }
-
-   png_write_image(png_ptr, row_pointers);
-   png_write_end(png_ptr, NULL);
-
-   free(row_pointers);
-   png_destroy_write_struct(&png_ptr, &info_ptr);
+   fwrite(state.data, 1, state.size, file);
    fclose(file);
+   free(state.data);
 }

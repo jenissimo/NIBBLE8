@@ -147,6 +147,7 @@ function TextManipulation:removeSelectedText(textEditor)
     end
 
     textEditor:adjustCursorPositionAndScroll(startX, startY)
+    trace("Cursor moved to " .. textEditor.cursor.x .. "," .. textEditor.cursor.y)
     textEditor:clearSelection()
     textEditor.syntax_highlighting_dirty = true
 end

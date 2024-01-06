@@ -1123,9 +1123,9 @@ static int l_get_clipboard_text(lua_State *L)
     int top = lua_gettop(L);
 
     char *result = nibble_api_get_clipboard_text();
-    //printf("get_clipboard_text() = %s\n", result);
+    printf("get_clipboard_text() = %s\n", result);
     lua_pushstring(L, result);
-    free(result);
+    freeClipboardText(result);
     return 1;
 }
 

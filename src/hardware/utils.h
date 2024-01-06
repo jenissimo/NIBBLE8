@@ -10,11 +10,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-extern clock_t begin_t;
-extern clock_t end_t;
-
-void init_clock(void);
-void tick_clock(void);
+extern int nibble_frame_count;
 
 double nibble_api_rnd(int x);
 char nibble_api_chr(int x);

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdint.h>
-#include "src/nibble8.h"
+#include "../src/nibble8.h"
 #include <png.h>
-#include "src/utils/png.h"
+#include "../src/utils/png.h"
 
 #define FONT_SIZE 128 * 128
 
@@ -12,6 +12,7 @@ uint8_t *font_compressed;
 void load_font(char *file_name);
 void compress_font();
 void write_font(char *file_name);
+unsigned int getBitPixel(png_structp png_ptr, png_infop info_ptr, png_bytep row, png_uint_32 x);
 
 int main(int argc, char *argv[])
 {
@@ -19,14 +20,19 @@ int main(int argc, char *argv[])
     {
         font_raw = (uint8_t *)malloc(sizeof(uint8_t) * FONT_SIZE);
         font_compressed = (uint8_t *)malloc(sizeof(uint8_t) * FONT_SIZE_COMPRESSED);
+        printf("Font size: %d\n", FONT_SIZE);
         load_font(argv[1]);
+        printf("Compressing font...\n");
         compress_font();
+        printf("Writing font...\n");
         write_font(argv[2]);
+        printf("Done.\n");
     }
     else
     {
         fprintf(stderr, "font2bin: usage: font2bin [font.png] [font.bin]\n");
     }
+    return 0;
 }
 
 void load_font(char *file_name)
@@ -54,10 +60,8 @@ void load_font(char *file_name)
 
                     png_init_io(png_ptr, f);
                     png_read_info(png_ptr, info_ptr);
-
                     row = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
                                                                info_ptr));
-
                     row_tmp = row;
 
                     if (png_get_IHDR(png_ptr, info_ptr, &width, &height,
@@ -115,8 +119,8 @@ void load_font(char *file_name)
                                 {
                                     unsigned int pixel = getBitPixel(png_ptr, info_ptr, row_tmp, ppx);
                                     font_raw[pixelIndex++] = pixel > 0 ? 1 : 0;
-                                    //printf("%d", font_raw[pixelIndex]);
-                                    //pixelIndex++;
+                                    // printf("%d", font_raw[pixelIndex]);
+                                    // pixelIndex++;
                                 }
                             } /* y loop */
                         }     /* pass loop */
@@ -162,6 +166,33 @@ uint8_t get_pixel(int x, int y)
 {
     int pixelIndex = y * 128 + x;
     return font_raw[pixelIndex];
+}
+
+unsigned int getBitPixel(png_structp png_ptr, png_infop info_ptr, png_bytep row, png_uint_32 x)
+{
+    int color_type = png_get_color_type(png_ptr, info_ptr);
+    int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+
+    if (color_type == PNG_COLOR_TYPE_GRAY)
+    {
+        if (bit_depth == 8)
+        {
+            return row[x]; // For 8-bit grayscale images
+        }
+        else if (bit_depth == 16)
+        {
+            // For 16-bit grayscale images, assuming little endian
+            return row[x * 2] | (row[x * 2 + 1] << 8);
+        }
+        // Add handling for other bit depths if necessary
+    }
+    else
+    {
+        // Add handling for other color types if necessary (e.g., PNG_COLOR_TYPE_RGB)
+    }
+
+    // Return a default value if the desired pixel cannot be extracted
+    return 0;
 }
 
 void compress_font()
@@ -215,6 +246,7 @@ void write_font(char *file_name)
     {
         print_char(i);
     }
+    printf("font size: %d\n", FONT_SIZE_COMPRESSED);
     write_ptr = fopen(file_name, "wb");
     fwrite(font_compressed, sizeof(uint8_t), FONT_SIZE_COMPRESSED, write_ptr);
 }
