@@ -952,8 +952,18 @@ static int l_ls(lua_State *L)
 {
     int top = lua_gettop(L);
 
-    char *result = nibble_api_ls(NULL);
-    // printf("lst(%s) = %s
+    char *result;
+    if (top >= 1)
+    {
+        char *path = lua_tostring(L, 1);
+        result = nibble_api_ls(lua_tostring(L, 1));
+        //printf("ls(%s) = %s\n", path, result);
+    }
+    else
+    {
+        result = nibble_api_ls(NULL);
+        //printf("ls() = %s\n", result);
+    }
     lua_pushstring(L, result);
     free(result);
     return 1;

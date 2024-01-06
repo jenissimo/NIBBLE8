@@ -13,16 +13,14 @@ local KEYWORDS = {
     "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
     "palt", "spr", "sspr", "fset", "mget", "mset", "peek", "poke", "peek4",
     "poke4", "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line",
-    "flr", "sin", "cos", "rnd", "t", "time"
+    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs"
 }
 local TERMINATORS = {
     "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",
     " "
 }
 
-function SyntaxHighlighter:clearColors()
-    self.colors = {}
-end
+function SyntaxHighlighter:clearColors() self.colors = {} end
 
 function SyntaxHighlighter:setColor(lineIndex, index, color)
     if self.colors[lineIndex] == nil then self.colors[lineIndex] = {} end
@@ -69,7 +67,9 @@ function SyntaxHighlighter:match(line, index, values, terminateValues)
     return nil
 end
 
-function SyntaxHighlighter:isWordCharacter(char) return char and char:match("[%w_]") end
+function SyntaxHighlighter:isWordCharacter(char)
+    return char and char:match("[%w_]")
+end
 
 function SyntaxHighlighter:isNumber(char, prevChar)
     -- Check if the character is a digit, but not part of a variable name
@@ -84,7 +84,8 @@ function SyntaxHighlighter:isNumber(char, prevChar)
     return false
 end
 
-function SyntaxHighlighter:highlightString(line, lineIndex, startIndex, quoteType)
+function SyntaxHighlighter:highlightString(line, lineIndex, startIndex,
+                                           quoteType)
     local i = startIndex
     repeat
         SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
@@ -99,7 +100,7 @@ function SyntaxHighlighter:highlightComment(line, lineIndex, startIndex)
     for i = startIndex, #line do
         SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.COMMENT)
     end
-    return #line + 1  -- Move to the end of the line
+    return #line + 1 -- Move to the end of the line
 end
 
 function SyntaxHighlighter:highlightKeyword(line, lineIndex, startIndex)

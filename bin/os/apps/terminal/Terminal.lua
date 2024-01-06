@@ -44,8 +44,13 @@ function Terminal:printHistory()
     end
 end
 
-function Terminal:printLs()
-    local files = split(ls(), "\n")
+function Terminal:printLs(path)
+    local files
+    if path then
+        files = split(ls(path), "\n")
+    else
+        files = split(ls(), "\n")
+    end
     for i = 1, #files, 1 do self:printLn(files[i], 2) end
 end
 
@@ -134,7 +139,7 @@ function Terminal:executeInput()
     elseif command[1] == "cd" then
         cd(command[2])
     elseif command[1] == "ls" then
-        self:printLs()
+        self:printLs(command[2])
     elseif command[1] == "load" then
         self:loadCart(command[2])
     elseif command[1] == "import" then
