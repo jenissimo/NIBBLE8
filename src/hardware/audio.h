@@ -10,7 +10,7 @@
 
 #define SAMPLE_RATE 22050
 #define NUM_CHANNELS 1
-#define NUM_SAMPLES 512
+#define NUM_SAMPLES 4096
 
 enum
 {
@@ -23,10 +23,6 @@ enum
     FX_ARP_FAST =  6,
     FX_ARP_SLOW =  7,
 };
-
-float freq;
-bool note_on;
-Instrument currentInstrument;
 
 void nibble_audio_update(int16_t *stream, int num_samples);
 float nibble_audio_clip(float sample, float threshold);

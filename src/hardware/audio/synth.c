@@ -1,5 +1,9 @@
 #include "synth.h"
 
+float lastadvance;
+float sample;
+float lsample;
+
 float nibble_waveform(Instrument instrument, float advance)
 {
     // const from picolove:

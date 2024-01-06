@@ -33,39 +33,55 @@ PaletteManager *palette_manager_create(const char *ini_file)
     manager->num_palettes = num_palettes;
     manager->current_palette = 0;
 
-    int palette_index = 0;
+    printf("num_palettes: %d\n", num_palettes);
+
     SimpleIni ini;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
+    uint8_t r, g, b;
+    int palette_index = 0;
+
+    printf("Reading palette file: %s\n", ini_file);
 
     if (simple_ini_open(&ini, ini_file))
     {
-        char section[256];
-        char key[256];
-        char value[256];
+        char key[256], value[256];
+        Palette *palette = NULL;
 
-        while (simple_ini_read_next_section(&ini, section))
+        while (simple_ini_read_next_key_value(&ini, key, value))
         {
-            Palette *palette = &manager->palettes[palette_index];
-
-            strncpy(palette->name, section, sizeof(palette->name) - 1);
-            palette->name[sizeof(palette->name) - 1] = '\0';
-
-            while (simple_ini_read_next_key_value(&ini, key, value))
+            if (ini.new_section_encountered)
             {
-                int color_index;
-                sscanf(key, "Color%d", &color_index);
-                sscanf(value, "%d,%d,%d", &palette->color[color_index - 1][0], &palette->color[color_index - 1][1], &palette->color[color_index - 1][2]);
+                if (palette != NULL)
+                {
+                    // Finalize previous palette
+                    //printf("Section %d: %s\n", palette_index - 1, ini.current_section);
+                    strncpy(palette->name, ini.current_section, sizeof(ini.current_section) - 1);
+                    palette->name[sizeof(palette->name) - 1] = '\0';
+                }
 
-                // Cache for faster rendering
-                r = palette->color[color_index - 1][0];
-                g = palette->color[color_index - 1][1];
-                b = palette->color[color_index - 1][2];
-                palette->argb[color_index - 1] = (255 << 24) + ((int)r << 16) + ((int)g << 8) + (int)b;
+                // Start a new palette
+                palette = &manager->palettes[palette_index++];
+                ini.new_section_encountered = false; // Reset flag after processing new section
+                continue;
             }
 
-            palette_index++;
+            // Parse and set color values
+            int color_index;
+            sscanf(key, "Color%d", &color_index);
+            sscanf(value, "%d,%d,%d", &palette->color[color_index - 1][0], &palette->color[color_index - 1][1], &palette->color[color_index - 1][2]);
+
+            // Cache for faster rendering
+            r = palette->color[color_index - 1][0];
+            g = palette->color[color_index - 1][1];
+            b = palette->color[color_index - 1][2];
+            palette->argb[color_index - 1] = (255 << 24) + ((int)r << 16) + ((int)g << 8) + (int)b;
+        }
+
+        // Process the last section
+        if (palette != NULL)
+        {
+            //printf("Section %d: %s\n", palette_index - 1, ini.current_section);
+            strncpy(palette->name, ini.current_section, sizeof(ini.current_section) - 1);
+            palette->name[sizeof(palette->name) - 1] = '\0';
         }
 
         simple_ini_close(&ini);

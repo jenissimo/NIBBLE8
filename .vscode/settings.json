@@ -65,6 +65,8 @@
         "vector": "c",
         "algorithm": "c",
         "__verbose_abort": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "audio.h": "c",
+        "synth.h": "c"
     }
 }
