@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall
 LIBS_LIST = lua5.4 lua sdl2 libpng
-CFLAGS += $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function
+CFLAGS += $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function -mconsole
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 SRCDIR = src

@@ -1,4 +1,5 @@
 #include "sdl_adapter.h"
+#include "../debug/debug.h"
 #include "../hardware/audio.h"
 #include "../hardware/video.h"
 #include "../hardware/palette_manager.h"
@@ -48,6 +49,7 @@ int nibble_sdl_init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
+        debug_log("SDL Initialization failed: %s", SDL_GetError());
         printf("Can't init: %s\n", SDL_GetError());
         system("pause");
         return 1;
@@ -77,6 +79,7 @@ int nibble_sdl_init()
 
     if (SDL_OpenAudio(&desired_spec, &obtained_spec) < 0)
     {
+        debug_log("Failed to open audio device: %s", SDL_GetError());
         fprintf(stderr, "Failed to open audio device: %s\n", SDL_GetError());
         return 1;
     }
@@ -85,6 +88,8 @@ int nibble_sdl_init()
     SDL_Delay(50);  // Add a short delay, say 50ms
     // Start audio playback
     SDL_PauseAudio(0);
+
+    debug_log("SDL Initialized");
 
     // Init iunput
     nibble_clear_keys();

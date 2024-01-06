@@ -2,6 +2,9 @@
 #include "ram.h"
 
 float phi = 0.0f;
+float freq;
+bool note_on;
+Instrument currentInstrument;
 
 void nibble_audio_update(int16_t *stream, int num_samples)
 {

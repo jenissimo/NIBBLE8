@@ -28,10 +28,6 @@ typedef enum
     EFFECT_ARPEGGIO_SLOW,
 } NoteEffect;
 
-float lastadvance;
-float sample;
-float lsample;
-
 float nibble_waveform(Instrument instrument, float advance);
 
 #endif

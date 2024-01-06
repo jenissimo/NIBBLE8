@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "nibble8.h"
+#include "debug/debug.h"
 #include "adapters/sdl_adapter.h"
 #include "hardware/os.h"
 #include "hardware/ram.h"
@@ -19,6 +20,9 @@ int main(int argc, char *argv[])
     uint32_t last_time;
     uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
+    printf("Welcome to NIBBLE-8!\n");
+    fflush(stdout);
+
     srand(time(NULL)); // Initialization, should only be called once.
 
     initRAM();
@@ -32,12 +36,16 @@ int main(int argc, char *argv[])
     // parse params
     for (int i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "--fullscreen") == 0)
+        if (strcmp(argv[i], "--debug") == 0)
+        {
+            debug_init("nibble8.log");
+            debug_log("Debug mode enabled.\n");
+        }
+        else if (strcmp(argv[i], "--fullscreen") == 0)
         {
             goFullScreen();
         }
-        // if cart is specified, load it
-        if (strcmp(argv[i], "--cart") == 0)
+        else if (strcmp(argv[i], "--cart") == 0)
         {
             if (i + 1 < argc)
             {
@@ -77,5 +85,6 @@ int main(int argc, char *argv[])
     destroyLua();
     destroyVideo();
     destroyRAM();
+    debug_close();
     return nibble_sdl_quit();
 }

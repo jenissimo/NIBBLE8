@@ -4,9 +4,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-typedef struct {
+typedef struct
+{
     const char *filename;
     FILE *file;
+    bool new_section_encountered;
+    char current_section[256];
 } SimpleIni;
 
 bool simple_ini_open(SimpleIni *ini, const char *filename);
