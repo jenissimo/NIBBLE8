@@ -6,6 +6,7 @@ local SelectionManager = require("os/apps/text_editor/SelectionManager")
 local TextManipulation = require("os/apps/text_editor/TextManipulation")
 local InputHandler = require("os/apps/text_editor/InputHandler")
 local DisplayManager = require("os/apps/text_editor/DisplayManager")
+local TabBar = require("os/apps/text_editor/TabBar")
 
 function TextEditor.new(text, x, y, width, height)
     local self = setmetatable({}, TextEditor)
@@ -22,7 +23,10 @@ end
 function TextEditor:init(text)
     self.text = text or ""
     self.cursor = {x = 0, y = 0, visible = true}
-    self.lines = split(text or "", "\n")
+    -- self.lines = split(text or "", "\n")
+    self.lines = {}
+    self.tabs = {}
+    self.currentTab = 1
     self.rows_on_screen = ceil(self.height / 6)
     self.cols_on_screen = ceil(self.width / 4)
     self.scroll = {x = 0, y = 0}
@@ -32,16 +36,83 @@ function TextEditor:init(text)
     self.selecting = false
     self.cursorBlink = 0
     self.offsetY = 0
+    self:parseTabs()
+end
+
+-- Tabs
+function TextEditor:parseTabs()
+    local lines = split(self.text, "\n")
+    local currentTabContent = {}
+    local tabIndex = 1
+
+    for _, line in ipairs(lines) do
+        if line:match("^--#tab") then
+            if #currentTabContent > 0 or tabIndex == 1 then
+                self:createTab(currentTabContent)
+                tabIndex = tabIndex + 1
+                currentTabContent = {}
+            end
+        else
+            table.insert(currentTabContent, line)
+        end
+    end
+
+    -- Create a tab for any remaining content or if no tabs have been created yet
+    if #currentTabContent > 0 or tabIndex == 1 then
+        self:createTab(currentTabContent)
+    end
+
+    self:switchToTab(1) -- Initialize with the first tab
+end
+
+function TextEditor:createTab(contentLines)
+    table.insert(self.tabs, {
+        text = table.concat(contentLines, "\n"),
+        cursor = {x = 0, y = 0, visible = true},
+        scroll = {x = 0, y = 0},
+        selection = {x1 = nil, y1 = nil, x2 = nil, y2 = nil},
+        offsetY = 0
+    })
+    trace("Created tab: " .. #self.tabs)
+end
+
+function TextEditor:switchToTab(tabIndex)
+    if tabIndex ~= self.currentTab then
+        TextManipulation:saveCurrentTab(self)
+    end
+    -- Check if the current tab is empty before switching
+    if self.currentTab > 1 and #self.tabs > 1 and self.tabs[self.currentTab] and
+        #self.tabs[self.currentTab].text:gsub("%s+", "") == 0 then
+        -- Remove the empty tab
+        table.remove(self.tabs, self.currentTab)
+
+        -- Adjust the tabIndex if it's greater than the number of tabs
+        if tabIndex > #self.tabs then tabIndex = #self.tabs end
+
+        -- Adjust the currentTab index if it's now out of range
+        if self.currentTab > #self.tabs then self.currentTab = #self.tabs end
+    end
+
+    -- Proceed with switching tabs
+    if self.tabs[tabIndex] then
+        self.currentTab = tabIndex
+        self.lines = split(self.tabs[tabIndex].text, "\n")
+        self.cursor = self.tabs[tabIndex].cursor
+        self.selection = self.tabs[tabIndex].selection
+        self.offsetY = self.tabs[tabIndex].offsetY
+        self.scroll = self.tabs[tabIndex].scroll
+        self.syntax_highlighting_dirty = true
+    end
 end
 
 -- Input
-
 function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
     InputHandler.handleKeyInput(self, key_code, ctrl_pressed, shift_pressed)
 end
 
 function TextEditor:mousep(x, y, button)
     InputHandler:handleMouseInput(self, x, y, button)
+    TabBar:mousep(self, x, y, button)
 end
 
 function TextEditor:update()
@@ -51,6 +122,7 @@ function TextEditor:update()
     end
 
     CursorManager:updateCursor(self)
+    TabBar:update(self)
 end
 
 function TextEditor:setPosition(x, y)
@@ -70,6 +142,8 @@ function TextEditor:getSize() return self.width, self.height end
 -- Display
 
 function TextEditor:draw() DisplayManager:drawEditor(self) end
+
+function TextEditor:drawPost() TabBar:draw(self) end
 
 function TextEditor:redrawText() DisplayManager:redrawText(self) end
 

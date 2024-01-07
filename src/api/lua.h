@@ -63,6 +63,8 @@ static int l_get_code(lua_State *L);
 static int l_run_code(lua_State *L);
 static int l_import_png(lua_State *L);
 static int l_export_png(lua_State *L);
+static int l_import_lua(lua_State *L);
+static int l_export_lua(lua_State *L);
 static int l_ls(lua_State *L);
 static int l_get_clipboard_text(lua_State *L);
 static int l_set_clipboard_text(lua_State *L);

@@ -88,13 +88,13 @@ int nibble_api_write_file(char *path, char *data)
 const uint8_t *nibble_api_get_clipboard_text()
 {
     char *clipboardContent = getClipboardText();
-    //printf("Clipboard: %s\n", clipboardContent);
+    // printf("Clipboard: %s\n", clipboardContent);
     return clipboardContent;
 }
 
 int nibble_api_set_clipboard_text(const uint8_t *text)
 {
-    //printf("Setting clipboard: %s\n", text);
+    // printf("Setting clipboard: %s\n", text);
     return setClipboardText(text);
 }
 
@@ -114,7 +114,7 @@ ErrorCode nibble_api_load_cart(char *path)
         return ERROR_CART_NOT_FOUND;
     }
 
-    //printf("Loading cart from %s\n", path);
+    // printf("Loading cart from %s\n", path);
 
     // TODO: make error check here also
     load_text_from_zip(path, "app.lua", (void **)&luaCode);
@@ -178,6 +178,52 @@ void nibble_api_import_png(char *path)
 void nibble_api_export_png(char *path)
 {
     write_indexed_png(path, memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
+}
+
+void nibble_api_import_lua(char *path)
+{
+    FILE *file = fopen(path, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error opening file: %s\n", path);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    userLuaCode = (uint8_t *)malloc(fileSize + 1);
+    if (userLuaCode == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(file);
+        return;
+    }
+
+    fread(userLuaCode, 1, fileSize, file);
+    userLuaCode[fileSize] = '\0'; // Null-terminate the string
+
+    fclose(file);
+}
+
+void nibble_api_export_lua(char *path)
+{
+    if (userLuaCode == NULL)
+    {
+        fprintf(stderr, "No Lua code to write\n");
+        return;
+    }
+
+    FILE *file = fopen(path, "w");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error opening file for writing: %s\n", path);
+        return;
+    }
+
+    fprintf(file, "%s", userLuaCode);
+    fclose(file);
 }
 
 int nibble_api_save_cart(char *path, char *luaCode)
@@ -264,7 +310,8 @@ bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, 
     }
 
     *buffer = mz_zip_reader_extract_file_to_heap(&zip_archive, file_to_load, &file_stat.m_uncomp_size, 0);
-    if (buffer_size) *buffer_size = file_stat.m_uncomp_size;
+    if (buffer_size)
+        *buffer_size = file_stat.m_uncomp_size;
 
     mz_zip_reader_end(&zip_archive);
     return (*buffer != NULL);
@@ -286,7 +333,7 @@ void load_file_from_zip(const char *zip_filename, const char *file_to_load, void
 void load_text_from_zip(const char *zip_filename, const char *file_to_load, char **buffer)
 {
     size_t buffer_size;
-    if (extract_file_to_buffer(zip_filename, file_to_load, (void**)buffer, &buffer_size))
+    if (extract_file_to_buffer(zip_filename, file_to_load, (void **)buffer, &buffer_size))
     {
         char *textBuffer = malloc(buffer_size + 1);
         if (textBuffer)

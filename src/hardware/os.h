@@ -36,6 +36,8 @@ void nibble_api_run_code(char *code);
 int nibble_api_save_cart(char *path, char *luaCode);
 void nibble_api_import_png(char *path);
 void nibble_api_export_png(char *path);
+void nibble_api_import_lua(char *path);
+void nibble_api_export_lua(char *path);
 
 // Zip functions
 bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, void **buffer, size_t *buffer_size);

@@ -13,7 +13,7 @@ local KEYWORDS = {
     "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
     "palt", "spr", "sspr", "fset", "mget", "mset", "peek", "poke", "peek4",
     "poke4", "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line",
-    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs"
+    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs", "in"
 }
 local TERMINATORS = {
     "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",

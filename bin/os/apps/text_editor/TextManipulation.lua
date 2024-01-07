@@ -39,8 +39,23 @@ function TextManipulation:setText(textEditor, str)
     textEditor.syntax_highlighting_dirty = true
 end
 
+function TextManipulation:saveCurrentTab(textEditor)
+    textEditor.tabs[textEditor.currentTab].text = table.concat(textEditor.lines, "\n")
+end
+
 function TextManipulation:getText(textEditor)
-    textEditor.text = table.concat(textEditor.lines, "\n")
+    local combinedText = {}
+    self:saveCurrentTab(textEditor)
+    for i, tab in ipairs(textEditor.tabs) do
+        -- Add tab separator before each tab except the first one
+        if i ~= 1 then
+            table.insert(combinedText, "--#tab")
+        end
+        -- Add the text of the tab
+        table.insert(combinedText, tab.text)
+    end
+    -- Combine all tabs into a single string
+    textEditor.text = table.concat(combinedText, "\n")
     return textEditor.text
 end
 

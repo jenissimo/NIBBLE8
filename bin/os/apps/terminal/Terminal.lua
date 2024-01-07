@@ -2,7 +2,7 @@ local Terminal = {}
 Terminal.__index = Terminal
 
 function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
-                      saveCartCallback)
+                      saveCartCallback, importCodeCallback)
     local self = setmetatable({}, Terminal)
 
     self.input = ""
@@ -18,6 +18,7 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.spriteEditCallback = spriteEditCallback
     self.loadCartCallback = loadCartCallback
     self.saveCartCallback = saveCartCallback
+    self.importCodeCallback = importCodeCallback
 
     cls()
     self:printLn("", 2)
@@ -88,24 +89,33 @@ end
 function Terminal:export(path)
     if path then
         -- check extension
-        if sub(path, -4) ~= ".png" then
-            self:printLn("Error: specify PNG extension", 2)
+        if sub(path, -4) == ".png" then
+            self:printLn("exporting spritesheet " .. path, 2)
+            export_png(path)
             return
+        elseif sub(path, -4) == ".lua" then
+            self:printLn("exporting lua script " .. path, 2)
+            export_lua(path)
+        else
+            self:printLn("error: specify png or lua extension", 2)
         end
-        self:printLn("exporting spritesheet " .. path, 2)
-        export_png(path)
     end
 end
 
 function Terminal:import(path)
     if path then
         -- check extension
-        if sub(path, -4) ~= ".png" then
-            self:printLn("Error: specify PNG extension", 2)
+        if sub(path, -4) == ".png" then
+            self:printLn("importing spritesheet " .. path, 2)
+            import_png(path)
             return
+        elseif sub(path, -4) == ".lua" then
+            self:printLn("importing lua script " .. path, 2)
+            self.importCodeCallback(import_lua(path))
+        else
+            self:printLn("error: specify png or lua extension", 2)
         end
-        self:printLn("importing spritesheet " .. path, 2)
-        import_png(path)
+        
     end
 end
 

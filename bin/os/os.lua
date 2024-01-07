@@ -21,7 +21,7 @@ local currentCartPath = nil
 function _init()
     cls()
     textEditor = TextEditor.new("", 1, 8, 159, 106)
-    terminal = Terminal.new(editFile, editSprite, loadCart, saveCart)
+    terminal = Terminal.new(editFile, editSprite, loadCart, saveCart, importCode)
     synth = Synth.new(0, 8)
     musicTracker = MusicTracker.new(0, 8)
     mapEditor = MapEditor.new(0, 8)
@@ -242,4 +242,8 @@ end
 function runCart()
     trace("running cart")
     return run_code(textEditor:getText())
+end
+
+function importCode(code)
+    textEditor:init(code)
 end

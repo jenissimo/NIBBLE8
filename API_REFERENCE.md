@@ -1,5 +1,6 @@
 NIBBLE-8
 Resolution: 160x120 pixels, 4 color palette
+Programming language: Lua
 
 print(str, [x, y, col])
 pal(c0, c1, [p])

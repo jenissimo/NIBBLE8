@@ -34,6 +34,8 @@ void initCoreAPI()
     luaL_dostring(currentVM, "function _mouser(x, y, button) end");
     luaL_dostring(currentVM, "function _mousem(x, y) end");
 
+    luaL_dostring(currentVM, "function add(t,a) table.insert(t,a) end");
+    luaL_dostring(currentVM, "function del(t,a) table.remove(t,a) end");
     luaL_dostring(currentVM, "function str(a) return tostring(a) end");
     luaL_dostring(currentVM, "function len(a) return string.len(a) end");
     luaL_dostring(currentVM, "function sub(str,str_start,str_end) return string.sub(str,str_start,str_end) end");
@@ -92,6 +94,8 @@ void initCoreAPI()
     registerFunction("save_cart", l_save_cart);
     registerFunction("import_png", l_import_png);
     registerFunction("export_png", l_export_png);
+    registerFunction("import_lua", l_import_lua);
+    registerFunction("export_lua", l_export_lua);
 
     // Audio
     registerFunction("note_on", l_note_on);
@@ -944,6 +948,36 @@ static int l_export_png(lua_State *L)
         // printf("export(%s) = %d
         // lua_pushnumber(L, result);
         return 1;
+    }
+    return 0;
+}
+
+static int l_import_lua(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        const char *filename = lua_tostring(L, 1);
+        nibble_api_import_lua(filename);
+        printf("import(%s) = %s\n", filename, userLuaCode);
+        lua_pushstring(L, userLuaCode);
+        return 1;
+    }
+    return 0;
+}
+
+static int l_export_lua(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        const char *filename = lua_tostring(L, 1);
+        nibble_api_export_lua(filename);
+        // printf("export(%s) = %d
+        // lua_pushnumber(L, result);
+        return 0;
     }
     return 0;
 }
