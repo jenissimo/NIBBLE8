@@ -18,6 +18,8 @@ local tabs = {}
 
 local currentCartPath = nil
 
+local mouse_coords = {x = 0, y = 0}
+
 function _init()
     cls()
     textEditor = TextEditor.new("", 1, 8, 159, 106)
@@ -68,6 +70,10 @@ function _draw()
     
     if currentWindow.drawPost then
         currentWindow:drawPost()
+    end
+
+    if (currentWindow ~= terminal) then
+        drawCursor()
     end
 end
 
@@ -164,6 +170,25 @@ function drawPanel()
     end
 end
 
+function drawCursor()
+    local cursor_spr = {
+        {0, 0, 4, 4 ,4 ,4},
+        {0, 3, 0, 4 ,4 ,4},
+        {0, 3, 3, 0 ,4 ,4},
+        {0, 3, 3, 3, 0 ,4},
+        {0, 3, 3, 3, 3, 0},
+        {0, 3, 0, 0, 0, 4},
+        {0, 0, 4, 4, 4, 4},
+    }
+    for i = 1, #cursor_spr do
+        for j = 1, #cursor_spr[i] do
+            if cursor_spr[i][j] < 4 then
+                pset(mouse_coords.x + j - 1, mouse_coords.y + i - 1, cursor_spr[i][j])
+            end
+        end
+    end
+end
+
 function _mousep(x, y, button)
     if (y < 7 and x < 37) then
         local offset = 0
@@ -185,7 +210,10 @@ function _mouser(x, y, button)
 end
 
 function _mousem(x, y, button)
-    currentWindow:mousem(x, y)
+    if currentWindow.mousem then
+        currentWindow:mousem(x, y)
+    end
+    mouse_coords = {x = x, y = y}
 end
 
 function editFile(file)

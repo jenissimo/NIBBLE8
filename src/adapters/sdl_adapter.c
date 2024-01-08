@@ -99,6 +99,7 @@ int nibble_sdl_init()
     freeClipboardText = SDL_free;
 
     screen = SDL_GetWindowSurface(window);
+    SDL_ShowCursor(SDL_DISABLE);
 
     return 0;
 }
