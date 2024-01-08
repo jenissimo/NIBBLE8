@@ -9,13 +9,17 @@ TabBar.tabColor = 1
 TabBar.tabSelectedColor = 0
 TabBar.textColor = 2
 TabBar.textSelectedColor = 3
+TabBar.totalTabWidth = 0
 
-function TabBar:update(textEditor) end
+function TabBar:update(textEditor)
+    TabBar.totalTabWidth = #textEditor.tabs * (self.tabWidth + self.margin) + self.plusButtonWidth
+    TabBar.x = 160 - TabBar.totalTabWidth
+end
 
 function TabBar:draw(textEditor)
-    local x = self.margin + self.x
+    -- Align TabBar to the right side of the screen
+    local x = TabBar.x
     local y = 0
-
     -- Draw the tabs
     for i = 1, #textEditor.tabs do
         local tabColor = i == textEditor.currentTab and self.tabSelectedColor or
@@ -67,7 +71,7 @@ function TabBar:mousep(textEditor, x, y, button)
         for i = 1, #textEditor.tabs do
             if self:isMouseOverTab(textEditor, x, y, i) then
                 trace("Switch to tab", i)
-                textEditor:switchToTab(i)
+                textEditor:switchToTab(i, true)
                 return
             end
         end

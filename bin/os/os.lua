@@ -129,17 +129,6 @@ end
 
 function draw_brackets_icon(x, y, col)
     print("{}", x, y, col)
-    -- left bracket
-    -- line(x, y + 1, x, y + 3, col)
-    -- line(x + 1, y, x + 1, y + 4, col)
-    -- pset(x + 2, y, col)
-    -- pset(x + 2, y + 4, col)
-
-    -- right bracket
-    -- pset(x + 4, y, col)
-    -- pset(x + 4, y + 4, col)
-    -- line(x + 5, y, x + 5, y + 4, col)
-    -- line(x + 6, y + 1, x + 6, y + 3, col)
 end
 
 function draw_alien_icon(x, y, col)

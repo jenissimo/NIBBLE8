@@ -76,12 +76,12 @@ function TextEditor:createTab(contentLines)
     trace("Created tab: " .. #self.tabs)
 end
 
-function TextEditor:switchToTab(tabIndex)
+function TextEditor:switchToTab(tabIndex, checkEmptyTab)
     if tabIndex ~= self.currentTab then
         TextManipulation:saveCurrentTab(self)
     end
     -- Check if the current tab is empty before switching
-    if self.currentTab > 1 and #self.tabs > 1 and self.tabs[self.currentTab] and
+    if checkEmptyTab and self.currentTab > 1 and #self.tabs > 1 and self.tabs[self.currentTab] and
         #self.tabs[self.currentTab].text:gsub("%s+", "") == 0 then
         -- Remove the empty tab
         table.remove(self.tabs, self.currentTab)
