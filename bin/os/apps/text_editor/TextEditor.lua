@@ -61,6 +61,7 @@ function TextEditor:parseTabs()
     if #currentTabContent > 0 or tabIndex == 1 then
         self:createTab(currentTabContent)
     end
+    TabBar.dirty = true
 
     self:switchToTab(1) -- Initialize with the first tab
 end
@@ -103,6 +104,8 @@ function TextEditor:switchToTab(tabIndex, checkEmptyTab)
         self.scroll = self.tabs[tabIndex].scroll
         self.syntax_highlighting_dirty = true
     end
+
+    TabBar:updateTabSwitch(self, tabIndex)
 end
 
 -- Input
@@ -189,8 +192,8 @@ function TextEditor:pageUp() CursorManager:pageUp(self) end
 
 function TextEditor:pageDown() CursorManager:pageDown(self) end
 
-function TextEditor:adjustCursorPositionAndScroll(x, y)
-    CursorManager:adjustCursorPositionAndScroll(self, x, y)
+function TextEditor:checkAndAdjustCursorBounds()
+    CursorManager:checkAndAdjustCursorBounds(self)
 end
 
 function TextEditor:moveCursor(xDir, yDir)

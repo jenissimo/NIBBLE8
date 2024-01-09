@@ -84,8 +84,8 @@ int nibble_sdl_init()
         return 1;
     }
 
-    memset(audioBuffer, 0, sizeof(audioBuffer));  // Empty our audio buffer
-    SDL_Delay(50);  // Add a short delay, say 50ms
+    memset(audioBuffer, 0, sizeof(audioBuffer)); // Empty our audio buffer
+    SDL_Delay(50);                               // Add a short delay, say 50ms
     // Start audio playback
     SDL_PauseAudio(0);
 

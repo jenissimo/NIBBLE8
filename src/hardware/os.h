@@ -24,6 +24,7 @@ extern GetClipboardTextFunc setClipboardText;
 extern FreeClipboardTextFunc freeClipboardText;
 
 // Other methods
+void nibble_api_reboot();
 char *nibble_api_ls(char *path);
 char *nibble_api_read_file(char *path);
 int nibble_api_change_dir(char *path);

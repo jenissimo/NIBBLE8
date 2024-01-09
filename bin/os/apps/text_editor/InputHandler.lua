@@ -140,8 +140,18 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
     end
 end
 
-function InputHandler.handleMouseInput(textEditor, x, y, button)
+function InputHandler:handleMouseInput(textEditor, x, y, button)
     if button == 1 then
+        if y < textEditor.y then
+            return
+        elseif y > textEditor.y + textEditor.height then
+            return
+        elseif x < textEditor.x then
+            return
+        elseif x > textEditor.x + textEditor.width then
+            return
+        end
+
         textEditor:clearSelection()
         -- glyphs is 6x4
         -- detect cursor position based on glyph size

@@ -7,10 +7,17 @@
 Memory memory;
 uint8_t *userLuaCode;
 uint8_t *clipboard;
+bool rebootRequested = false;
 
 void initRAM()
 {
     //saveMemoryLayout();
+}
+
+void clearRAM()
+{
+    memset(memory.data, 0, sizeof(memory.data));
+    userLuaCode = NULL;
 }
 
 void saveMemoryLayout()

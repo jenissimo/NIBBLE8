@@ -169,6 +169,8 @@ function Terminal:executeInput()
         else
             self:saveCart()
         end
+    elseif command[1] == "reboot" then
+        reboot()
     elseif command[1] == "help" then
         self:printLn("", 1)
         self:printLn("commands", 3)

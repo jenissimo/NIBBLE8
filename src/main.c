@@ -61,6 +61,12 @@ int main(int argc, char *argv[])
         frame_time = now_time - last_time;
         last_time = now_time;
 
+        if (rebootRequested)
+        {
+            rebootRequested = false;
+            nibble_api_reboot();
+        }
+
         if (nibble_sdl_update() == 0)
         {
             run = 0;

@@ -59,6 +59,7 @@ static int l_keyp(lua_State *L);
 static int l_btn(lua_State *L);
 static int l_btnp(lua_State *L);
 static int l_load_file(lua_State *L);
+static int l_reboot(lua_State *L);
 static int l_get_code(lua_State *L);
 static int l_run_code(lua_State *L);
 static int l_import_png(lua_State *L);

@@ -40,7 +40,8 @@ function TextManipulation:setText(textEditor, str)
 end
 
 function TextManipulation:saveCurrentTab(textEditor)
-    textEditor.tabs[textEditor.currentTab].text = table.concat(textEditor.lines, "\n")
+    textEditor.tabs[textEditor.currentTab].text =
+        table.concat(textEditor.lines, "\n")
 end
 
 function TextManipulation:getText(textEditor)
@@ -48,9 +49,7 @@ function TextManipulation:getText(textEditor)
     self:saveCurrentTab(textEditor)
     for i, tab in ipairs(textEditor.tabs) do
         -- Add tab separator before each tab except the first one
-        if i ~= 1 then
-            table.insert(combinedText, "--#tab")
-        end
+        if i ~= 1 then table.insert(combinedText, "--#tab") end
         -- Add the text of the tab
         table.insert(combinedText, tab.text)
     end
@@ -116,25 +115,19 @@ function TextManipulation:removeChar(textEditor, dir, x, y)
     textEditor.syntax_highlighting_dirty = true
 end
 
+function TextManipulation:normalizeSelection(textEditor)
+    local startX, endX = textEditor.selection.x1, textEditor.selection.x2
+    local startY, endY = textEditor.selection.y1, textEditor.selection.y2
+
+    if startX > endX then startX, endX = endX, startX end
+    if startY > endY then startY, endY = endY, startY end
+
+    return startX, endX, startY, endY
+end
+
 function TextManipulation:removeSelectedText(textEditor)
     if textEditor.selection.x1 == nil then return end
-
-    -- Invert the selection
-    local startX, endX, startY, endY
-    if textEditor.selection.x1 < textEditor.selection.x2 then
-        startX = textEditor.selection.x1
-        endX = textEditor.selection.x2
-    else
-        startX = textEditor.selection.x2
-        endX = textEditor.selection.x1
-    end
-    if textEditor.selection.y1 < textEditor.selection.y2 then
-        startY = textEditor.selection.y1
-        endY = textEditor.selection.y2
-    else
-        startY = textEditor.selection.y2
-        endY = textEditor.selection.y1
-    end
+    local startX, endX, startY, endY = self:normalizeSelection(textEditor)
 
     if startX == endX and startY == endY then
         textEditor:clearSelection()
@@ -144,6 +137,9 @@ function TextManipulation:removeSelectedText(textEditor)
     local line
     local line1
     local line2
+
+    trace("Selection: " .. startX .. "," .. startY .. " - " .. endX .. "," ..
+              endY)
 
     if endY - startY >= 1 then
         line = textEditor.lines[endY + 1]
@@ -161,8 +157,8 @@ function TextManipulation:removeSelectedText(textEditor)
         textEditor.lines[startY + 1] = line1 .. line2
     end
 
-    textEditor:adjustCursorPositionAndScroll(startX, startY)
-    trace("Cursor moved to " .. textEditor.cursor.x .. "," .. textEditor.cursor.y)
+    textEditor:checkAndAdjustCursorBounds()
+    
     textEditor:clearSelection()
     textEditor.syntax_highlighting_dirty = true
 end
@@ -171,54 +167,41 @@ function TextManipulation:copy(textEditor)
     trace("TextManipulation:copy")
 
     if textEditor.selection.x1 == nil then return end
+    local startX, endX, startY, endY = self:normalizeSelection(textEditor)
 
-    -- Invert the selection
-    local startX, endX, startY, endY
-    if textEditor.selection.x1 < textEditor.selection.x2 then
-        startX = textEditor.selection.x1
-        endX = textEditor.selection.x2
-    else
-        startX = textEditor.selection.x2
-        endX = textEditor.selection.x1
-    end
-    if textEditor.selection.y1 < textEditor.selection.y2 then
-        startY = textEditor.selection.y1
-        endY = textEditor.selection.y2
-    else
-        startY = textEditor.selection.y2
-        endY = textEditor.selection.y1
-    end
+    trace("Selection: " .. startX .. "," .. startY .. " - " .. endX .. "," ..
+              endY)
 
-    if startX == endX and startY == endY then
-        textEditor:clearSelection()
-        return
-    end
-
-    local line
-    local line1
-    local line2
-    local text = ""
-
+    local text = {}
     if endY - startY >= 1 then
-        line = textEditor.lines[startY + 1]
-        line1 = sub(line, startX)
-        text = text .. line1 .. "\n"
-
-        for i = startY + 1, endY do
-            line = textEditor.lines[i + 1]
-            if i == endY then
-                text = text .. line
-            else
-                text = text .. line .. "\n"
+        if startX == 0 and endX == 0 then
+            -- Special case: selection starts at the beginning of one line and ends at the beginning of the next
+            for i = startY, endY - 1 do
+                table.insert(text, textEditor.lines[i + 1])
+                table.insert(text, "\n")
+            end
+        else
+            -- Handle multi-line selection normally
+            table.insert(text, sub(textEditor.lines[startY + 1], startX))
+            table.insert(text, "\n")
+            for i = startY + 1, endY do
+                local line = textEditor.lines[i + 1]
+                if i == endY then
+                    table.insert(text, sub(line, 1, endX))
+                else
+                    table.insert(text, line)
+                    table.insert(text, "\n")
+                end
             end
         end
     else
-        line = textEditor.lines[startY + 1]
-        text = sub(line, startX + 1, endX)
+        -- Single-line selection
+        table.insert(text, sub(textEditor.lines[startY + 1], startX + 1, endX))
     end
 
-    trace("Copy text: " .. text)
-    set_clipboard_text(text)
+    local finalText = table.concat(text)
+    trace("Copy text: " .. finalText)
+    set_clipboard_text(finalText)
 end
 
 function TextManipulation:cut(textEditor)

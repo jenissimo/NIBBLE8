@@ -4,6 +4,14 @@ GetClipboardTextFunc getClipboardText;
 GetClipboardTextFunc setClipboardText;
 FreeClipboardTextFunc freeClipboardText;
 
+void nibble_api_reboot()
+{
+    destroyLua();
+    initLua();
+    clearRAM();
+    initVideo();
+}
+
 char *nibble_api_ls(char *path)
 {
     DIR *dir;

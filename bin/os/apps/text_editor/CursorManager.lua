@@ -3,10 +3,10 @@ local CursorManager = {}
 function CursorManager:setCursor(textEditor, x, y)
     if x < 0 then
         x = 0
-    elseif x >= textEditor.cols_on_screen then
+    elseif x >= textEditor.cols_on_screen - 1 then
         textEditor.cursor.x = textEditor.cols_on_screen - 1
         textEditor.cursor.y = y
-        textEditor.scroll.x = x - (textEditor.cols_on_screen - 1)
+        textEditor.scroll.x = textEditor.scroll.x + (x - (textEditor.cols_on_screen - 1))
     else
         textEditor.cursor.x = x
         textEditor.cursor.y = y
@@ -90,33 +90,40 @@ function CursorManager:moveCursor(textEditor, xDir, yDir)
     textEditor:checkSelectionUpdate()
 end
 
-function CursorManager:adjustCursorPositionAndScroll(textEditor, x, y)
-    -- adjust cursor position if it's outside the visible screen area
-    if x < textEditor.scroll.x then
-        x = textEditor.scroll.x
-    elseif x > textEditor.scroll.x + textEditor.cols_on_screen - 1 then
-        x = textEditor.scroll.x + textEditor.cols_on_screen - 1
+function CursorManager:checkAndAdjustCursorBounds(textEditor)
+    local totalLines = #textEditor.lines
+    local cursorX, cursorY = textEditor.cursor.x + textEditor.scroll.x, textEditor.cursor.y + textEditor.scroll.y
+
+    -- Adjust cursor Y position if it's outside the range of total lines
+    if cursorY < 1 then
+        cursorY = 1
+    elseif cursorY > totalLines then
+        cursorY = totalLines
     end
 
-    if y < textEditor.scroll.y then
-        y = textEditor.scroll.y
-    elseif y > textEditor.scroll.y + textEditor.rows_on_screen - 1 then
-        y = textEditor.scroll.y + textEditor.rows_on_screen - 1
+    -- Adjust cursor X position based on the length of the current line
+    local currentLineLength = textEditor.lines[cursorY] and #textEditor.lines[cursorY] or 0
+    if cursorX < 1 then
+        cursorX = 1
+    elseif cursorX > currentLineLength + 1 then
+        cursorX = currentLineLength + 1
     end
 
-    -- adjust scroll position if cursor is outside visible screen area
-    if x < textEditor.scroll.x then
-        textEditor.scroll.x = x
-    elseif x > textEditor.scroll.x + textEditor.cols_on_screen - 1 then
-        textEditor.scroll.x = x - textEditor.cols_on_screen + 1
-    end
-    if y < textEditor.scroll.y then
-        textEditor.scroll.y = y
-    elseif y > textEditor.scroll.y + textEditor.rows_on_screen - 1 then
-        textEditor.scroll.y = y - textEditor.rows_on_screen + 1
+    -- Adjust scroll position to make sure the cursor is within the visible area
+    if cursorX < textEditor.scroll.x + 1 then
+        textEditor.scroll.x = cursorX - 1
+    elseif cursorX > textEditor.scroll.x + textEditor.cols_on_screen then
+        textEditor.scroll.x = cursorX - textEditor.cols_on_screen
     end
 
-    self:setCursor(textEditor, x, y)
+    if cursorY < textEditor.scroll.y + 1 then
+        textEditor.scroll.y = cursorY - 1
+    elseif cursorY > textEditor.scroll.y + textEditor.rows_on_screen then
+        textEditor.scroll.y = cursorY - textEditor.rows_on_screen
+    end
+
+    -- Update cursor position within the bounds of the screen
+    self:setCursor(textEditor, cursorX - textEditor.scroll.x, cursorY - textEditor.scroll.y)
 end
 
 function CursorManager:moveCursorToLineStart(textEditor)

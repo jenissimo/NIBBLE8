@@ -84,6 +84,7 @@ void initCoreAPI()
     registerFunction("btnp", l_btnp);
     registerFunction("get_clipboard_text", l_get_clipboard_text);
     registerFunction("set_clipboard_text", l_set_clipboard_text);
+    registerFunction("reboot", l_reboot);
     registerFunction("get_code", l_get_code);
     registerFunction("run_code", l_run_code);
     registerFunction("load_file", l_load_file);
@@ -896,6 +897,12 @@ static int l_load_file(lua_State *L)
         // lua_pushnumber(L, result);
         return 1;
     }
+    return 0;
+}
+
+static int l_reboot(lua_State *L)
+{
+    rebootRequested = true;
     return 0;
 }
 

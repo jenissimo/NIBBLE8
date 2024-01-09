@@ -2,6 +2,7 @@
 #define nibble_ram_h
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include "../nibble8.h"
 
@@ -104,8 +105,10 @@ typedef union
 extern Memory memory;
 extern uint8_t *userLuaCode;
 extern uint8_t *clipboard;
+extern bool rebootRequested;
 
 void initRAM(void);
+void clearRAM();
 void saveMemoryLayout();
 void dumpPart(char *name, void *start, int size);
 void dumpRAM(void);
