@@ -34,7 +34,7 @@ function sprite_editor:init()
     drawTools = DrawTools.new(drawArea.x + 5, drawArea.y + drawArea.height + 4, sprite_editor.onToolChanged)
     colorPicker = ColorPicker.new(sprite_editor.x + 3, sprite_editor.y + 89)
     spriteSelector = SpriteSelector.new(80, 0, 80, 120)
-    spriteSelectorTabBar = TabBar.new(73, sprite_editor.y + 2, 2)
+    spriteSelectorTabBar = TabBar.new(73, sprite_editor.y + 2, 6)
     spriteFlagsSelector = SpriteFlagsSelector.new(16, 105)
 
     brushSizeStepper = NumbericStepper.new(33, 96, 1, 4,

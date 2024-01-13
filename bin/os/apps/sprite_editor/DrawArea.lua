@@ -42,11 +42,9 @@ function DrawArea:draw()
         palt(0, false)
     end
 
-    local sprites_per_row = 20;
-    local row = flr(self.currentSprite / sprites_per_row);
-    local col = self.currentSprite % sprites_per_row;
-
-    -- trace("Current sprite: "..self.currentSprite.." - "..row.." - "..col)
+    local spritesPerRow = 30 -- Adjusted to 30 as per the spritesheet layout
+    local row = math.floor(self.currentSprite / spritesPerRow)
+    local col = self.currentSprite % spritesPerRow
 
     -- Draw sprite using sspr
     sspr(col * 8, row * 8, 8 * self.zoom, 8 * self.zoom, self.x, self.y, self.width, self.height)
@@ -110,8 +108,9 @@ function DrawArea:getPixel(x, y)
 end
 
 function DrawArea:getPixelLocal(x, y)
-    local sprX = self.currentSprite % 32 * 8
-    local sprY = flr(self.currentSprite / 32) * 8
+    local spritesPerRow = 30 -- As your spritesheet is 240 pixels wide with 8 pixel sprites
+    local sprX = self.currentSprite % spritesPerRow * 8
+    local sprY = math.floor(self.currentSprite / spritesPerRow) * 8
 
     return sget(sprX + x, sprY + y)
 end
@@ -127,8 +126,9 @@ function DrawArea:setPixel(x, y, color)
 end
 
 function DrawArea:setPixelLocal(x, y, color)
-    local sprX = self.currentSprite % 32 * 8
-    local sprY = flr(self.currentSprite / 32) * 8
+    local spritesPerRow = 30 -- As your spritesheet is 240 pixels wide with 8 pixel sprites
+    local sprX = self.currentSprite % spritesPerRow * 8
+    local sprY = math.floor(self.currentSprite / spritesPerRow) * 8
 
     if color == nil then
         color = self.currentColor

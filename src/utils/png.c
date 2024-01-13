@@ -86,6 +86,9 @@ void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targ
    if (targetWidth != width || targetHeight != height)
    {
       printf("Error: Image dimensions do not match the target dimensions.\n");
+      printf("Target dimensions: %dx%d\n", targetWidth, targetHeight);
+      printf("Image dimensions: %dx%d\n", width, height);
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return;
    }
 

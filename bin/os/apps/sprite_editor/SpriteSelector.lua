@@ -28,31 +28,49 @@ function SpriteSelector:draw()
     for i = 0, 3 do palt(0, false) end
 
     local spriteSize = 8
-    local spritesPerRow = 160 / spriteSize
-    local columns = flr(self.width / spriteSize) * 2
-    local rows = flr(self.height / spriteSize)
-    local totalPages = flr(160 / self.width)
 
-    for j = 0, rows - 1 do
-        for i = 0, columns - 1 do
-            local spriteIndex = self.page * columns * rows + j * spritesPerRow + i
-            local x = self.x + i * spriteSize
-            local y = self.y + j * spriteSize
-            if x <= 152 then
-                spr(spriteIndex, x, y)
-            end
+    local spritesPerRow = 30 -- Total sprites per row in the entire spritesheet
+    local pageSpritesPerRow = 10 -- Sprites per row on each page
+    local pageSpritesPerColumn = 15 -- Sprites per column on each page
+
+    local pagesPerRow = 3 -- Total pages per row in the spritesheet
+    local startCol = (self.page % pagesPerRow) * pageSpritesPerRow
+    local startRow = math.floor(self.page / pagesPerRow) * pageSpritesPerColumn
+
+    for row = 0, pageSpritesPerColumn - 1 do
+        for col = 0, pageSpritesPerRow - 1 do
+            local spriteIndex = (startRow + row) * spritesPerRow +
+                                    (startCol + col)
+            local x = col * spriteSize + self.x
+            local y = row * spriteSize + self.y
+
+            spr(spriteIndex, x, y)
         end
     end
 
     palt()
 
-    -- Selected sprite
-    local row = flr(self.selectedSprite / spritesPerRow)
-    local col = self.selectedSprite % spritesPerRow
+    -- Draw selected sprite
+    local startCol = (self.page % pagesPerRow) * pageSpritesPerRow
+    local startRow = math.floor(self.page / pagesPerRow) * pageSpritesPerColumn
+    local endRow = startRow + pageSpritesPerColumn - 1
+    local endCol = startCol + pageSpritesPerRow - 1
 
-    rect(self.x + col * 8, self.y + row * 8, self.spriteSize, self.spriteSize, 0)
-    rect(self.x + col * 8 - 1, self.y + row * 8 - 1, self.spriteSize + 2,
-         self.spriteSize + 2, 3)
+    local selectedRow = math.floor(self.selectedSprite / spritesPerRow)
+    local selectedCol = self.selectedSprite % spritesPerRow
+
+    -- Check if the selected sprite is on the current page
+    if selectedRow >= startRow and selectedRow <= endRow and selectedCol >=
+        startCol and selectedCol <= endCol then
+        local selectedRowRelative = selectedRow - startRow
+        local selectedColRelative = selectedCol - startCol
+
+        rect(self.x + selectedColRelative * 8, self.y + selectedRowRelative * 8,
+             self.spriteSize, self.spriteSize, 0)
+        rect(self.x + selectedColRelative * 8 - 1,
+             self.y + selectedRowRelative * 8 - 1, self.spriteSize + 2,
+             self.spriteSize + 2, 3)
+    end
 end
 
 function SpriteSelector:mousepressed(x, y, button)
@@ -61,17 +79,21 @@ function SpriteSelector:mousepressed(x, y, button)
 
     if button == 1 then
         local spriteSize = 8
-        local spritesPerRow = 160 / spriteSize
-        local columns = flr(self.width / spriteSize) * 2
-        local rows = flr(self.height / spriteSize)
-        local totalPages = flr(160 / self.width)
+        local spritesPerRow = 30 -- Total sprites per row in the entire spritesheet
+        local pageSpritesPerRow = 10 -- Sprites per row on each page
+        local pageSpritesPerColumn = 15 -- Sprites per column on each page
 
-        local row = flr((y - self.y) / spriteSize)
-        local col = flr((x - self.x) / spriteSize)
+        local pagesPerRow = 3 -- Total pages per row in the spritesheet
 
-        self.selectedSprite = flr(self.page * columns * rows + row * spritesPerRow + col)
-        --self.selectedSprite = row * self.spritesHCount + col + self.page *
-        --                          self.spritesHCount * self.spritesVCount
+        local row = math.floor((y - self.y) / spriteSize)
+        local col = math.floor((x - self.x) / spriteSize)
+
+        local startCol = (self.page % pagesPerRow) * pageSpritesPerRow
+        local startRow = math.floor(self.page / pagesPerRow) *
+                             pageSpritesPerColumn
+
+        local spriteIndex = (startRow + row) * spritesPerRow + (startCol + col)
+        self.selectedSprite = flr(spriteIndex)
     end
 end
 
