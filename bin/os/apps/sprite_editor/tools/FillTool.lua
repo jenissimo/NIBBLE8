@@ -1,5 +1,6 @@
 local Tool = require("os/apps/sprite_editor/tools/Tool")
-local SetPixelsCommand = require("os/apps/sprite_editor/commands/SetPixelsCommand")
+local SetPixelsCommand = require(
+                             "os/apps/sprite_editor/commands/SetPixelsCommand")
 
 local FillTool = setmetatable({}, Tool)
 FillTool.__index = FillTool
@@ -23,7 +24,9 @@ end
 
 function FillTool:onMouseUp(drawArea, x, y)
     if self.drawing then
-        self:fill(drawArea, x, y)
+        local cursor = drawArea:getCursorPos(x, y)
+        self:fill(drawArea, cursor.x, cursor.y,
+                  drawArea:getPixelLocal(cursor.x, cursor.y))
         if self:isDirty() then
             self.command:setNewPixels(self.newPixels)
             drawArea.commandStack:push(self.command)
@@ -37,27 +40,18 @@ function FillTool:onMouseMove(drawArea, x, y)
     -- Do nothing
 end
 
-function FillTool:fill(drawArea, x, y)
-    local cursor = drawArea:getCursorPos(x, y)
-    local oldColor = drawArea:getPixel(x, y)
-    if oldColor == newColor then
-        return
-    end
-    self.newPixels[cursor.y + 1] = {}
-    self:fillPixel(drawArea, cursor.x, cursor.y, oldColor)
-end
+function FillTool:fill(drawArea, x, y, targetColor)
+    if not self:isInBounds(drawArea, x, y) then return end
 
-function FillTool:fillPixel(drawArea, x, y, oldColor)
-    local cursor = drawArea:getCursorPos(x, y)
-    if not self:isCursorInBounds(drawArea, cursor) or drawArea:getPixel(x, y) ~= oldColor then
-        return
-    end
-    self:setPixel(drawArea, x, y)
+    if self.newPixels[y + 1][x + 1] == targetColor then
+        self:setLocalPixel(drawArea, x, y)
 
-    self:fillPixel(drawArea, x + 1, y, oldColor)
-    self:fillPixel(drawArea, x - 1, y, oldColor)
-    self:fillPixel(drawArea, x, y + 1, oldColor)
-    self:fillPixel(drawArea, x, y - 1, oldColor)
+        -- Recursive calls for adjacent pixels
+        self:fill(drawArea, x + 1, y, targetColor)
+        self:fill(drawArea, x - 1, y, targetColor)
+        self:fill(drawArea, x, y + 1, targetColor)
+        self:fill(drawArea, x, y - 1, targetColor)
+    end
 end
 
 return FillTool

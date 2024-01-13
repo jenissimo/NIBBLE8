@@ -27,7 +27,6 @@ end
 
 function ColorPicker:mousereleased(x, y, button)
     if button == 1 and self.isPressed then
-        trace("Released!")
         for i = 0, 3 do
             local rectX = self.x + i * 7
             local rectY = self.y
@@ -37,6 +36,7 @@ function ColorPicker:mousereleased(x, y, button)
                 rectH then self.selectedColor = i end
             self.isPressed = false
         end
+        trace("Selected color: " .. self.selectedColor)
 
     end
 end

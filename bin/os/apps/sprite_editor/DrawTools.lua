@@ -6,7 +6,7 @@ DrawTools.__index = DrawTools
 local Tool = require("os/apps/sprite_editor/tools/Tool")
 local PenTool = require("os/apps/sprite_editor/tools/PenTool")
 local RectTool = require("os/apps/sprite_editor/tools/RectTool")
-local CircTool = require("os/apps/sprite_editor/tools/CircTool")
+local EllipseTool = require("os/apps/sprite_editor/tools/EllipseTool")
 local FillTool = require("os/apps/sprite_editor/tools/FillTool")
 local LineTool = require("os/apps/sprite_editor/tools/LineTool")
 
@@ -33,7 +33,7 @@ function DrawTools.new(x, y, toolChangeCallback)
     }, {
         name = "circle",
         drawFunction = DrawTools.drawCircle,
-        tool = CircTool.new()
+        tool = EllipseTool.new()
     }, {
         name = "rect",
         drawFunction = DrawTools.drawRect,
