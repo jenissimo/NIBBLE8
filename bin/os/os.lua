@@ -172,7 +172,7 @@ function drawCursor()
     for i = 1, #cursor_spr do
         for j = 1, #cursor_spr[i] do
             if cursor_spr[i][j] < 4 then
-                pset(mouse_coords.x + j - 1, mouse_coords.y + i - 1, cursor_spr[i][j])
+                pset(mouse_coords.x + j - 1, mouse_coords.y + i - 2, cursor_spr[i][j])
             end
         end
     end
