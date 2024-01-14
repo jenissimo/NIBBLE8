@@ -113,6 +113,10 @@ function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
     InputHandler.handleKeyInput(self, key_code, ctrl_pressed, shift_pressed)
 end
 
+function TextEditor:mousem(x, y, button)
+    TabBar:mousem(self, x, y, button)
+end
+
 function TextEditor:mousep(x, y, button)
     InputHandler:handleMouseInput(self, x, y, button)
     TabBar:mousep(self, x, y, button)

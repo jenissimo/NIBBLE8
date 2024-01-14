@@ -67,6 +67,18 @@ void dumpRAM()
     dumpPart("dump/screen.bin", memory.screenData, NIBBLE_SCREEN_DATA_SIZE);
 }
 
+void printMap()
+{
+    for (int y = 0; y < NIBBLE_MAP_HEIGHT; y++)
+    {
+        for (int x = 0; x < NIBBLE_MAP_WIDTH; x++)
+        {
+            printf("%d ", memory.mapData[x + y * NIBBLE_MAP_WIDTH]);
+        }
+        printf("\n");
+    }
+}
+
 void destroyRAM()
 {
     // free(state->memory);

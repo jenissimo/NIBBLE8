@@ -35,15 +35,26 @@ void nibble_api_sset(int16_t x, int16_t y, uint8_t col);
 uint8_t nibble_api_sget(int16_t x, int16_t y);
 void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol);
 void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8_t flipY);
-void nibble_api_mset(uint16_t x, uint16_t y, uint8_t sprite_number);
-uint8_t nibble_api_mget(uint16_t x, uint16_t y);
-void nibble_api_draw_fps(int fps);
+
+// map functions
+void nibble_api_map(int celx, int cely, int sx, int sy, int celw, int celh, uint8_t layer);
+void nibble_api_mset(uint16_t x, uint16_t y, int16_t sprite_number);
+int16_t nibble_api_mget(uint16_t x, uint16_t y);
+
 
 uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width);
 uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width);
+
+void moveCamera(int16_t dx, int16_t dy);
+void setCameraPosition(int16_t x, int16_t y);
+void setAndGetCamera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y);
+
 void setPixelFromSprite(int16_t x, int16_t y, uint8_t col);
 bool isColorTransparent(uint8_t color);
 void updateFrame(void);
+
+// debug
+void nibble_api_draw_fps(int fps);
 void printVRam(void);
 
 #endif

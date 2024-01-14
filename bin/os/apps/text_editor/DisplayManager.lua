@@ -36,7 +36,8 @@ function DisplayManager:redrawText(textEditor)
             if textEditor:isSelected(charIndex - 1, lineIndex - 1) then
                 color = 3
                 bgColor = 1
-            elseif textEditor:isUnderCursor(charIndex - 1, lineIndex - 1) and textEditor.cursor.visible then
+            elseif textEditor:isUnderCursor(charIndex - 1, lineIndex - 1) and
+                textEditor.cursor.visible then
                 color = 3
             end
 

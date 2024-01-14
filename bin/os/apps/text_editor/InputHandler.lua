@@ -165,6 +165,8 @@ function InputHandler:handleMouseInput(textEditor, x, y, button)
 
         if desiredCursorX + textEditor.scroll.x >
             #textEditor.lines[desiredCursorY + textEditor.scroll.y + 1] then
+                textEditor:setCursor(0, desiredCursorY)
+                textEditor:endCursor()
             return
         end
 

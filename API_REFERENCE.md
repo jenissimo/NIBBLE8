@@ -3,6 +3,7 @@ Resolution: 160x120 pixels, 4 color palette
 Programming language: Lua
 
 print(str, [x, y, col])
+camera([x,] [y])
 pal(c0, c1, [p])
 palt(c, t)
 pget(x, y)
@@ -17,6 +18,7 @@ spr(n, x, y, [w, h, flip_x, flip_y])
 sspr(sx, sy, sw, sh, dx, dy, [dw, dh, flip_x, flip_y])
 sset(x, y, col)
 sget(x, y)
+map(celx, cely, sx, sy, celw, celh, [layer])
 mget(x, y)
 mset(x, y, v)
 split(str, [delimiter])

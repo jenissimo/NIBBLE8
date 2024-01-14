@@ -44,15 +44,16 @@ function _init()
         width = 7,
         iconfn = draw_map_icon,
         window = mapEditor
-    }, {
-        width = 7,
-        iconfn = draw_note_icon,
-        window = musicTracker
-    }, {
-        width = 7,
-        iconfn = draw_note_icon,
-        window = synth
     }}
+--    }, {
+--        width = 7,
+--        iconfn = draw_note_icon,
+--        window = musicTracker
+--    }, {
+--        width = 7,
+--        iconfn = draw_note_icon,
+--        window = synth
+--    }}
 end
 
 function _update()

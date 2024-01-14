@@ -34,17 +34,17 @@ function SelectionManager:selectText(textEditor)
     local dirX = 0
     local dirY = 0
 
-    if key(KEYCODE.KEY_LEFT) == 1 then
+    if key(KEYCODE.KEY_LEFT) then
         dirX = -1
-    elseif key(KEYCODE.KEY_RIGHT) == 1 then
+    elseif key(KEYCODE.KEY_RIGHT) then
         dirX = 1
-    elseif key(KEYCODE.KEY_UP) == 1 then
+    elseif key(KEYCODE.KEY_UP) then
         dirY = -1
-    elseif key(KEYCODE.KEY_DOWN) == 1 then
+    elseif key(KEYCODE.KEY_DOWN) then
         dirY = 1
-    elseif key(KEYCODE.KEY_HOME) == 1 then
+    elseif key(KEYCODE.KEY_HOME) then
         dirX = -1
-    elseif key(KEYCODE.KEY_END) == 1 then
+    elseif key(KEYCODE.KEY_END) then
         dirX = 1        
     end
 

@@ -24,7 +24,7 @@ function MapEditor.new(x, y)
     self.dx = 0
     self.dy = 0
     self.viewportWidth = 160
-    self.viewportHeight = 120 - self.x-- - 64
+    self.viewportHeight = 120 - self.x -- - 64
     self.toolbarHeight = 64
     self.currentTool = "draw"
     self.dragging = false
@@ -32,6 +32,7 @@ function MapEditor.new(x, y)
     self.scrollY = 0
     self.mouseX = 0
     self.mouseY = 0
+    self.drawGrid = false
 
     self.history = {}
     self.historyIndex = 0
@@ -84,35 +85,46 @@ function MapEditor:draw()
     end
 
     -- Draw grid
-    for i = 1, self.viewportWidth, 8 do
-        line(self.x + i, self.y, self.x + i, self.y + self.viewportHeight, 1)
-    end
-    for i = 1, self.viewportHeight, 8 do
-        line(self.x, self.y + i, self.x + self.viewportWidth, self.y + i, 1)
+    if self.drawGrid then
+        for i = 1, self.viewportWidth, 8 do
+            line(self.x + i, self.y, self.x + i, self.y + self.viewportHeight, 1)
+        end
+        for i = 1, self.viewportHeight, 8 do
+            line(self.x, self.y + i, self.x + self.viewportWidth, self.y + i, 1)
+        end
     end
 
     if self.mouseX >= self.x and self.mouseX < self.x + self.viewportWidth and
         self.mouseY >= self.y and self.mouseY < self.y + self.viewportHeight then
         local mapX = math.floor((self.mouseX - self.x + self.scrollX) / 8)
         local mapY = math.floor((self.mouseY - self.y + self.scrollY) / 8)
-        rect(self.x + mapX * 8 - self.scrollX + 1, self.y + mapY * 8 - self.scrollY + 1,
-             9, 9, 2)
-        
+        rect(self.x + mapX * 8 - self.scrollX + 1,
+             self.y + mapY * 8 - self.scrollY + 1, 9, 9, 2)
+
         -- Draw tooltip
         self:drawTooltip(mapX, mapY)
     end
 
+    -- Draw the toolbar UI
+    -- rectfill(self.x, self.y + self.viewportHeight, self.viewportWidth,
+    --         self.toolbarHeight, 3)
+    -- for _, button in ipairs(self.toolbarButtons) do
+    --    button.draw(button.x, button.y, 1)
+    -- end
+
+end
+
+function MapEditor:drawPost()
     -- Draw the toolbar UI
     --rectfill(self.x, self.y + self.viewportHeight, self.viewportWidth,
     --         self.toolbarHeight, 3)
     --for _, button in ipairs(self.toolbarButtons) do
     --    button.draw(button.x, button.y, 1)
     --end
-
 end
 
 function MapEditor:drawTooltip(mapX, mapY)
-    local tooltipText = str(mapX)..":"..str(mapY)
+    local tooltipText = str(mapX) .. ":" .. str(mapY)
     local tileX = self.x + mapX * 8 - self.scrollX
     local tileY = self.y + mapY * 8 - self.scrollY
     -- change placement of tooltip next to viewport borders
@@ -120,9 +132,7 @@ function MapEditor:drawTooltip(mapX, mapY)
         tileX = tileX - #tooltipText * 4 - 2 - 8
     end
 
-    if tileY - 8 < self.y then
-        tileY = tileY + 20
-    end
+    if tileY - 8 < self.y then tileY = tileY + 20 end
 
     rectfill(tileX + 8, tileY - 8, #tooltipText * 4 + 2, 7, 2)
     print(tooltipText, tileX + 9, tileY - 7, 0)
@@ -145,11 +155,14 @@ function MapEditor:key(key_code, ctrl_pressed, shift_pressed)
                 self.historyIndex = self.historyIndex - 1
             end
         end
+    elseif key_code == KEYCODE.KEY_SPACE then
+        self.drawGrid = true
     end
 end
 
 function MapEditor:keyup(key_code, ctrl_pressed, shift_pressed)
     -- Handle key release events
+    if key_code == KEYCODE.KEY_SPACE then self.drawGrid = false end
 end
 
 function MapEditor:mousep(x, y, button)
@@ -164,8 +177,10 @@ function MapEditor:mousep(x, y, button)
     if self.currentTool == "draw" then
         local mapX = math.floor((x - self.x + self.scrollX) / 8)
         local mapY = math.floor((y - self.y + self.scrollY) / 8)
-        local prevSpriteIndex = nibble_api_mget(mapX, mapY)
-        mset(mapX, mapY, 1) -- Set sprite number, for example, 1
+        local prevSpriteIndex = mget(mapX, mapY)
+        mset(mapX, mapY, 1) -- Set sprite number, for example, 2
+
+        trace("mapX: " .. mapX .. ", mapY: " .. mapY .. ", sprite: " .. prevSpriteIndex)
 
         -- Record the action in the history stack
         self.historyIndex = self.historyIndex + 1
@@ -209,4 +224,3 @@ function MapEditor:mousem(x, y)
 end
 
 return MapEditor
-

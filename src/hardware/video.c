@@ -17,6 +17,9 @@ void initVideo()
     loadPalettes();
     updateFrame();
     nibble_api_pal_reset();
+
+    memory.drawState.camera_x = 0;
+    memory.drawState.camera_y = 0;
 }
 
 void loadFont()
@@ -185,6 +188,9 @@ void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
 {
     uint16_t index;
     uint8_t bitPairIndex;
+
+    x -= memory.drawState.camera_x;
+    y -= memory.drawState.camera_y;
 
     if ((x < 0) || (y < 0))
         return;
@@ -409,19 +415,51 @@ uint8_t nibble_api_sget(int16_t x, int16_t y)
     return (memory.spriteSheetData[index] >> ((3 - bitPairIndex) * 2)) & 0x03;
 }
 
-void nibble_api_mset(uint16_t x, uint16_t y, uint8_t sprite_number)
+void nibble_api_map(int celx, int cely, int sx, int sy, int celw, int celh, uint8_t layer)
+{
+    for (int y = 0; y < celh; y++)
+    {
+        for (int x = 0; x < celw; x++)
+        {
+            // Calculate the map cell index
+            uint16_t mapIndex = (cely + y) * NIBBLE_MAP_WIDTH + (celx + x);
+
+            // Check bounds
+            if (mapIndex < 0 || mapIndex >= NIBBLE_MAP_COUNT)
+                continue;
+
+            // Retrieve the sprite index from the map data
+            uint16_t spriteIndex = memory.mapData[mapIndex];
+
+            // If a layer is specified, check sprite flags
+            if (layer > 0)
+            {
+                uint8_t spriteFlags = memory.spriteFlagsData[spriteIndex];
+                if ((spriteFlags & layer) != layer)
+                    continue;
+            }
+
+            // Draw the sprite
+            int drawX = sx + x * NIBBLE_TILE_SIZE;
+            int drawY = sy + y * NIBBLE_TILE_SIZE;
+            nibble_api_spr(spriteIndex, drawX, drawY, 0, 0);
+        }
+    }
+}
+
+void nibble_api_mset(uint16_t x, uint16_t y, int16_t sprite_number)
 {
     uint32_t index = y * NIBBLE_MAP_WIDTH + x;
-    if (index >= 0 && index < NIBBLE_MAP_SIZE)
+    if (index >= 0 && index < NIBBLE_MAP_COUNT)
     {
         memory.mapData[index] = sprite_number;
     }
 }
 
-uint8_t nibble_api_mget(uint16_t x, uint16_t y)
+int16_t nibble_api_mget(uint16_t x, uint16_t y)
 {
     uint32_t index = y * NIBBLE_MAP_WIDTH + x;
-    if (index >= 0 && index < NIBBLE_MAP_SIZE)
+    if (index >= 0 && index < NIBBLE_MAP_COUNT)
     {
         return memory.mapData[index];
     }
@@ -467,6 +505,29 @@ uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
 uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
 {
     return (y * width + x) % NIBBLE_PIXELS_IN_BYTE;
+}
+
+void moveCamera(int16_t dx, int16_t dy)
+{
+    memory.drawState.camera_x += dx;
+    memory.drawState.camera_y += dy;
+}
+
+void setCameraPosition(int16_t x, int16_t y)
+{
+    memory.drawState.camera_x = x;
+    memory.drawState.camera_y = y;
+}
+
+void setAndGetCamera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
+{
+    // Store the current camera position
+    *prev_x = memory.drawState.camera_x;
+    *prev_y = memory.drawState.camera_y;
+
+    // Set the new camera position
+    memory.drawState.camera_x = x;
+    memory.drawState.camera_y = y;
 }
 
 void setPixelFromSprite(int16_t x, int16_t y, uint8_t col)

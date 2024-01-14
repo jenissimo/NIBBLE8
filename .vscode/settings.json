@@ -70,6 +70,8 @@
         "synth.h": "c",
         "utils.h": "c",
         "debug.h": "c",
-        "nibble8.h": "c"
+        "nibble8.h": "c",
+        "error_handling.h": "c",
+        "os.h": "c"
     }
 }

@@ -57,18 +57,6 @@ typedef struct DrawState
     int16_t line_y;
 } DrawState;
 
-typedef struct MemoryLayout
-{
-    uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
-    uint8_t mapData[NIBBLE_MAP_SIZE];
-    uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
-    uint8_t musicData[NIBBLE_MUSIC_SIZE];
-    uint8_t sfxData[NIBBLE_SFX_SIZE];
-    DrawState drawState;
-    uint8_t hardwareState[NIBBLE_HARDWARE_STATE_SIZE];
-    uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
-} MemoryLayout;
-
 typedef struct Note
 {
     uint8_t custom : 1;     // note height (0-1)
@@ -86,12 +74,24 @@ typedef struct SFX
     Note notes[NIBBLE_SFX_MAX_NOTES]; // Array of notes for this SFX
 } SFX;
 
+typedef struct MemoryLayout
+{
+    uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
+    uint16_t mapData[NIBBLE_MAP_COUNT];
+    uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
+    uint8_t musicData[NIBBLE_MUSIC_SIZE];
+    uint8_t sfxData[NIBBLE_SFX_SIZE];
+    DrawState drawState;
+    uint8_t hardwareState[NIBBLE_HARDWARE_STATE_SIZE];
+    uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
+} MemoryLayout;
+
 typedef union
 {
     struct
     {
         uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
-        uint8_t mapData[NIBBLE_MAP_SIZE];
+        uint16_t mapData[NIBBLE_MAP_COUNT];
         uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
         uint8_t musicData[NIBBLE_MUSIC_SIZE];
         SFX sfxData[NIBBLE_SFX_COUNT];
@@ -113,6 +113,7 @@ void saveMemoryLayout();
 void dumpPart(char *name, void *start, int size);
 void dumpRAM(void);
 void destroyRAM(void);
+void printMap();
 uint8_t nibble_api_peek(uint16_t addr);
 uint16_t nibble_api_peek2(uint16_t addr);
 void nibble_api_poke(uint16_t addr, uint8_t value);

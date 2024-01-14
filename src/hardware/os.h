@@ -31,18 +31,7 @@ int nibble_api_change_dir(char *path);
 int nibble_api_write_file(char *path, char *data);
 const uint8_t *nibble_api_get_clipboard_text();
 int nibble_api_set_clipboard_text(const uint8_t *text);
-ErrorCode nibble_api_load_cart(char *path);
 const char *nibble_api_get_code();
 void nibble_api_run_code(char *code);
-int nibble_api_save_cart(char *path, char *luaCode);
-void nibble_api_import_png(char *path);
-void nibble_api_export_png(char *path);
-void nibble_api_import_lua(char *path);
-void nibble_api_export_lua(char *path);
-
-// Zip functions
-bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, void **buffer, size_t *buffer_size);
-void load_file_from_zip(const char *zip_filename, const char *file_to_load, void **buffer);
-void load_text_from_zip(const char *zip_filename, const char *file_to_load, char **buffer);
 
 #endif

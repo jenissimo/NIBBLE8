@@ -2,10 +2,12 @@
 #define nibble_lua_h
 
 #include "../nibble8.h"
+#include "../debug/debug.h"
 #include "../hardware/video.h"
 #include "../hardware/audio.h"
 #include "../hardware/input.h"
 #include "../hardware/os.h"
+#include "../hardware/cart.h"
 #include "../hardware/utils.h"
 #include "../utils/error_handling.h"
 
@@ -29,6 +31,7 @@ void closeLuaApp(void);
 void registerFunction(const char* name, lua_CFunction func);
 
 static char* printString(lua_State* lua, int index);
+static int l_camera(lua_State *L);
 static int l_pal(lua_State *L);
 static int l_palt(lua_State *L);
 static int l_cls(lua_State *L);
@@ -73,10 +76,15 @@ static int l_read_file(lua_State *L);
 static int l_load_cart(lua_State *L);
 static int l_save_cart(lua_State *L);
 static int l_change_dir(lua_State *L);
+
+// Sprite functions
 static int l_spr(lua_State *L);
 static int l_sspr(lua_State *L);
 static int l_sset(lua_State *L);
 static int l_sget(lua_State *L);
+
+// Map functions
+static int l_map(lua_State *L);
 static int l_mget(lua_State *L);
 static int l_mset(lua_State *L);
 

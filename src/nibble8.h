@@ -34,7 +34,8 @@
 
 #define NIBBLE_MAP_WIDTH          128
 #define NIBBLE_MAP_HEIGHT         64
-#define NIBBLE_MAP_SIZE          NIBBLE_TILE_SIZE * NIBBLE_MAP_WIDTH * NIBBLE_MAP_HEIGHT
+#define NIBBLE_MAP_COUNT          NIBBLE_MAP_WIDTH * NIBBLE_MAP_HEIGHT
+#define NIBBLE_MAP_SIZE           NIBBLE_MAP_COUNT * sizeof(uint16_t)
 
 // 64 music frames (0-63), each frame uses 4 bytes represents 4 channels
 #define NIBBLE_MUSIC_SIZE           256 

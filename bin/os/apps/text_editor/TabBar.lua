@@ -13,6 +13,7 @@ TabBar.scrollIndex = 1
 TabBar.maxVisibleTabs = 14
 TabBar.totalTabWidth = 0
 TabBar.uiElements = {}
+TabBar.tooltip = nil
 TabBar.dirty = true
 
 function TabBar:update(textEditor) end
@@ -46,6 +47,13 @@ function TabBar:draw(textEditor)
             print("+", x + 2, y + 1, self.tabColor)
         end
     end
+
+    if self.tooltip then self:drawTooltip() end
+end
+
+function TabBar:drawTooltip()
+    rectfill(0, 7, 160, 7, 1)
+    print(self.tooltip.text, 1, 8, 3)
 end
 
 function TabBar:getVisibleTabsCount(textEditor)
@@ -163,11 +171,40 @@ function TabBar:invalidateUIElements(textEditor)
     self.totalTabWidth = x - self.margin -- Assuming x is the position after the last element
     self.x = 160 - self.totalTabWidth
 
-    if #textEditor.tabs <= self.maxVisibleTabs then
-        self.scrollIndex = 1
-    end
+    if #textEditor.tabs <= self.maxVisibleTabs then self.scrollIndex = 1 end
 
     self.dirty = false -- Reset the dirty flag after updating
+end
+
+function TabBar:mousem(textEditor, mouseX, mouseY, button)
+    for _, element in ipairs(self.uiElements) do
+        local x1 = element.x1 + self.x
+        local x2 = element.x2 + self.x
+        local y1 = element.y1
+        local y2 = element.y2
+
+        if mouseX >= x1 and mouseX <= x2 and mouseY >= y1 and mouseY <= y2 and
+            element.type == "tab" then
+
+            if TabBar.tooltip ~= nil and TabBar.tooltip.index == element.index then
+                return
+            end
+
+            local tabText = textEditor.tabs[element.index].text
+            local firstLine = tabText:match("^(.-)\n") or tabText
+
+            -- Check if the first line starts with a comment
+            if firstLine:match("^%-%- ?(.+)") then
+                --local commentText = firstLine:match("^%-%- ?(.+)")
+                TabBar.tooltip = {text = firstLine, index = element.index}
+            else
+                TabBar.tooltip = nil
+            end
+
+            return
+        end
+    end
+    TabBar.tooltip = nil
 end
 
 function TabBar:mousep(textEditor, mouseX, mouseY, button)
