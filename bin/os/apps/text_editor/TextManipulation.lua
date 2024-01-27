@@ -157,10 +157,11 @@ function TextManipulation:removeSelectedText(textEditor)
         textEditor.lines[startY + 1] = line1 .. line2
     end
 
-    textEditor:checkAndAdjustCursorBounds()
-    
     textEditor:clearSelection()
     textEditor.syntax_highlighting_dirty = true
+
+    textEditor:setCursor(startX, startY)
+    textEditor:checkAndAdjustCursorBounds()
 end
 
 function TextManipulation:copy(textEditor)
