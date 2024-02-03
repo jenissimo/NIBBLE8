@@ -10,6 +10,7 @@ ErrorCode nibble_api_load_cart(const char *path)
 
     loadLuaCodeFromCart(path);
     loadMapDataFromCart(path);
+    loadSpriteFlagsFromCart(path);
     loadSpriteSheetFromCart(path);
 
     return ERROR_SUCCESS;
@@ -50,6 +51,26 @@ void processMapData(const uint8_t *buffer, size_t bufferSize)
     {
         uint16_t value = buffer[i * 2] | (buffer[i * 2 + 1] << 8);
         memory.mapData[i] = value;
+    }
+}
+
+// Load sprite flags data from the cart
+void loadSpriteFlagsFromCart(const char *path)
+{
+    if (cart_has_file(path, "spriteFlags.bin"))
+    {
+        uint8_t *flagsBuffer;
+        size_t flagsBufferSize = load_file_from_zip(path, "spriteFlags.bin", (void **)&flagsBuffer);
+        // Ensure the buffer size matches NIBBLE_SPRITE_FLAG_SIZE
+        if (flagsBufferSize == NIBBLE_SPRITE_FLAG_SIZE)
+        {
+            memcpy(memory.spriteFlagsData, flagsBuffer, flagsBufferSize);
+        }
+        else
+        {
+            printf("Error: spriteFlags.bin size mismatch.\n");
+        }
+        free(flagsBuffer);
     }
 }
 
@@ -110,6 +131,14 @@ int nibble_api_save_cart(char *path, char *luaCode)
     {
         printf("Failed to add spritesheet.png to cartridge.zip\n");
         // free(spritesheet_data);
+        mz_zip_writer_end(&zip_archive);
+        return 1;
+    }
+
+    // Add spriteFlagsData to the ZIP archive
+    if (!mz_zip_writer_add_mem(&zip_archive, "spriteFlags.bin", memory.spriteFlagsData, NIBBLE_SPRITE_FLAG_SIZE, MZ_DEFAULT_COMPRESSION))
+    {
+        printf("Failed to add spriteFlags.bin to cartridge.zip\n");
         mz_zip_writer_end(&zip_archive);
         return 1;
     }

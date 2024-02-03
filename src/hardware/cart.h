@@ -18,6 +18,7 @@ ErrorCode nibble_api_load_cart(const char *path);
 void loadLuaCodeFromCart(const char *path);
 void loadMapDataFromCart(const char *path);
 void processMapData(const uint8_t *buffer, size_t bufferSize);
+void loadSpriteFlagsFromCart(const char *path);
 void loadSpriteSheetFromCart(const char *path);
 
 int nibble_api_save_cart(char *path, char *luaCode);

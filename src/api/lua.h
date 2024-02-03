@@ -82,6 +82,8 @@ static int l_spr(lua_State *L);
 static int l_sspr(lua_State *L);
 static int l_sset(lua_State *L);
 static int l_sget(lua_State *L);
+static int l_fget(lua_State *L);
+static int l_fset(lua_State *L);
 
 // Map functions
 static int l_map(lua_State *L);

@@ -55,10 +55,16 @@ void initCoreAPI()
     registerFunction("rect", l_rect);
     registerFunction("rectfill", l_rectfill);
     registerFunction("cls", l_cls);
+
+    // Sprite functions
     registerFunction("spr", l_spr);
     registerFunction("sspr", l_sspr);
     registerFunction("sset", l_sset);
     registerFunction("sget", l_sget);
+    registerFunction("fget", l_fget);
+    registerFunction("fset", l_fset);
+
+    // Map Functions
     registerFunction("map", l_map);
     registerFunction("mget", l_mget);
     registerFunction("mset", l_mset);
@@ -1007,6 +1013,102 @@ static int l_sget(lua_State *L)
     }
 
     return 0;
+}
+
+static int l_fget(lua_State *L)
+{
+    int nargs = lua_gettop(L);                 // Number of arguments
+    int spriteIndex = luaL_checkinteger(L, 1); // Sprite index
+
+    if (spriteIndex < 0 || spriteIndex >= NIBBLE_SPRITE_FLAG_SIZE)
+    {
+        luaL_error(L, "Sprite index out of bounds");
+        return 0;
+    }
+
+    if (nargs == 1)
+    {
+        // If flag index is omitted, return a bit field of all flags
+        lua_pushinteger(L, memory.spriteFlagsData[spriteIndex]);
+    }
+    else if (nargs == 2)
+    {
+        // If flag index is provided
+        int flagIndex = luaL_checkinteger(L, 2);
+        if (flagIndex < 0 || flagIndex > 7)
+        {
+            luaL_error(L, "Flag index must be between 0 and 7");
+            return 0;
+        }
+
+        // Calculate if the specific flag is set
+        bool isSet = (memory.spriteFlagsData[spriteIndex] & (1 << flagIndex)) != 0;
+        lua_pushboolean(L, isSet);
+    }
+    else
+    {
+        luaL_error(L, "fget takes 1 or 2 arguments: sprite index and optional flag index");
+        return 0;
+    }
+
+    return 1; // Number of return values
+}
+
+static int l_fset(lua_State *L)
+{
+    int nargs = lua_gettop(L); // Number of arguments
+
+    int spriteIndex = luaL_checkinteger(L, 1); // Use the first argument as sprite index
+
+    // Default initialization
+    bool value = false;
+    int flagIndex = -1; // Use -1 to indicate "all flags" scenario initially
+
+    // Determine action based on argument count
+    if (nargs == 2)
+    {
+        // If only two arguments, the second argument is the value to set/clear all flags
+        value = lua_toboolean(L, 2);
+        for (int i = 0; i < 8; ++i)
+        {
+            if (value)
+            {
+                memory.spriteFlagsData[spriteIndex] |= (1 << i);
+            }
+            else
+            {
+                memory.spriteFlagsData[spriteIndex] &= ~(1 << i);
+            }
+        }
+    }
+    else if (nargs == 3)
+    {
+        // If three arguments, the second is flag index and the third is the value
+        flagIndex = luaL_checkinteger(L, 2); // Use the second argument as flag index
+        value = lua_toboolean(L, 3);
+
+        // Validate flagIndex range
+        if (flagIndex < 0 || flagIndex > 7)
+        {
+            return luaL_error(L, "Flag index must be between 0 and 7");
+        }
+
+        // Set or clear the specific flag
+        if (value)
+        {
+            memory.spriteFlagsData[spriteIndex] |= (1 << flagIndex);
+        }
+        else
+        {
+            memory.spriteFlagsData[spriteIndex] &= ~(1 << flagIndex);
+        }
+    }
+    else
+    {
+        return luaL_error(L, "Incorrect number of arguments to fset");
+    }
+
+    return 0; // No return values
 }
 
 static int l_map(lua_State *L)

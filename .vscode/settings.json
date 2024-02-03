@@ -72,6 +72,8 @@
         "debug.h": "c",
         "nibble8.h": "c",
         "error_handling.h": "c",
-        "os.h": "c"
+        "os.h": "c",
+        "stdio.h": "c",
+        "ram.h": "c"
     }
 }

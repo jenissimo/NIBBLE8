@@ -30,8 +30,10 @@ function sprite_editor:init()
     commandStack = CommandStack.new()
 
     spriteNumberLabel = Label.new(30, 9, "#001", 3)
-    drawArea = DrawArea.new(sprite_editor.x + 6, sprite_editor.y + 11, 64, 64, commandStack)
-    drawTools = DrawTools.new(drawArea.x + 5, drawArea.y + drawArea.height + 4, sprite_editor.onToolChanged)
+    drawArea = DrawArea.new(sprite_editor.x + 6, sprite_editor.y + 11, 64, 64,
+                            commandStack)
+    drawTools = DrawTools.new(drawArea.x + 5, drawArea.y + drawArea.height + 4,
+                              sprite_editor.onToolChanged)
     colorPicker = ColorPicker.new(sprite_editor.x + 3, sprite_editor.y + 89)
     spriteSelector = SpriteSelector.new(80, 0, 80, 120)
     spriteSelectorTabBar = TabBar.new(73, sprite_editor.y + 2, 6)
@@ -52,7 +54,8 @@ function sprite_editor:init()
         end
     end)
 
-    spriteSizeStepper = NumbericStepper.new(55, 96, 1, 4, sprite_editor.onSpriteSizeChanged,
+    spriteSizeStepper = NumbericStepper.new(55, 96, 1, 4,
+                                            sprite_editor.onSpriteSizeChanged,
                                             function(x, y, value)
         rectfill(x, y, 7, 7, 0)
         if value == 1 then
@@ -102,6 +105,9 @@ function sprite_editor:update()
     drawArea.currentSprite = spriteSelector.selectedSprite
     drawArea.currentColor = colorPicker.selectedColor
     spriteSelector.page = spriteSelectorTabBar.selectedTab
+    if (spriteSelector.selectedSprite ~= spriteFlagsSelector.selectedSprite) then
+        spriteFlagsSelector:setSelectedSprite(spriteSelector.selectedSprite)
+    end
 
     uiManager:update()
 end
@@ -120,9 +126,7 @@ function sprite_editor:drawPost()
     self:drawStatusBar()
 end
 
-function sprite_editor.onToolChanged(tool)
-    drawArea.currentTool = tool
-end
+function sprite_editor.onToolChanged(tool) drawArea.currentTool = tool end
 
 function sprite_editor.onBrushSizeChanged(value)
     -- drawArea:setBrushSize(value)

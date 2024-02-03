@@ -16,8 +16,6 @@ typedef struct DrawState
     uint8_t clip_xe;
     uint8_t clip_ye;
 
-    uint8_t unknown05f24;
-
     uint8_t color;
 
     uint8_t text_x;
@@ -43,10 +41,6 @@ typedef struct DrawState
     uint8_t colorSettingFlag;
 
     uint8_t lineInvalid;
-
-    // hardware extension
-    uint8_t unknown05f36;
-    uint8_t unknown05f37;
 
     uint8_t tlineMapWidth;
     uint8_t tlineMapHeight;

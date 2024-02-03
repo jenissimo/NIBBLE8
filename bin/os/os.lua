@@ -44,12 +44,12 @@ function _init()
         width = 7,
         iconfn = draw_map_icon,
         window = mapEditor
-    }}
---    }, {
---        width = 7,
---        iconfn = draw_note_icon,
---        window = musicTracker
---    }, {
+    },--}
+    {
+        width = 7,
+        iconfn = draw_note_icon,
+        window = musicTracker
+    }}--, {
 --        width = 7,
 --        iconfn = draw_note_icon,
 --        window = synth
@@ -227,6 +227,7 @@ function loadCart(path)
         return errorMsg
     else
         textEditor:init(result)
+        spriteEditor.init()
         currentCartPath = path
     end
 end
