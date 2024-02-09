@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "nibble8.h"
 #include "debug/debug.h"
-#include "adapters/sdl_adapter.h"
+#include "adapters/sdl2/sdl_adapter.h"
 #include "hardware/os.h"
 #include "hardware/ram.h"
 #include "hardware/video.h"

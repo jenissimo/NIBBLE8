@@ -1,116 +1,15 @@
-#include "sdl_adapter.h"
-#include "../debug/debug.h"
-#include "../hardware/audio.h"
-#include "../hardware/video.h"
-#include "../hardware/palette_manager.h"
-#include "../hardware/input.h"
-#include "../hardware/ram.h"
-#include "../hardware/os.h"
-#include "../nibble8.h"
-#include "../api/lua.h"
-#include "../utils/png.h"
+#include "input_manager.h"
+#include <SDL2/SDL.h>
 
-SDL_Window *window = NULL;
-SDL_Surface *screen = NULL;
-SDL_Renderer *renderer;
-SDL_Texture *texture;
-SDL_Rect viewport;
-bool isFullscreen = false;
-
-int16_t audioBuffer[NUM_SAMPLES];
-uint32_t next_time;
-
-const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
-Uint32 fpsLastTime = 0;
-int frameCount = 0;
-int fpsCurrent = 0;
-
-uint32_t time_left(void)
+int input_init()
 {
-    uint32_t now;
-
-    now = SDL_GetTicks();
-    if (next_time <= now)
-        return 0;
-    else
-        return next_time - now;
-}
-
-static void audio_callback(void *userdata, uint8_t *stream, int len)
-{
-    int16_t *audioStream = (int16_t *)stream;
-    int audioLength = len / sizeof(int16_t);
-
-    nibble_audio_update(audioBuffer, audioLength);
-    memcpy(audioStream, audioBuffer, len);
-}
-
-int nibble_sdl_init()
-{
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-    {
-        DEBUG_LOG("SDL Initialization failed: %s", SDL_GetError());
-        printf("Can't init: %s\n", SDL_GetError());
-        system("pause");
-        return 1;
-    }
-
-    window = SDL_CreateWindow(NIBBLE_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, NIBBLE_WIDTH * NIBBLE_WINDOW_SCALE, NIBBLE_HEIGHT * NIBBLE_WINDOW_SCALE, 0);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, NIBBLE_WIDTH, NIBBLE_HEIGHT);
-
-    SDL_RenderSetScale(renderer, NIBBLE_WINDOW_SCALE, NIBBLE_WINDOW_SCALE);
-    if (window == NULL)
-    {
-        printf("Can't create window: %s\n", SDL_GetError());
-        system("pause");
-        return 1;
-    }
-
-    // Open the audio device
-    SDL_AudioSpec desired_spec, obtained_spec;
-
-    desired_spec.freq = SAMPLE_RATE;
-    desired_spec.format = AUDIO_S16SYS;
-    desired_spec.channels = NUM_CHANNELS;
-    desired_spec.samples = NUM_SAMPLES;
-    desired_spec.callback = audio_callback;
-    desired_spec.userdata = NULL;
-
-    if (SDL_OpenAudio(&desired_spec, &obtained_spec) < 0)
-    {
-        DEBUG_LOG("Failed to open audio device: %s", SDL_GetError());
-        fprintf(stderr, "Failed to open audio device: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    memset(audioBuffer, 0, sizeof(audioBuffer)); // Empty our audio buffer
-    SDL_Delay(50);                               // Add a short delay, say 50ms
-    // Start audio playback
-    SDL_PauseAudio(0);
-
-    DEBUG_LOG("SDL Initialized");
-
-    // Init iunput
-    nibble_clear_keys();
-    // init clipboard functions
-    getClipboardText = SDL_GetClipboardText;
-    setClipboardText = SDL_SetClipboardText;
-    freeClipboardText = SDL_free;
-
-    screen = SDL_GetWindowSurface(window);
-    SDL_ShowCursor(SDL_DISABLE);
-
     return 0;
 }
 
-int nibble_sdl_update()
+int input_update()
 {
     SDL_Event e;
-    SDL_UpdateTexture(texture, NULL, frame, NIBBLE_WIDTH * sizeof(uint32_t));
-
     nibble_clear_keys();
-
     while (SDL_PollEvent(&e) != NULL)
     {
         if (e.type == SDL_QUIT)
@@ -197,61 +96,9 @@ int nibble_sdl_update()
             callLuaMouseRelease(mousePos.x, mousePos.y, e.button.button);
         }
     }
-
-    int windowWidth, windowHeight;
-    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
-    updateAspectRatio(renderer, windowWidth, windowHeight, NIBBLE_WIDTH * NIBBLE_WINDOW_SCALE, NIBBLE_HEIGHT * NIBBLE_WINDOW_SCALE);
     updateButtonState();
 
-    callLuaFunction("_update");
-    callLuaFunction("_draw");
-
-#if NIBBLE_DISPLAY_FPS
-    nibble_api_draw_fps(fpsCurrent);
-#endif
-
-    updateFrame();
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-#if NIBBLE_DISPLAY_FPS
-    frameCount++;
-    if (SDL_GetTicks() - fpsLastTime > FPS_DELAY)
-    {
-        fpsCurrent = frameCount * 1000 / (SDL_GetTicks() - fpsLastTime);
-        fpsLastTime = SDL_GetTicks();
-        frameCount = 0;
-    }
-#endif
-
     return 1;
-}
-
-void goFullScreen()
-{
-    isFullscreen = true;
-    Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
-    SDL_SetWindowFullscreen(window, flags);
-}
-
-void updateAspectRatio(SDL_Renderer *renderer, int windowWidth, int windowHeight, int targetWidth, int targetHeight)
-{
-    float scaleX = (float)windowWidth / targetWidth;
-    float scaleY = (float)windowHeight / targetHeight;
-
-    float scale = fminf(scaleX, scaleY);
-
-    int viewportWidth = (int)(targetWidth * scale);
-    int viewportHeight = (int)(targetHeight * scale);
-
-    viewport.x = (windowWidth - viewportWidth) / 2;
-    viewport.y = (windowHeight - viewportHeight) / 2;
-    viewport.w = viewportWidth;
-    viewport.h = viewportHeight;
-
-    SDL_RenderSetViewport(renderer, &viewport);
-    SDL_RenderSetScale(renderer, 1, 1);
 }
 
 SDL_Point convertMouseCoordinates(int mouseX, int mouseY)
@@ -288,12 +135,6 @@ void updateButtonState()
 
     buttonState.previous[BUTTON_B] = buttonState.current[BUTTON_B];
     buttonState.current[BUTTON_B] = SDL_GetKeyboardState(NULL)[SDL_SCANCODE_X];
-}
-
-void make_screenshot()
-{
-    write_indexed_png("screenshot.png", memory.screenData, NIBBLE_WIDTH, NIBBLE_HEIGHT, currentPalette(manager));
-    // write_indexed_png("sprite_sheet.png", memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
 }
 
 int nibble_get_custom_key(int key)
@@ -471,16 +312,4 @@ void nibble_sdl_save_lua_keys_constants()
 void nibble_sdl_print_lua_key(FILE *f, char *name, int key)
 {
     fprintf(f, "key_constant.KEY_%s = %d\n", name, nibble_get_custom_key(key));
-}
-
-int nibble_sdl_quit()
-{
-    SDL_PauseAudio(1);
-    SDL_CloseAudio();
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    return EXIT_SUCCESS;
 }

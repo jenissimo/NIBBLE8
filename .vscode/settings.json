@@ -74,6 +74,8 @@
         "error_handling.h": "c",
         "os.h": "c",
         "stdio.h": "c",
-        "ram.h": "c"
+        "ram.h": "c",
+        "sdl_adapter.h": "c",
+        "video_manager.h": "c"
     }
 }
