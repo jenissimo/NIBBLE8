@@ -56,7 +56,7 @@ void video_update()
     nibble_api_draw_fps(fpsCurrent);
 #endif
 
-    updateFrame();
+    update_frame();
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);

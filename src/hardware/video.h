@@ -11,10 +11,10 @@ extern uint8_t *font;
 extern PaletteManager *manager;
 static const uint8_t fullByteColors[4] = {0b00000000, 0b01010101, 0b10101010, 0b11111111};
 
-void initVideo(void);
-void destroyVideo(void);
-void loadFont(void);
-void loadPalettes();
+void init_video(void);
+void destroy_video(void);
+void load_font(void);
+void load_palettes();
 void print_char(int charIndex);
 void nibble_api_cls(uint8_t col);
 void nibble_api_pal(uint8_t c0, uint8_t c1, uint8_t p);
@@ -45,16 +45,16 @@ int16_t nibble_api_mget(uint16_t x, uint16_t y);
 uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width);
 uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width);
 
-void moveCamera(int16_t dx, int16_t dy);
-void setCameraPosition(int16_t x, int16_t y);
-void setAndGetCamera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y);
+void move_camera(int16_t dx, int16_t dy);
+void set_camera_position(int16_t x, int16_t y);
+void set_and_get_camera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y);
 
-void setPixelFromSprite(int16_t x, int16_t y, uint8_t col);
-bool isColorTransparent(uint8_t color);
-void updateFrame(void);
+void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col);
+bool is_color_transparent(uint8_t color);
+void update_frame(void);
 
 // debug
 void nibble_api_draw_fps(int fps);
-void printVRam(void);
+void print_vram(void);
 
 #endif

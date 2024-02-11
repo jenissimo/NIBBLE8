@@ -9,7 +9,7 @@ void nibble_api_reboot()
     destroyLua();
     initLua();
     clearRAM();
-    initVideo();
+    init_video();
 }
 
 char *nibble_api_ls(char *path)

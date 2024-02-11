@@ -10,19 +10,19 @@ uint32_t *frame;
 uint8_t *font;
 PaletteManager *manager;
 
-void initVideo()
+void init_video()
 {
     frame = malloc(NIBBLE_WIDTH * NIBBLE_HEIGHT * sizeof(uint32_t));
-    loadFont();
-    loadPalettes();
-    updateFrame();
+    load_font();
+    load_palettes();
+    update_frame();
     nibble_api_pal_reset();
 
     memory.drawState.camera_x = 0;
     memory.drawState.camera_y = 0;
 }
 
-void loadFont()
+void load_font()
 {
     font = malloc(FONT_SIZE_COMPRESSED * sizeof(uint8_t));
     FILE *f = fopen("font.bin", "rb");
@@ -30,7 +30,7 @@ void loadFont()
     fclose(f);
 }
 
-void loadPalettes()
+void load_palettes()
 {
     const char *ini_file = "palettes.ini";
 
@@ -62,7 +62,7 @@ void print_char(int charIndex)
     printf("\n");
 }
 
-void destroyVideo()
+void destroy_video()
 {
     free(frame);
 }
@@ -341,9 +341,9 @@ void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8
         for (uint16_t sprX = startX; sprX != endX; sprX += incX)
         {
             uint8_t color = nibble_api_sget(sprX, sprY);
-            if (!isColorTransparent(color))
+            if (!is_color_transparent(color))
             {
-                setPixelFromSprite(x + sprX - startX, y + sprY - startY, color);
+                set_pixel_from_sprite(x + sprX - startX, y + sprY - startY, color);
             }
         }
     }
@@ -370,9 +370,9 @@ void nibble_api_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int
             }
 
             uint8_t color = nibble_api_sget(sx + si, sy + sj);
-            if (!isColorTransparent(color))
+            if (!is_color_transparent(color))
             {
-                setPixelFromSprite(dx + i, dy + j, color);
+                set_pixel_from_sprite(dx + i, dy + j, color);
             }
         }
     }
@@ -478,7 +478,7 @@ void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol
             }
             else
             {
-                if (!isColorTransparent(bgCol))
+                if (!is_color_transparent(bgCol))
                 {
                     nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
                 }
@@ -507,19 +507,19 @@ uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
     return (y * width + x) % NIBBLE_PIXELS_IN_BYTE;
 }
 
-void moveCamera(int16_t dx, int16_t dy)
+void move_camera(int16_t dx, int16_t dy)
 {
     memory.drawState.camera_x += dx;
     memory.drawState.camera_y += dy;
 }
 
-void setCameraPosition(int16_t x, int16_t y)
+void set_camera_position(int16_t x, int16_t y)
 {
     memory.drawState.camera_x = x;
     memory.drawState.camera_y = y;
 }
 
-void setAndGetCamera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
+void set_and_get_camera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
 {
     // Store the current camera position
     *prev_x = memory.drawState.camera_x;
@@ -530,7 +530,7 @@ void setAndGetCamera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
     memory.drawState.camera_y = y;
 }
 
-void setPixelFromSprite(int16_t x, int16_t y, uint8_t col)
+void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
 {
     uint16_t index;
     uint8_t bitPairIndex;
@@ -551,13 +551,13 @@ void setPixelFromSprite(int16_t x, int16_t y, uint8_t col)
     memory.screenData[index] |= (col << shift);
 }
 
-bool isColorTransparent(uint8_t color)
+bool is_color_transparent(uint8_t color)
 {
     color = color & 0x0f;
     return (memory.drawState.drawPaletteMap[color] >> 4) > 0; // upper bits indicate transparency
 }
 
-void updateFrame()
+void update_frame()
 {
     int pixelIndex = 0;
     const Palette *palette = currentPalette(manager);
@@ -575,7 +575,7 @@ void updateFrame()
     }
 }
 
-void printVRam()
+void print_vram()
 {
     int v = 0;
     int col = 0;

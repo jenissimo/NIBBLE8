@@ -388,7 +388,7 @@ static int l_camera(lua_State *L)
     if (top >= 2)
         y = (int16_t)lua_tointeger(L, 2);
 
-    setAndGetCamera(x, y, &prev_x, &prev_y);
+    set_and_get_camera(x, y, &prev_x, &prev_y);
 
     // Push the previous camera position onto the Lua stack
     lua_pushinteger(L, prev_x);
@@ -1499,7 +1499,7 @@ void closeLuaApp()
         lua_close(app);
         app = NULL;
         // reset draw state
-        initVideo();
+        init_video();
     }
     currentVM = lua;
 }

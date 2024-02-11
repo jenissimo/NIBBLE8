@@ -42,13 +42,6 @@ void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targ
    png_structp png_ptr;
    png_infop info_ptr;
 
-   printf("First 8 bytes in hex: ");
-   for (int i = 0; i < 8; i++)
-   {
-      printf("%c", png_data[i]);
-   }
-   printf("\n");
-
    if (png_sig_cmp(png_data, 0, 8))
    {
       fprintf(stderr, "Error: Not a PNG file.\n");
