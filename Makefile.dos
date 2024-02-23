@@ -1,0 +1,45 @@
+CC = gcc
+CFLAGS = -w
+# Adjust the include and lib paths as necessary for your Allegro installation
+CFLAGS += -D DOS -fgnu89-inline -Ic:/djgpp/include
+LIBS =  -Lc:/djgpp/lib -llua -lalleg -lpng -lm -lz
+# If you have more Allegro libraries (like allegro_image, allegro_font, etc.), add them here
+
+SRCDIR = src
+TOOLSDIR = tools
+OBJDIR = obj
+BUILDDIR = bin
+TARGET = nibble8.exe
+
+# Using wildcard to specify source files. Adjust or add paths as needed for your project structure.
+COMMON_SOURCES := $(wildcard $(SRCDIR)/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/adapters/allegro/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/api/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/debug/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/hardware/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/utils/*.c)
+
+# Combine common sources with the Allegro-specific sources
+SOURCES := $(COMMON_SOURCES)
+OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
+
+all: CFLAGS += -O2
+all: $(BUILDDIR)/$(TARGET)
+
+debug: CFLAGS += -g
+debug: $(BUILDDIR)/$(TARGET)
+
+$(BUILDDIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@ 
+
+.PHONY: clean
+clean:
+	del /Q $(OBJDIR) $(BUILDDIR)\$(TARGET)
+
+font2bin: $(TOOLSDIR)/font2bin.c
+	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)

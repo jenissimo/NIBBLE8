@@ -7,14 +7,14 @@
 #include <setjmp.h>
 
 uint32_t *frame;
-uint8_t *font;
+uint8_t *nibble_font;
 PaletteManager *manager;
 
 void init_video()
 {
     frame = malloc(NIBBLE_WIDTH * NIBBLE_HEIGHT * sizeof(uint32_t));
-    load_font();
-    load_palettes();
+    nibble_load_font();
+    nibble_load_palettes();
     update_frame();
     nibble_api_pal_reset();
 
@@ -22,15 +22,15 @@ void init_video()
     memory.drawState.camera_y = 0;
 }
 
-void load_font()
+void nibble_load_font()
 {
-    font = malloc(FONT_SIZE_COMPRESSED * sizeof(uint8_t));
+    nibble_font = malloc(FONT_SIZE_COMPRESSED * sizeof(uint8_t));
     FILE *f = fopen("font.bin", "rb");
-    fread(font, 1, FONT_SIZE_COMPRESSED, f);
+    fread(nibble_font, 1, FONT_SIZE_COMPRESSED, f);
     fclose(f);
 }
 
-void load_palettes()
+void nibble_load_palettes()
 {
     const char *ini_file = "palettes.ini";
 
@@ -48,7 +48,7 @@ void print_char(int charIndex)
     {
         for (int i = 7; i >= 0; i--)
         {
-            if ((font[j] >> i) & 1)
+            if ((nibble_font[j] >> i) & 1)
             {
                 printf("█");
             }
@@ -472,7 +472,7 @@ void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol
     {
         for (int i = 7; i >= 8 - NIBBLE_FONT_WIDTH; i--)
         {
-            if ((font[j] >> i) & 1)
+            if ((nibble_font[j] >> i) & 1)
             {
                 nibble_api_pset(x + (7 - i), y + (j % 8), fgCol);
             }
@@ -575,7 +575,7 @@ void update_frame()
     }
 }
 
-void print_vram()
+void printVRam()
 {
     int v = 0;
     int col = 0;

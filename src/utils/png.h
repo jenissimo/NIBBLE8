@@ -2,7 +2,11 @@
 #define nibble_png_h
 
 #include <png.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include "miniz.h"
 #include "../hardware/palette_manager.h"
 #include "../hardware/video.h"

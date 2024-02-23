@@ -1,3 +1,2 @@
-LOG (src/main.c:41): Debug mode enabled.
+LOG (src/adapters/allegro/main_dos.c:41): Debug mode enabled.
 
-Unexpected termination: signal 11

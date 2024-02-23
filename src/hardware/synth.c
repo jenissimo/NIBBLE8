@@ -44,7 +44,25 @@ float nibble_waveform(Instrument instrument, float advance)
         lsample = sample;
         sample = (lsample + scale * (((float)rand() / (float)RAND_MAX) * 2.0f - 1.0f)) / (1.0f + scale);
         lastadvance = advance;
-        float endval = fmin(fmax((lsample + sample) * 4.0f / 3.0f * (1.75f - scale), -1.0f), 1.0f) * 0.2f;
+
+        // Manual implementation of fmin and fmax
+        float temp = (lsample + sample) * 4.0f / 3.0f * (1.75f - scale);
+        float endval;
+
+        if (temp < -1.0f)
+        {
+            endval = -1.0f;
+        }
+        else if (temp > 1.0f)
+        {
+            endval = 1.0f;
+        }
+        else
+        {
+            endval = temp;
+        }
+
+        endval *= 0.2f;
         return endval;
     }
     case INST_DARK_SYNTH:

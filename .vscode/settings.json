@@ -76,6 +76,16 @@
         "stdio.h": "c",
         "ram.h": "c",
         "sdl_adapter.h": "c",
-        "video_manager.h": "c"
+        "video_manager.h": "c",
+        "png.h": "c",
+        "lua.h": "c",
+        "allegro_adapter.h": "c",
+        "audio_manager.h": "c",
+        "input_manager.h": "c",
+        "math.h": "c",
+        "string.h": "c",
+        "setjmp.h": "c",
+        "memory.h": "c",
+        "palette_manager.h": "c"
     }
 }

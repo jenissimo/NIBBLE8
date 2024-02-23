@@ -2,11 +2,14 @@
 #define nibble_audio_h
 
 #include <stdlib.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
-#include "audio/synth.h"
 
 #define SAMPLE_RATE 22050
 #define NUM_CHANNELS 1

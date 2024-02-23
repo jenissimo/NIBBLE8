@@ -1,5 +1,6 @@
 #include "audio.h"
 #include "ram.h"
+#include "synth.h"
 
 float phi = 0.0f;
 float freq;

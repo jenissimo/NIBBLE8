@@ -535,7 +535,11 @@ typedef void *const voidpc;
 
 #pragma once
 #include <assert.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 

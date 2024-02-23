@@ -3,18 +3,22 @@
 
 #include "../nibble8.h"
 #include "palette_manager.h"
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdbool.h>
 
 extern uint32_t *frame;
-extern uint8_t *font;
+extern uint8_t *nibble_font;
 extern PaletteManager *manager;
 static const uint8_t fullByteColors[4] = {0b00000000, 0b01010101, 0b10101010, 0b11111111};
 
 void init_video(void);
 void destroy_video(void);
-void load_font(void);
-void load_palettes();
+void nibble_load_font(void);
+void nibble_load_palettes();
 void print_char(int charIndex);
 void nibble_api_cls(uint8_t col);
 void nibble_api_pal(uint8_t c0, uint8_t c1, uint8_t p);
@@ -55,6 +59,6 @@ void update_frame(void);
 
 // debug
 void nibble_api_draw_fps(int fps);
-void print_vram(void);
+void printVRam(void);
 
 #endif

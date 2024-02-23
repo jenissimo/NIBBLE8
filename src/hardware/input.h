@@ -1,7 +1,11 @@
 #ifndef nibble_input_h
 #define nibble_input_h
 
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdbool.h>
 
 typedef enum {

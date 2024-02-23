@@ -1,5 +1,9 @@
 #include <stdlib.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdio.h>
 #include <setjmp.h> /* required for error handling */
 #include <math.h>
@@ -11,7 +15,7 @@
 
 int find_closest_palette_index(const Palette *palette, uint8_t gray_value)
 {
-   int min_distance = INT32_MAX;
+   int min_distance = INT_MAX;
    int closest_index = -1;
 
    for (int i = 0; i < 4; i++)

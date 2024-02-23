@@ -108,10 +108,10 @@ function Synth.invalidateFilter()
     local mode = 0
 
     -- Set the appropriate bits based on the toggle switch states
-    if highPassSwitch.state then mode = mode | HP_BIT end
-    if lowPassSwitch.state then mode = mode | LP_BIT end
-    if bandPassSwitch.state then mode = mode | BP_BIT end
-    if notchSwitch.state then mode = mode | NT_BIT end
+    --if highPassSwitch.state then mode = mode | HP_BIT end
+    --if lowPassSwitch.state then mode = mode | LP_BIT end
+    --if bandPassSwitch.state then mode = mode | BP_BIT end
+    --if notchSwitch.state then mode = mode | NT_BIT end
 
     -- Call the update_filter function with the bit field mode
     update_filter(knobCO.value, knobRES.value, mode)

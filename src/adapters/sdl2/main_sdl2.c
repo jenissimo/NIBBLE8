@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "nibble8.h"
-#include "debug/debug.h"
-#include "adapters/sdl2/sdl_adapter.h"
-#include "hardware/os.h"
-#include "hardware/ram.h"
-#include "hardware/video.h"
-#include "hardware/utils.h"
-#include "api/lua.h"
-#include <SDL2/SDL.h>
+#include "../../nibble8.h"
+#include "../../debug/debug.h"
+#include "../../hardware/os.h"
+#include "../../hardware/ram.h"
+#include "../../hardware/video.h"
+#include "../../hardware/utils.h"
+#include "../../api/lua.h"
+#include "sdl_adapter.h"
 
 int run = 1;
 

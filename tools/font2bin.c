@@ -1,5 +1,9 @@
 #include <stdlib.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include "../src/nibble8.h"
 #include <png.h>
 #include "../src/utils/png.h"

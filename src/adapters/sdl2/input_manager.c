@@ -63,7 +63,7 @@ int input_update()
                 nextPalette(manager);
                 break;
             // case SDLK_F10:
-            //     print_vram();
+            //     printVRam();
             //     break;
             case SDLK_F10:
                 make_screenshot();

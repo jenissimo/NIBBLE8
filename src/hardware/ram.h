@@ -1,7 +1,11 @@
 #ifndef nibble_ram_h
 #define nibble_ram_h
 
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <stdbool.h>
 #include <string.h>
 #include "../nibble8.h"

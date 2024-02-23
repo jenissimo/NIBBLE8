@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 #include <string.h>
 #include "../utils/simple_ini.h"
 

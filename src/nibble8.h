@@ -1,7 +1,11 @@
 #ifndef NIBBLE8_H
 #define NIBBLE8_H
 
+#ifdef DOS
+#include <allegro.h>
+#else
 #include <stdint.h>
+#endif
 
 // Debug flags
 #define NIBBLE_DISPLAY_FPS        0

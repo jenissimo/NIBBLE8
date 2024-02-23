@@ -207,7 +207,7 @@ static int l_pset(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 3) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("pset(%d, %d, %d)\n", x, y, color);
+        // DEBUG_LOG("pset(%d, %d, %d)\n", x, y, color);
 
         nibble_api_pset(x, y, color);
 
@@ -226,7 +226,7 @@ static int l_pget(lua_State *L)
         int16_t x = (int16_t)lua_tonumber(L, 1);
         int16_t y = (int16_t)lua_tonumber(L, 2);
 
-        // printf("pget(%d, %d)\n", x, y);
+        // DEBUG_LOG("pget(%d, %d)\n", x, y);
 
         uint8_t color = nibble_api_pget(x, y);
 
@@ -259,7 +259,7 @@ static int l_circ(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 4) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("circle(%d, %d, %d, %d)\n", x, y, radius, color);
+        // DEBUG_LOG("circle(%d, %d, %d, %d)\n", x, y, radius, color);
 
         nibble_api_circ(x, y, radius, color);
 
@@ -290,7 +290,7 @@ static int l_circfill(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 4) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("circlefill(%d, %d, %d, %d)\n", x, y, radius, color);
+        // DEBUG_LOG("circlefill(%d, %d, %d, %d)\n", x, y, radius, color);
 
         nibble_api_circfill(x, y, radius, color);
 
@@ -327,7 +327,7 @@ static int l_rect(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 5) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("rect(%d, %d, %d, %d, %d)\n", x, y, width, height, color);
+        // DEBUG_LOG("rect(%d, %d, %d, %d, %d)\n", x, y, width, height, color);
 
         nibble_api_rect(x, y, width, height, color);
 
@@ -364,7 +364,7 @@ static int l_rectfill(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 5) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("rectfill(%d, %d, %d, %d, %d)\n", x1, y1, x2, y2, color);
+        // DEBUG_LOG("rectfill(%d, %d, %d, %d, %d)\n", x1, y1, x2, y2, color);
 
         nibble_api_rectfill(x1, y1, x2, y2, color);
 
@@ -411,7 +411,7 @@ static int l_pal(lua_State *L)
             pset = lua_toboolean(L, 3);
         }
 
-        // printf("pal(%d, %d, %d)\n", color0, color1, pset);
+        // DEBUG_LOG("pal(%d, %d, %d)\n", color0, color1, pset);
 
         nibble_api_pal(color0, color1, pset);
 
@@ -441,7 +441,7 @@ static int l_palt(lua_State *L)
             transparent = lua_toboolean(L, 2);
         }
 
-        // printf("palt(%d, %d)\n", color, transparent);
+        // DEBUG_LOG("palt(%d, %d)\n", color, transparent);
 
         nibble_api_palt(color, transparent);
 
@@ -468,7 +468,7 @@ static int l_cls(lua_State *L)
         color = (uint8_t)lua_tonumber(L, 1) % NIBBLE_PALETTE_SIZE;
     }
 
-    // printf("cls(%d)\n", color);
+    // DEBUG_LOG("cls(%d)\n", color);
 
     nibble_api_cls(color);
 
@@ -502,7 +502,7 @@ static int l_chr(lua_State *L)
         char result[2] = "\0";
         result[0] = nibble_api_chr(x);
 
-        // printf("chr(%d) = %s\n", x, result);
+        // DEBUG_LOG("chr(%d) = %s\n", x, result);
 
         lua_pushlstring(L, result, 1);
 
@@ -517,7 +517,7 @@ static int l_time(lua_State *L)
     int top = lua_gettop(L);
 
     double result = nibble_api_time();
-    // printf("time() = %f\n", result);
+    // DEBUG_LOG("time() = %f\n", result);
     lua_pushnumber(L, result);
     return 1;
 }
@@ -530,7 +530,7 @@ static int l_flr(lua_State *L)
     {
         double x = lua_tonumber(L, 1);
         double result = nibble_api_flr(x);
-        // printf("flr(%f) = %f\n", x, result);
+        // DEBUG_LOG("flr(%f) = %f\n", x, result);
         lua_pushinteger(L, result);
         return 1;
     }
@@ -546,7 +546,7 @@ static int l_ceil(lua_State *L)
     {
         double x = lua_tonumber(L, 1);
         double result = nibble_api_ceil(x);
-        // printf("ceil(%f) = %f\n", x, result);
+        // DEBUG_LOG("ceil(%f) = %f\n", x, result);
         lua_pushinteger(L, result);
         return 1;
     }
@@ -569,7 +569,7 @@ static int l_sub(lua_State *L)
             end = lua_tonumber(L, 3); // lua is 1 based
         }
         char *result = nibble_api_sub(text, start, end);
-        // printf("sub(%s, %d, %d) = %s\n", text, start, end, result);
+        // DEBUG_LOG("sub(%s, %d, %d) = %s\n", text, start, end, result);
 
         lua_pushstring(L, result);
 
@@ -598,7 +598,7 @@ static int l_line(lua_State *L)
             color = (uint8_t)lua_tonumber(L, 5) % NIBBLE_PALETTE_SIZE;
         }
 
-        // printf("line(%d, %d, %d, %d, %d)\n", x1, y1, x2, y2, color);
+        // DEBUG_LOG("line(%d, %d, %d, %d, %d)\n", x1, y1, x2, y2, color);
 
         nibble_api_line(x1, y1, x2, y2, color);
 
@@ -616,7 +616,7 @@ static int l_sin(lua_State *L)
     {
         double x = lua_tonumber(L, 1);
         double result = nibble_api_sin(x);
-        // printf("sin(%f) = %f\n", x, result);
+        // DEBUG_LOG("sin(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -632,7 +632,7 @@ static int l_cos(lua_State *L)
     {
         double x = lua_tonumber(L, 1);
         double result = nibble_api_cos(x);
-        // printf("cos(%f) = %f\n", x, result);
+        // DEBUG_LOG("cos(%f) = %f\n", x, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -649,7 +649,7 @@ static int l_atan2(lua_State *L)
         double x = lua_tonumber(L, 1);
         double y = lua_tonumber(L, 2);
         double result = nibble_api_atan2(x, y);
-        // printf("atan2(%f, %f) = %f\n", x, y, result);
+        // DEBUG_LOG("atan2(%f, %f) = %f\n", x, y, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -666,7 +666,7 @@ static int l_min(lua_State *L)
         double x = lua_tonumber(L, 1);
         double y = lua_tonumber(L, 2);
         double result = nibble_api_min(x, y);
-        // printf("min(%f, %f) = %f\n", x, y, result);
+        // DEBUG_LOG("min(%f, %f) = %f\n", x, y, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -683,7 +683,7 @@ static int l_max(lua_State *L)
         double x = lua_tonumber(L, 1);
         double y = lua_tonumber(L, 2);
         double result = nibble_api_max(x, y);
-        // printf("max(%f, %f) = %f\n", x, y, result);
+        // DEBUG_LOG("max(%f, %f) = %f\n", x, y, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -701,7 +701,7 @@ static int l_mid(lua_State *L)
         double y = lua_tonumber(L, 2);
         double z = lua_tonumber(L, 3);
         double result = nibble_api_mid(x, y, z);
-        // printf("mid(%f, %f, %f) = %f\n", x, y, z, result);
+        // DEBUG_LOG("mid(%f, %f, %f) = %f\n", x, y, z, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -717,7 +717,7 @@ static int l_btn(lua_State *L)
     {
         int i = lua_tonumber(L, 1);
         int result = nibble_api_btn(i);
-        // printf("btn(%d) = %d\n", i, result);
+        // DEBUG_LOG("btn(%d) = %d\n", i, result);
         lua_pushboolean(L, result > 0);
         // lua_pushnumber(L, result);
         return 1;
@@ -734,7 +734,7 @@ static int l_btnp(lua_State *L)
     {
         int i = lua_tonumber(L, 1);
         int result = nibble_api_btnp(i);
-        // printf("btnp(%d) = %d\n", i, result);
+        // DEBUG_LOG("btnp(%d) = %d\n", i, result);
         lua_pushboolean(L, result > 0);
         // lua_pushnumber(L, result);
         return 1;
@@ -751,7 +751,7 @@ static int l_key(lua_State *L)
     {
         int x = lua_tonumber(L, 1);
         int result = nibble_api_key(x);
-        // printf("key(%d) = %d\n", x, result);
+        // DEBUG_LOG("key(%d) = %d\n", x, result);
         // lua_pushnumber(L, result);
         lua_pushboolean(L, result > 0);
         return 1;
@@ -767,7 +767,7 @@ static int l_keyp(lua_State *L)
     {
         int x = lua_tonumber(L, 1);
         int result = nibble_api_keyp(x);
-        // printf("keyp(%d) = %d\n", x, result);
+        // DEBUG_LOG("keyp(%d) = %d\n", x, result);
         // lua_pushnumber(L, result);
         lua_pushboolean(L, result > 0);
         return 1;
@@ -783,7 +783,7 @@ static int l_load_file(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         runLuaAppFile(filename);
-        // printf("load(%s) = %d
+        // DEBUG_LOG("load(%s) = %d
         // lua_pushnumber(L, result);
         return 1;
     }
@@ -812,7 +812,7 @@ static int l_run_code(lua_State *L)
     {
         const char *code = lua_tostring(L, 1);
         nibble_api_run_code(code);
-        // printf("run(%s) = %d
+        // DEBUG_LOG("run(%s) = %d
         // lua_pushnumber(L, result);
         return 0;
     }
@@ -827,7 +827,7 @@ static int l_import_png(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         nibble_api_import_png(filename);
-        // printf("import(%s) = %d
+        // DEBUG_LOG("import(%s) = %d
         // lua_pushnumber(L, result);
         return 1;
     }
@@ -842,7 +842,7 @@ static int l_export_png(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         nibble_api_export_png(filename);
-        // printf("export(%s) = %d
+        // DEBUG_LOG("export(%s) = %d
         // lua_pushnumber(L, result);
         return 1;
     }
@@ -857,7 +857,7 @@ static int l_import_lua(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         nibble_api_import_lua(filename);
-        printf("import(%s) = %s\n", filename, userLuaCode);
+        DEBUG_LOG("import(%s) = %s\n", filename, userLuaCode);
         lua_pushstring(L, userLuaCode);
         return 1;
     }
@@ -872,7 +872,7 @@ static int l_export_lua(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         nibble_api_export_lua(filename);
-        // printf("export(%s) = %d
+        // DEBUG_LOG("export(%s) = %d
         // lua_pushnumber(L, result);
         return 0;
     }
@@ -888,12 +888,12 @@ static int l_ls(lua_State *L)
     {
         char *path = lua_tostring(L, 1);
         result = nibble_api_ls(lua_tostring(L, 1));
-        // printf("ls(%s) = %s\n", path, result);
+        // DEBUG_LOG("ls(%s) = %s\n", path, result);
     }
     else
     {
         result = nibble_api_ls(NULL);
-        // printf("ls() = %s\n", result);
+        // DEBUG_LOG("ls() = %s\n", result);
     }
     lua_pushstring(L, result);
     free(result);
@@ -924,7 +924,7 @@ static int l_spr(lua_State *L)
             flip_y = (uint8_t)lua_tonumber(L, 5);
         }
 
-        // printf("spr(%d, %d, %d, %d, %d)\n", n, x, y, flip_x, flip_y);
+        // DEBUG_LOG("spr(%d, %d, %d, %d, %d)\n", n, x, y, flip_x, flip_y);
 
         nibble_api_spr(n, x, y, flip_x, flip_y);
 
@@ -971,7 +971,7 @@ static int l_sspr(lua_State *L)
             flip_y = (uint8_t)lua_toboolean(L, 10);
         }
 
-        // printf("sspr(%d, %d, %d, %d, %d, %d, %d, %d, %d, %d)\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
+        // DEBUG_LOG("sspr(%d, %d, %d, %d, %d, %d, %d, %d, %d, %d)\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
 
         nibble_api_sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
 
@@ -990,7 +990,7 @@ static int l_sset(lua_State *L)
         int16_t x = (int16_t)lua_tonumber(L, 1);
         int16_t y = (int16_t)lua_tonumber(L, 2);
         uint8_t color = (uint8_t)lua_tonumber(L, 3) % NIBBLE_PALETTE_SIZE;
-        // printf("sset(%d, %d, %d)\n", x, y, color);
+        // DEBUG_LOG("sset(%d, %d, %d)\n", x, y, color);
         nibble_api_sset(x, y, color);
         return 0;
     }
@@ -1007,7 +1007,7 @@ static int l_sget(lua_State *L)
         int16_t x = (int16_t)lua_tonumber(L, 1);
         int16_t y = (int16_t)lua_tonumber(L, 2);
         uint8_t color = nibble_api_sget(x, y);
-        // printf("sget(%d, %d) = %d\n", x, y, color);
+        // DEBUG_LOG("sget(%d, %d) = %d\n", x, y, color);
         lua_pushinteger(L, color);
         return 1;
     }
@@ -1147,7 +1147,7 @@ static int l_mget(lua_State *L)
         int16_t x = (int16_t)lua_tonumber(L, 1);
         int16_t y = (int16_t)lua_tonumber(L, 2);
         int16_t spriteIndex = nibble_api_mget(x, y);
-        // printf("mget(%d, %d) = %d\n", x, y, spriteIndex);
+        // DEBUG_LOG("mget(%d, %d) = %d\n", x, y, spriteIndex);
         lua_pushinteger(L, spriteIndex);
         return 1;
     }
@@ -1164,7 +1164,7 @@ static int l_mset(lua_State *L)
         int16_t x = (int16_t)lua_tonumber(L, 1);
         int16_t y = (int16_t)lua_tonumber(L, 2);
         int16_t spriteIndex = (uint8_t)lua_tonumber(L, 3);
-        // printf("mset(%d, %d, %d)\n", x, y, spriteIndex);
+        // DEBUG_LOG("mset(%d, %d, %d)\n", x, y, spriteIndex);
         nibble_api_mset(x, y, spriteIndex);
         return 0;
     }
@@ -1177,7 +1177,7 @@ static int l_get_clipboard_text(lua_State *L)
     int top = lua_gettop(L);
 
     char *result = nibble_api_get_clipboard_text();
-    printf("get_clipboard_text() = %s\n", result);
+    DEBUG_LOG("get_clipboard_text() = %s\n", result);
     lua_pushstring(L, result);
     freeClipboardText(result);
     return 1;
@@ -1191,7 +1191,7 @@ static int l_set_clipboard_text(lua_State *L)
     {
         const char *text = lua_tostring(L, 1);
         int result = nibble_api_set_clipboard_text(text);
-        // printf("set_clipboard_text(%s) = %d", text, result);
+        // DEBUG_LOG("set_clipboard_text(%s) = %d", text, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -1206,7 +1206,7 @@ static int l_read_file(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         char *result = nibble_api_read_file(filename);
-        // printf("read(%s) = %s
+        // DEBUG_LOG("read(%s) = %s
         lua_pushstring(L, result);
         free(result);
         return 1;
@@ -1223,7 +1223,7 @@ static int l_write_file(lua_State *L)
         const char *filename = lua_tostring(L, 1);
         const char *text = lua_tostring(L, 2);
         int result = nibble_api_write_file(filename, text);
-        // printf("write(%s) = %d
+        // DEBUG_LOG("write(%s) = %d
         lua_pushnumber(L, result);
         return 1;
     }
@@ -1241,7 +1241,7 @@ static int l_load_cart(lua_State *L)
         ErrorCode result = nibble_api_load_cart(filename);
         if (result != ERROR_SUCCESS)
         {
-            // printf("Houston, we have a problem: %s\n", get_error_text(result, filename));
+            // DEBUG_LOG("Houston, we have a problem: %s\n", get_error_text(result, filename));
             lua_pushnil(L);
             lua_pushstring(L, get_error_text(result, filename));
         }
@@ -1250,7 +1250,7 @@ static int l_load_cart(lua_State *L)
             lua_pushstring(L, userLuaCode);
             lua_pushnil(L);
         }
-        // printf("load_cart(%s) = %d", filename, result);
+        // DEBUG_LOG("load_cart(%s) = %d", filename, result);
         return 2;
     }
     return 0;
@@ -1265,10 +1265,10 @@ static int l_save_cart(lua_State *L)
         const char *filename = lua_tostring(L, 1);
         const char *code = lua_tostring(L, 2);
 
-        printf("%s\n", code);
+        DEBUG_LOG("%s\n", code);
 
         int result = nibble_api_save_cart(filename, code);
-        // printf("save(%s) = %d\n", filename, result);
+        // DEBUG_LOG("save(%s) = %d\n", filename, result);
         lua_pushnumber(L, result);
         return 1;
     }
@@ -1283,7 +1283,7 @@ static int l_change_dir(lua_State *L)
     {
         const char *filename = lua_tostring(L, 1);
         int result = nibble_api_change_dir(filename);
-        // printf("cd(%s) = %d
+        // DEBUG_LOG("cd(%s) = %d
         lua_pushnumber(L, result);
         return 1;
     }
@@ -1301,7 +1301,7 @@ static int l_note_on(lua_State *L)
         uint8_t octave = (int)lua_tonumber(L, 2);
         uint8_t instrument = (int)lua_tonumber(L, 3);
         nibble_api_note_on(note, octave, instrument);
-        printf("note_on(%d, %d, %d)\n", note, octave, instrument);
+        DEBUG_LOG("note_on(%d, %d, %d)\n", note, octave, instrument);
         return 0;
     }
 
@@ -1331,7 +1331,7 @@ static int l_set_note(lua_State *L)
         uint8_t effect = (int)lua_tonumber(L, 6);
 
         nibble_api_set_note(sfx_index, note_index, pitch, instrument, volume, effect);
-        // printf("set_note(%d, %d, %d, %d, %d, %d)\n", sfx_index, note_index, pitch, instrument, volume, effect);
+        // DEBUG_LOG("set_note(%d, %d, %d, %d, %d, %d)\n", sfx_index, note_index, pitch, instrument, volume, effect);
 
         return 0;
     }
@@ -1365,7 +1365,7 @@ static int l_update_filter(lua_State *L)
         float cutoff = (float)lua_tonumber(L, 1);
         float resonance = (float)lua_tonumber(L, 2);
         int16_t mode = (int16_t)lua_tonumber(L, 3);
-        printf("update_filter(%f, %f, %d)\n", cutoff, resonance, mode);
+        DEBUG_LOG("update_filter(%f, %f, %d)\n", cutoff, resonance, mode);
         nibble_api_update_filter(cutoff, resonance, mode);
         return 0;
     }
@@ -1407,7 +1407,7 @@ int executeLuaCode(const char *code)
 
     if (load_status != 0)
     {
-        printf("Error loading Lua script: %s\n", lua_tostring(currentVM, -1));
+        DEBUG_LOG("Error loading Lua script: %s\n", lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1); // Remove the error message from the stack
         return 2;
     }
@@ -1420,7 +1420,7 @@ int executeLuaCode(const char *code)
     int call_status = lua_pcall(currentVM, 0, LUA_MULTRET, -2);
     if (call_status != 0)
     {
-        printf("Error executing Lua script:\n%s\n", lua_tostring(currentVM, -1));
+        DEBUG_LOG("Error executing Lua script:\n%s\n", lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1); // Remove the error message (with traceback) from the stack
         return 3;
     }
@@ -1434,7 +1434,7 @@ int loadLuaFile(const char *filename)
 
     if (load_status != 0)
     {
-        printf("Error loading Lua script: %s\n", lua_tostring(currentVM, -1));
+        DEBUG_LOG("Error loading Lua script: %s\n", lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1); // Remove the error message from the stack
         // lua_close(currentVM);  // Close the Lua state
         return 2;
@@ -1448,7 +1448,7 @@ int loadLuaFile(const char *filename)
     int call_status = lua_pcall(currentVM, 0, LUA_MULTRET, -2);
     if (call_status != 0)
     {
-        printf("Error executing Lua script:\n%s\n", lua_tostring(currentVM, -1));
+        DEBUG_LOG("Error executing Lua script:\n%s\n", lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1); // Remove the error message (with traceback) from the stack
         // lua_close(currentVM);  // Close the Lua state
         return 3;
@@ -1493,7 +1493,7 @@ void runLuaAppCode(const char *code)
 
 void closeLuaApp()
 {
-    printf("Closing Lua App...\n");
+    DEBUG_LOG("Closing Lua App...\n");
     if (app != NULL)
     {
         lua_close(app);
@@ -1506,7 +1506,7 @@ void closeLuaApp()
 
 void registerFunction(const char *name, lua_CFunction func)
 {
-    // printf("%s\n", name);
+    // DEBUG_LOG("%s\n", name);
     lua_pushcfunction(currentVM, func);
     lua_setglobal(currentVM, name);
 }
@@ -1536,14 +1536,14 @@ void callLuaFunction(const char *name)
 
     if (!lua_isfunction(currentVM, -1))
     {
-        printf("%s not a function\n", name);
+        DEBUG_LOG("%s not a function\n", name);
         lua_pop(currentVM, 1);
         return;
     }
 
     if (lua_pcall(currentVM, 0, 0, 0) != 0)
     {
-        printf("error running function `%s': %s\n", name, lua_tostring(currentVM, -1));
+        DEBUG_LOG("error running function `%s': %s\n", name, lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1);
         return;
     }
@@ -1561,7 +1561,7 @@ void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed)
     lua_pushboolean(currentVM, ctrl_pressed);
     lua_pushboolean(currentVM, shift_pressed);
     lua_pcall(currentVM, 3, 0, 0);
-    // printf("key(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
+    // DEBUG_LOG("key(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
 }
 
 void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed)
@@ -1576,7 +1576,7 @@ void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed)
     lua_pushboolean(currentVM, ctrl_pressed);
     lua_pushboolean(currentVM, shift_pressed);
     lua_pcall(currentVM, 3, 0, 0);
-    // printf("keyup(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
+    // DEBUG_LOG("keyup(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
 }
 
 void callLuaMouseMove(int x, int y)
@@ -1590,7 +1590,7 @@ void callLuaMouseMove(int x, int y)
     lua_pushinteger(currentVM, x);
     lua_pushinteger(currentVM, y);
     lua_pcall(currentVM, 2, 0, 0);
-    // printf("mouse_move(%d, %d)\n", x, y);
+    // DEBUG_LOG("mouse_move(%d, %d)\n", x, y);
 }
 
 void callLuaMousePress(int x, int y, int button)
@@ -1605,7 +1605,7 @@ void callLuaMousePress(int x, int y, int button)
     lua_pushinteger(currentVM, y);
     lua_pushinteger(currentVM, button);
     lua_pcall(currentVM, 3, 0, 0);
-    // printf("mouse_press(%d, %d, %d)\n", x, y, button);
+    // DEBUG_LOG("mouse_press(%d, %d, %d)\n", x, y, button);
 }
 
 void callLuaMouseRelease(int x, int y, int button)
@@ -1620,7 +1620,7 @@ void callLuaMouseRelease(int x, int y, int button)
     lua_pushinteger(currentVM, y);
     lua_pushinteger(currentVM, button);
     lua_pcall(currentVM, 3, 0, 0);
-    // printf("mouse_release(%d, %d, %d)\n", x, y, button);
+    // DEBUG_LOG("mouse_release(%d, %d, %d)\n", x, y, button);
 }
 
 void destroyLua()
