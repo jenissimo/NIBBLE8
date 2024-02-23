@@ -1499,7 +1499,7 @@ void closeLuaApp()
         lua_close(app);
         app = NULL;
         // reset draw state
-        init_video();
+        nibble_init_video();
     }
     currentVM = lua;
 }

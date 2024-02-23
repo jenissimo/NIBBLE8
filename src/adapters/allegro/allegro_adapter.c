@@ -12,7 +12,9 @@ void nibble_allegro_init()
         DEBUG_LOG("Allegro Initialization failed.");
         return 1;
     }
+    
     install_keyboard();
+    install_mouse();
     install_timer();
 
     if (video_init() != 0)
@@ -33,13 +35,17 @@ void nibble_allegro_update()
 {
     if (input_update() == 0)
     {
+        shutdownRequested = true;
         return; // Quit signal received
     }
 
     callLuaFunction("_update");
     callLuaFunction("_draw");
 
-    video_update();
+    if (frame_dirty)
+    {
+        video_update();
+    }
 }
 
 void nibble_allegro_quit()

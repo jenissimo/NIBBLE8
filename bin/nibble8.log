@@ -1,2 +1,1137 @@
-LOG (src/adapters/allegro/main_dos.c:41): Debug mode enabled.
+LOG (src/adapters/allegro/main_dos.c:31): Debug mode enabled.
+
+LOG (src/hardware/utils.c:75): Created tab: 1
+
+LOG (src/adapters/allegro/video_manager.c:50): Color 0: 44, 33, 55
+LOG (src/adapters/allegro/video_manager.c:50): Color 1: 118, 68, 98
+LOG (src/adapters/allegro/video_manager.c:50): Color 2: 169, 104, 104
+LOG (src/adapters/allegro/video_manager.c:50): Color 3: 237, 180, 161
+LOG (src/adapters/allegro/allegro_adapter.c:31): Allegro Initialized
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 102 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 117 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 116 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 105 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 97 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 45 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 97 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 119 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 102 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 105 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 61 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 202 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): HOME
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 117 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 59 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 121 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 61 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 121 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 112 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 116 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 54 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 50 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 51 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 61 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 210 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 52 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 52 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 45 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 45 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 112 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 105 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 116 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 39 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 104 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 39 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 54 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 50 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 44 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 114 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 51 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 51 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 57 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 51 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 61 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 49 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 48 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): cart path is nil
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 202 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): HOME
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 102 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 117 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 116 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 105 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 110 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 208 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 108 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 97 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 109 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 97 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 32 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 109 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 47 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 115 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 112 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 97 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 99 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 101 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 353 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 45 ctrl: false shift: true
+
+LOG (src/hardware/utils.c:75): key: 100 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 111 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 103 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 13 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): command: "load"
+
+LOG (src/hardware/utils.c:75): Created tab: 1
+
+LOG (src/hardware/utils.c:75): Created tab: 2
+
+LOG (src/hardware/utils.c:75): Created tab: 3
+
+LOG (src/hardware/utils.c:75): Created tab: 4
+
+LOG (src/hardware/utils.c:75): Created tab: 5
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 209 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 8 ctrl: false shift: false
+
+LOG (src/hardware/utils.c:75): Backspace!
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
+
+LOG (src/hardware/utils.c:75): run cart
+
+LOG (src/hardware/utils.c:75): writing cart: demos/space_dog.n8
+
+LOG (src/api/lua.c:1268): -- game loop
+-- game about dog flying in space
+-- collecting bones
+-- avoiding asteroids
+local state="game"
+
+function _init()
+ for i = 0, 3 do
+  palt(i, false)
+ end
+ palt(1, true)
+ state="game"
+ score = 0
+ bones={}
+ asteroids={}
+ game_init()
+end
+
+function _draw()
+ if state=="game" then
+  game_draw()
+ elseif state=="gameover" then
+  gameover_draw()
+ end
+end
+
+function _update()
+ if state=="game" then
+  game_update()
+ elseif state=="gameover" then
+  gameover_update()
+ end
+end
+--#tab
+-- game state
+asteroids={}
+bones={}
+stars={}
+
+score=0
+
+function game_init()
+ for i=1,5 do
+  add(bones, {
+   x=160+rnd(80),
+   y=rnd(104),
+   r=bone.r,
+   sprite=bone.sprite
+  })
+  add(asteroids, {
+   x=160+rnd(80),
+   y=rnd(104),
+   r=asteroid.r,
+   sprite=asteroid.sprite
+  })
+ end
+ -- initialize some stars
+ for i=1,20 do
+  add(stars, {
+   x=rnd(160),
+   y=rnd(120),
+   speed=rnd(1)+0.3
+  })
+ end
+end
+
+function game_update()
+ -- existing horizontal movement code
+ player.move_x = 0
+ if btn(0) then
+  player.move_x = -1
+  player.flip = true
+ elseif btn(1) then
+  player.move_x = 1
+  player.flip = false
+ end
+
+ -- adding vertical movement
+ player.move_y = 0
+ if btn(2) then 
+  player.move_y = -1
+ elseif btn(3) then
+  player.move_y = 1
+ end
+
+ -- update animation
+ if time() - player.anim_time > player.anim_wait then
+  player.frame = player.frame + 1
+  player.anim_time = time()
+ end
+ if player.frame > #player.sprites then
+  player.frame = 1
+ end
+
+ -- update player position
+ player.x = player.x + player.move_x*player.speed
+ player.y = player.y + player.move_y*player.speed
+
+ -- boundary checks
+ if player.x >= 144 then
+  player.x = 143
+ elseif player.x < 0 then
+  player.x = 0
+ end
+
+ if player.y > 104 then
+  player.y = 104
+ elseif player.y < 0 then
+  player.y = 0
+ end
+
+ for i,s in pairs(stars) do
+  s.x=s.x-s.speed
+  if s.x<0 then
+   s.x=160
+   s.y=rnd(120)
+  end
+ end
+
+ update_objects(bones, -1)
+ update_objects(asteroids, -2)
+
+ -- check for collisions with bones and asteroids
+ check_collisions_with_player()
+end
+
+function game_draw()
+ cls()
+ for i,s in pairs(stars) do
+  pset(s.x,s.y,1)
+ end
+ cani(player.sprites, player.frame, player.x, player.y, player.flip)
+ --cspr(bone.sprite,64,64,false)
+ --cspr(asteroid.sprite,64,80,false)
+ print("bones: "..str(score),1,1,3)
+ draw_objects(bones)
+ draw_objects(asteroids)
+end
+
+function update_objects(objects, speed)
+ for i,obj in pairs(objects) do
+  obj.x = obj.x + speed
+  -- respawn object if it goes off-screen
+  if obj.x < -16 then
+   obj.x = 160
+   obj.y = rnd(104)  -- Random y-coordinate
+  end
+ end
+end
+
+function draw_objects(objects)
+ for i,obj in pairs(objects) do
+  cspr(obj.sprite, obj.x, obj.y, false)
+ end
+end
+
+function check_collisions_with_player()
+ for i,b in pairs(bones) do
+  if check_collision(player,b) then
+   b.x=160+rnd(80)
+   b.y=rnd(104)
+   score=score+1
+  end
+ end
+ for i,a in pairs(asteroids) do
+  if check_collision(player,a) then
+   state="gameover"
+  end
+ end
+end
+--#tab
+-- utils
+-- print horizontal center
+function printhc(s,y,c,bc)
+ print(s,hcenter(s),y,c,bc)
+end
+
+function hcenter(s)
+  return 80-#s*2
+end
+
+function vcenter(s)
+  return 58
+end
+
+-- custom animation
+function cani(obj, frm, x, y, flip)
+ cspr(obj[frm],x,y,flip)
+end
+
+-- custom sprite draw
+function cspr(cfrm, x, y, flip)
+ sspr(cfrm[1], cfrm[2], cfrm[3], cfrm[4], x, y, 16, 16, flip, false)
+end
+
+-- check collision between rects
+function check_collision(obj1, obj2)
+ local r1 = obj1.r
+ local r2 = obj2.r
+
+ return obj1.x + r1[1] < obj2.x + r2[1] + r2[3] and
+        obj2.x + r2[1] < obj1.x + r1[1] + r1[3] and
+        obj1.y + r1[2] < obj2.y + r2[2] + r2[4] and
+        obj2.y + r2[2] < obj1.y + r1[2] + r1[4]
+end
+--#tab
+-- game over state
+function gameover_update()
+ -- restart the game if a button is pressed
+ if btnp(4) then
+  _init()
+  state = "game"
+ end
+end
+
+function gameover_draw()
+ cls()
+ printhc("game over!",40,3,1)
+ printhc("score: "..score,50,3,1)
+ printhc("press a to restart",70,3,1)
+end
+--#tab
+-- objects
+bone = {
+ x=0,
+ y=0,
+ w=16,
+ h=16,
+ r={1,1,14,14},
+ sprite={64,0,16,16}
+}
+asteroid = {
+ x=0,
+ y=0,
+ w=16,
+ h=16,
+ r={4,4,12,12},
+ sprite={80,0,16,16}
+}
+player = {
+ sprites = {
+  {0, 0, 16, 16},
+  {16, 0, 16, 16},
+  {32, 0, 16, 16},
+  {48, 0, 16, 16}
+ },
+ anim_time = 0,
+ anim_wait = 0.1,
+ frame = 1,
+ x = 16,
+ y = 52,
+ move_x = 0,
+ move_y = 0,
+ speed = 1.7,
+ flip = false,
+ r={6,6,10,10}
+}
+
+LOG (src/hardware/utils.c:75): running cart
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 207 ctrl: false shift: false
+
+LOG (src/api/lua.c:1496): Closing Lua App...
+
+LOG (src/hardware/utils.c:75): key: 352 ctrl: true shift: false
 

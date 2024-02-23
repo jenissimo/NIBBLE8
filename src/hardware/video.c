@@ -9,14 +9,16 @@
 uint32_t *frame;
 uint8_t *nibble_font;
 PaletteManager *manager;
+bool frame_dirty = false;
 
-void init_video()
+void nibble_init_video()
 {
     frame = malloc(NIBBLE_WIDTH * NIBBLE_HEIGHT * sizeof(uint32_t));
     nibble_load_font();
     nibble_load_palettes();
-    update_frame();
+    // update_frame();
     nibble_api_pal_reset();
+    frame_dirty = true;
 
     memory.drawState.camera_x = 0;
     memory.drawState.camera_y = 0;
@@ -62,7 +64,7 @@ void print_char(int charIndex)
     printf("\n");
 }
 
-void destroy_video()
+void nibble_destroy_video()
 {
     free(frame);
 }
@@ -186,24 +188,24 @@ void nibble_api_circfill(int16_t xc, int16_t yc, int16_t r, uint8_t col)
 
 void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
 {
-    uint16_t index;
-    uint8_t bitPairIndex;
-
     x -= memory.drawState.camera_x;
     y -= memory.drawState.camera_y;
 
-    if ((x < 0) || (y < 0))
-        return;
-    if ((x >= NIBBLE_WIDTH) || (y >= NIBBLE_HEIGHT))
+    if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
 
-    index = nibble_get_vram_byte_index(x, y, NIBBLE_WIDTH);
-    bitPairIndex = nibble_get_vram_bitpair_index(x, y, NIBBLE_WIDTH);
+    // Assuming NIBBLE_WIDTH is a power of 2, optimize these calculations
+    uint16_t index = (y * NIBBLE_WIDTH + x) >> 2; // Example for NIBBLE_WIDTH being 128 or another power of 2
+    uint8_t bitPairIndex = (x & 3);               // Equivalent to x % 4 for power-of-2 widths
 
-    int shift = ((3 - bitPairIndex) * 2);
+    int shift = (3 - bitPairIndex) << 1; // Optimized to use shift instead of multiplication
 
-    memory.screenData[index] &= ~(3 << shift);
-    memory.screenData[index] |= (col << shift);
+    uint8_t mask = ~(3 << shift);
+    uint8_t value = (col << shift);
+
+    memory.screenData[index] = (memory.screenData[index] & mask) | value;
+
+    frame_dirty = true;
 }
 
 uint8_t nibble_api_pget(int16_t x, int16_t y)
@@ -493,16 +495,19 @@ void nibble_api_draw_fps(int fps)
     sprintf(fpsStr, "%d", fps);
     uint8_t fpsWidth = 4 * strlen(fpsStr) + 1;
     uint8_t fpsX = 160 - fpsWidth;
+    nibble_api_palt(0, false);
+    nibble_api_palt(3, false);
     nibble_api_rectfill(fpsX, 0, fpsWidth, 7, 0);
     nibble_api_print(fpsStr, fpsX + 1, 1, 3, 0);
+    nibble_api_palt_reset();
 }
 
-uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
+inline uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
 {
     return (y * width + x) / NIBBLE_PIXELS_IN_BYTE;
 }
 
-uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
+inline uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
 {
     return (y * width + x) % NIBBLE_PIXELS_IN_BYTE;
 }
@@ -535,9 +540,7 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
     uint16_t index;
     uint8_t bitPairIndex;
 
-    if ((x < 0) || (y < 0))
-        return;
-    if ((x >= NIBBLE_WIDTH) || (y >= NIBBLE_HEIGHT))
+    if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
 
     col = memory.drawState.drawPaletteMap[col & 0x0f] & 0x0f;

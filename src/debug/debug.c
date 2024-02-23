@@ -38,6 +38,8 @@ void debug_init(const char *logFile)
 
 void debug_log(const char *file, int line, const char *format, ...)
 {
+    return;
+
     va_list args;
     va_start(args, format);
 

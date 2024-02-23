@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "../nibble8.h"
+#include "../debug/debug.h"
 
 #define TAU 6.2831853071795864769252867665590057683936
 int nibble_frame_count = 0;
@@ -71,7 +72,7 @@ double nibble_api_atan2(double x, double y)
 
 void nibble_api_trace(char *text)
 {
-    printf("%s\n", text);
+    DEBUG_LOG("%s\n", text);
 }
 
 double nibble_api_min(double x, double y)

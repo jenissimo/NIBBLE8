@@ -21,16 +21,6 @@ int main(int argc, char *argv[])
     uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
     printf("Welcome to NIBBLE-8 for DOS!\n");
-    fflush(stdout);
-
-    srand(time(NULL)); // Initialization, should only be called once.
-
-    allegro_init();
-    install_timer();
-    initRAM();
-    init_video();
-    initLua();
-    nibble_allegro_init();
 
     // parse params
     for (int i = 0; i < argc; i++)
@@ -40,7 +30,21 @@ int main(int argc, char *argv[])
             debug_init("nibble8.log");
             DEBUG_LOG("Debug mode enabled.\n");
         }
-        else if (strcmp(argv[i], "--cart") == 0)
+    }
+
+    fflush(stdout);
+
+    srand(time(NULL)); // Initialization, should only be called once.
+
+    initRAM();
+    nibble_init_video();
+    initLua();
+    nibble_allegro_init();
+
+    // parse params
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--cart") == 0)
         {
             if (i + 1 < argc)
             {
@@ -64,6 +68,7 @@ int main(int argc, char *argv[])
         }
 
         nibble_allegro_update();
+        
         // sleep for remainder of time
         if (frame_time < targetFrameTimeMs)
         {
@@ -72,10 +77,15 @@ int main(int argc, char *argv[])
             last_time += msToSleep;
         }
         nibble_frame_count++;
+
+        if (shutdownRequested)
+        {
+            run = 0;
+        }
     }
 
     destroyLua();
-    destroy_video();
+    nibble_destroy_video();
     destroyRAM();
     debug_close();
 
