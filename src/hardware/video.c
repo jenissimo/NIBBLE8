@@ -17,6 +17,11 @@ void nibble_init_video()
     nibble_load_font();
     nibble_load_palettes();
     // update_frame();
+    nibble_reset_video();
+}
+
+void nibble_reset_video()
+{
     nibble_api_pal_reset();
     frame_dirty = true;
 
@@ -186,7 +191,7 @@ void nibble_api_circfill(int16_t xc, int16_t yc, int16_t r, uint8_t col)
     }
 }
 
-void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
+inline void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
 {
     x -= memory.drawState.camera_x;
     y -= memory.drawState.camera_y;
@@ -468,7 +473,7 @@ int16_t nibble_api_mget(uint16_t x, uint16_t y)
     return -1;
 }
 
-void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol)
+inline void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol)
 {
     for (int j = charIndex * 8; j < (charIndex * 8 + NIBBLE_FONT_HEIGHT); j++)
     {
@@ -478,12 +483,9 @@ void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol
             {
                 nibble_api_pset(x + (7 - i), y + (j % 8), fgCol);
             }
-            else
+            else if (!is_color_transparent(bgCol))
             {
-                if (!is_color_transparent(bgCol))
-                {
-                    nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
-                }
+                nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
             }
         }
     }
@@ -554,7 +556,7 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
     memory.screenData[index] |= (col << shift);
 }
 
-bool is_color_transparent(uint8_t color)
+inline bool is_color_transparent(uint8_t color)
 {
     color = color & 0x0f;
     return (memory.drawState.drawPaletteMap[color] >> 4) > 0; // upper bits indicate transparency

@@ -31,7 +31,7 @@ void nibble_allegro_init()
     DEBUG_LOG("Allegro Initialized");
 }
 
-void nibble_allegro_update()
+inline void nibble_allegro_update()
 {
     if (input_update() == 0)
     {
@@ -39,8 +39,14 @@ void nibble_allegro_update()
         return; // Quit signal received
     }
 
-    callLuaFunction("_update");
-    callLuaFunction("_draw");
+    lua_getglobal(currentVM, "_update");
+    lua_pcall(currentVM, 0, 0, 0);
+
+    lua_getglobal(currentVM, "_draw");
+    lua_pcall(currentVM, 0, 0, 0);
+    
+    //callLuaFunction("_update");
+    //callLuaFunction("_draw");
 
     if (frame_dirty)
     {

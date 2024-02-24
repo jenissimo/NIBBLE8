@@ -38,8 +38,8 @@ void debug_init(const char *logFile)
 
 void debug_log(const char *file, int line, const char *format, ...)
 {
+    // TODO: Fix for DOS
     return;
-
     va_list args;
     va_start(args, format);
 

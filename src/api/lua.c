@@ -716,9 +716,9 @@ static int l_btn(lua_State *L)
     if (top >= 1)
     {
         int i = lua_tonumber(L, 1);
-        int result = nibble_api_btn(i);
+        bool result = nibble_api_btn(i);
         // DEBUG_LOG("btn(%d) = %d\n", i, result);
-        lua_pushboolean(L, result > 0);
+        lua_pushboolean(L, result);
         // lua_pushnumber(L, result);
         return 1;
     }
@@ -733,9 +733,9 @@ static int l_btnp(lua_State *L)
     if (top >= 1)
     {
         int i = lua_tonumber(L, 1);
-        int result = nibble_api_btnp(i);
+        bool result = nibble_api_btnp(i);
         // DEBUG_LOG("btnp(%d) = %d\n", i, result);
-        lua_pushboolean(L, result > 0);
+        lua_pushboolean(L, result);
         // lua_pushnumber(L, result);
         return 1;
     }
@@ -750,10 +750,10 @@ static int l_key(lua_State *L)
     if (top >= 1)
     {
         int x = lua_tonumber(L, 1);
-        int result = nibble_api_key(x);
+        bool result = nibble_api_key(x);
         // DEBUG_LOG("key(%d) = %d\n", x, result);
         // lua_pushnumber(L, result);
-        lua_pushboolean(L, result > 0);
+        lua_pushboolean(L, result);
         return 1;
     }
     return 0;
@@ -766,10 +766,10 @@ static int l_keyp(lua_State *L)
     if (top >= 1)
     {
         int x = lua_tonumber(L, 1);
-        int result = nibble_api_keyp(x);
+        bool result = nibble_api_keyp(x);
         // DEBUG_LOG("keyp(%d) = %d\n", x, result);
         // lua_pushnumber(L, result);
-        lua_pushboolean(L, result > 0);
+        lua_pushboolean(L, result);
         return 1;
     }
     return 0;
@@ -1499,7 +1499,7 @@ void closeLuaApp()
         lua_close(app);
         app = NULL;
         // reset draw state
-        nibble_init_video();
+        nibble_reset_video();
     }
     currentVM = lua;
 }
@@ -1525,7 +1525,7 @@ static char *printString(lua_State *L, int index)
     return text;
 }
 
-void callLuaFunction(const char *name)
+inline void callLuaFunction(const char *name)
 {
     if (currentVM == NULL)
     {

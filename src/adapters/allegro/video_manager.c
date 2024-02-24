@@ -4,7 +4,7 @@
 BITMAP *native_buffer;
 
 // The scaled resolution
-const int SCREEN_SCALE = 2;
+const int SCREEN_SCALE = 4;
 const int SCALED_WIDTH = NIBBLE_WIDTH * SCREEN_SCALE;
 const int SCALED_HEIGHT = NIBBLE_HEIGHT * SCREEN_SCALE;
 
@@ -12,11 +12,12 @@ const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 uint32_t fpsLastTime = 0;
 int frameCount = 0;
 int fpsCurrent = 0;
+int currentPaletteIndex = 0;
 
 int video_init()
 {
     // Set the graphics mode to the scaled resolution
-    if (set_gfx_mode(GFX_AUTODETECT, 320, 240, 0, 0) != 0)
+    if (set_gfx_mode(GFX_AUTODETECT, SCALED_WIDTH, SCALED_HEIGHT, 0, 0) != 0)
     {
         DEBUG_LOG("Video Initialization failed: %s", allegro_error);
         return -1;
@@ -30,6 +31,7 @@ int video_init()
         return -1;
     }
 
+    currentPaletteIndex = manager->current_palette;
     // Setup the palette
     video_setup_palette();
 
@@ -60,13 +62,19 @@ void video_setup_palette()
     set_palette(allegPalette);
 }
 
-void video_update()
+inline void video_update()
 {
     // Clear the back buffer
     // clear_bitmap(native_buffer);
 
     // Perform drawing operations on native_buffer
     video_update_frame_allgero(); // Assuming this function draws the current frame
+
+    if (currentPaletteIndex != manager->current_palette)
+    {
+        video_setup_palette();
+        currentPaletteIndex = manager->current_palette;
+    }
 
     // Display FPS on the back buffer if enabled
 #if NIBBLE_DISPLAY_FPS

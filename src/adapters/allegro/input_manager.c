@@ -1,7 +1,7 @@
 #include "input_manager.h"
 
 #define INITIAL_DELAY 0.25 // Half a second before repeat starts
-#define REPEAT_RATE 0.05  // Repeat event every 0.05 seconds (20 times per second)
+#define REPEAT_RATE 0.05   // Repeat event every 0.05 seconds (20 times per second)
 
 // Global keyboard state from the previous frame for comparison
 static int old_key[KEY_MAX];
@@ -26,6 +26,7 @@ int input_init()
 int input_update()
 {
     double currentTime = nibble_api_time();
+    bool inputUpdated = false;
 
     // Refresh the keyboard state
     if (keyboard_needs_poll())
@@ -71,6 +72,7 @@ int input_update()
             // Key was released
             callLuaKeyUp(custom_key, ctrl_pressed, shift_pressed);
             inRepeatPhase[i] = 0; // Reset repeat phase upon key release
+            input_check_hotkey(i);
         }
 
         old_key[i] = key[i];                // Update old key state for next frame
@@ -105,6 +107,8 @@ int input_update()
         old_mouse_y = mouse_y;
     }
 
+    updateButtonState();
+
     if (key[KEY_F12])
     {
         return 0; // Indicate that the application should quit
@@ -119,6 +123,12 @@ void input_check_hotkey(int key)
     {
     case KEY_ESC:
         closeLuaApp();
+        break;
+    case KEY_F7:
+        prevPalette(manager);
+        break;
+    case KEY_F8:
+        nextPalette(manager);
         break;
     case KEY_F4:
         nibble_allegro_save_lua_keys_constants();

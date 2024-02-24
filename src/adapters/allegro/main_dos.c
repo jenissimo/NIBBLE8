@@ -12,35 +12,30 @@
 #include "../../api/lua.h"
 
 int run = 1;
+volatile int ticks = 0;
 
-int main(int argc, char *argv[])
+void timer_handler()
 {
-    uint32_t now_time = 0;
-    uint32_t frame_time = 0;
-    uint32_t last_time = 0;
-    uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
+    ticks++;
+}
+END_OF_FUNCTION(timer_handler);
 
-    printf("Welcome to NIBBLE-8 for DOS!\n");
-
+int check_param(char *param, int argc, char *argv[])
+{
     // parse params
     for (int i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "--debug") == 0)
+        if (strcmp(argv[i], param) == 0)
         {
-            debug_init("nibble8.log");
-            DEBUG_LOG("Debug mode enabled.\n");
+            return i;
         }
     }
 
-    fflush(stdout);
+    return -1;
+}
 
-    srand(time(NULL)); // Initialization, should only be called once.
-
-    initRAM();
-    nibble_init_video();
-    initLua();
-    nibble_allegro_init();
-
+void check_params(int argc, char *argv[])
+{
     // parse params
     for (int i = 0; i < argc; i++)
     {
@@ -54,12 +49,60 @@ int main(int argc, char *argv[])
             }
         }
     }
+}
+
+int main(int argc, char *argv[])
+{
+    printf("Welcome to NIBBLE-8 for DOS!\n");
+
+    if (check_param("--debug", argc, argv) > -1)
+    {
+        debug_init("nibble8.log");
+        DEBUG_LOG("Debug mode enabled.\n");
+    }
+
+    fflush(stdout);
+
+    srand(time(NULL)); // Initialization, should only be called once.
+
+    initRAM();
+    nibble_init_video();
+    initLua();
+    nibble_allegro_init();
+    check_params(argc, argv);
+
+    // Lock the timer handler function
+    LOCK_FUNCTION(timer_handler);
+    LOCK_VARIABLE(ticks);
+
+    // Install a timer to increment 'ticks' 30 times per second
+    if (install_int_ex(timer_handler, BPS_TO_TIMER(NIBBLE_FPS)) == -1)
+    {
+        fprintf(stderr, "Failed to install timer interrupt.\n");
+        return -1;
+    }
 
     while (run)
     {
-        now_time = time(NULL); // Or use Allegro's timing functions
-        frame_time = now_time - last_time;
-        last_time = now_time;
+        // Wait until 'ticks' has been incremented by the timer handler
+        while (ticks == 0)
+        {
+            rest(1); // Sleep briefly to reduce CPU usage
+        }
+
+        // Acknowledge tick
+        while (ticks > 0)
+        {
+            int old_ticks = ticks;
+            ticks--;
+            if (old_ticks <= ticks)
+            { // Ensure ticks is decreasing
+                break;
+            }
+        }
+
+        nibble_allegro_update();
+        nibble_frame_count++;
 
         if (rebootRequested)
         {
@@ -67,19 +110,9 @@ int main(int argc, char *argv[])
             nibble_api_reboot();
         }
 
-        nibble_allegro_update();
-        
-        // sleep for remainder of time
-        if (frame_time < targetFrameTimeMs)
-        {
-            uint32_t msToSleep = targetFrameTimeMs - frame_time;
-            rest(msToSleep); // Allegro's sleep function
-            last_time += msToSleep;
-        }
-        nibble_frame_count++;
-
         if (shutdownRequested)
         {
+            shutdownRequested = false;
             run = 0;
         }
     }
