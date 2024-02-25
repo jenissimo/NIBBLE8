@@ -103,7 +103,9 @@ static const int allegroToSDLScancode[KEY_MAX] = {
     [KEY_RCONTROL] = 356,
     [KEY_LCONTROL] = 352,
     [KEY_ALTGR] = 358,
-    [KEY_ALT] = 354
+    [KEY_ALT] = 354,
+    [KEY_OPENBRACE] = 91,
+    [KEY_CLOSEBRACE] = 93
 };
 
 #endif // INPUT_MANAGER_H
