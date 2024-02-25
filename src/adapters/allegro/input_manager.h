@@ -3,6 +3,7 @@
 
 #include "../../hardware/input.h"
 #include "../../hardware/utils.h"
+#include "../../debug/debug.h"
 #include "video_manager.h"
 
 int input_init();

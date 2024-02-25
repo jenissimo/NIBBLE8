@@ -4,7 +4,7 @@
 BITMAP *native_buffer;
 
 // The scaled resolution
-const int SCREEN_SCALE = 4;
+const int SCREEN_SCALE = 2;
 const int SCALED_WIDTH = NIBBLE_WIDTH * SCREEN_SCALE;
 const int SCALED_HEIGHT = NIBBLE_HEIGHT * SCREEN_SCALE;
 

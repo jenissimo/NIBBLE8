@@ -191,7 +191,7 @@ void nibble_allegro_save_lua_keys_constants()
     FILE *f = fopen("lib/keys_constants.lua", "w");
     if (f == NULL)
     {
-        printf("Error opening file!\n");
+        DEBUG_LOG("Error opening file!\n");
         exit(1);
     }
 
@@ -334,7 +334,7 @@ void nibble_allegro_save_lua_keys_constants()
 
     fclose(f);
 
-    printf("Constants printed'\n");
+    DEBUG_LOG("Constants printed'\n");
 }
 
 void nibble_allegro_print_lua_key(FILE *f, char *name, int key)
