@@ -86,6 +86,7 @@
         "string.h": "c",
         "setjmp.h": "c",
         "memory.h": "c",
-        "palette_manager.h": "c"
+        "palette_manager.h": "c",
+        "input.h": "c"
     }
 }
