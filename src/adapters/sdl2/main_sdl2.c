@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     srand(time(NULL)); // Initialization, should only be called once.
 
     initRAM();
-    init_video();
+    nibble_init_video();
     initLua();
     nibble_sdl_init();
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     }
 
     destroyLua();
-    destroy_video();
+    nibble_destroy_video();
     destroyRAM();
     debug_close();
     return nibble_sdl_quit();

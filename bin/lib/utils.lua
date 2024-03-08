@@ -3,7 +3,7 @@ local utils = {}
 function utils.handle_text_input(key_code, ctrl_pressed, shift_pressed)
     local result = ""
 
-    --trace("key: "..str(key_code).." ctrl: "..str(ctrl_pressed).." shift: "..str(shift_pressed))
+    trace("key: "..str(key_code).." ctrl: "..str(ctrl_pressed).." shift: "..str(shift_pressed))
 
     if key_code >= 32 and key_code <= 126 then
         if shift_pressed then

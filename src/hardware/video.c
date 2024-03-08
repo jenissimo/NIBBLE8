@@ -1,5 +1,6 @@
 #include "video.h"
 #include "palette_manager.h"
+#include "../debug/debug.h"
 #include "ram.h"
 #include <math.h>
 #include <stdlib.h>
@@ -9,14 +10,21 @@
 uint32_t *frame;
 uint8_t *nibble_font;
 PaletteManager *manager;
+bool frame_dirty = false;
 
-void init_video()
+void nibble_init_video()
 {
     frame = malloc(NIBBLE_WIDTH * NIBBLE_HEIGHT * sizeof(uint32_t));
     nibble_load_font();
     nibble_load_palettes();
-    update_frame();
+    // update_frame();
+    nibble_reset_video();
+}
+
+void nibble_reset_video()
+{
     nibble_api_pal_reset();
+    frame_dirty = true;
 
     memory.drawState.camera_x = 0;
     memory.drawState.camera_y = 0;
@@ -37,7 +45,7 @@ void nibble_load_palettes()
     manager = palette_manager_create(ini_file);
     if (!manager)
     {
-        printf("Error: Unable to create palette manager.\n");
+        DEBUG_LOG("Error: Unable to create palette manager.\n");
     }
     manager->current_palette = 1;
 }
@@ -50,19 +58,19 @@ void print_char(int charIndex)
         {
             if ((nibble_font[j] >> i) & 1)
             {
-                printf("█");
+                DEBUG_LOG("█");
             }
             else
             {
-                printf(" ");
+                DEBUG_LOG(" ");
             }
         }
-        printf("\n");
+        DEBUG_LOG("\n");
     }
-    printf("\n");
+    DEBUG_LOG("\n");
 }
 
-void destroy_video()
+void nibble_destroy_video()
 {
     free(frame);
 }
@@ -184,26 +192,26 @@ void nibble_api_circfill(int16_t xc, int16_t yc, int16_t r, uint8_t col)
     }
 }
 
-void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
+inline void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
 {
-    uint16_t index;
-    uint8_t bitPairIndex;
-
     x -= memory.drawState.camera_x;
     y -= memory.drawState.camera_y;
 
-    if ((x < 0) || (y < 0))
-        return;
-    if ((x >= NIBBLE_WIDTH) || (y >= NIBBLE_HEIGHT))
+    if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
 
-    index = nibble_get_vram_byte_index(x, y, NIBBLE_WIDTH);
-    bitPairIndex = nibble_get_vram_bitpair_index(x, y, NIBBLE_WIDTH);
+    // Assuming NIBBLE_WIDTH is a power of 2, optimize these calculations
+    uint16_t index = (y * NIBBLE_WIDTH + x) >> 2; // Example for NIBBLE_WIDTH being 128 or another power of 2
+    uint8_t bitPairIndex = (x & 3);               // Equivalent to x % 4 for power-of-2 widths
 
-    int shift = ((3 - bitPairIndex) * 2);
+    int shift = (3 - bitPairIndex) << 1; // Optimized to use shift instead of multiplication
 
-    memory.screenData[index] &= ~(3 << shift);
-    memory.screenData[index] |= (col << shift);
+    uint8_t mask = ~(3 << shift);
+    uint8_t value = (col << shift);
+
+    memory.screenData[index] = (memory.screenData[index] & mask) | value;
+
+    frame_dirty = true;
 }
 
 uint8_t nibble_api_pget(int16_t x, int16_t y)
@@ -314,7 +322,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
 {
     int i = 0;
 
-    // printf("print: %s\n", text);
+    // DEBUG_LOG("print: %s\n", text);
 
     while (text[i] != '\0')
     {
@@ -351,7 +359,7 @@ void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8
 
 void nibble_api_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, bool flip_x, bool flip_y)
 {
-    // printf("sspr: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
+    // DEBUG_LOG("sspr: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y);
     for (int j = 0; j < dh; j++)
     {
         for (int i = 0; i < dw; i++)
@@ -388,7 +396,7 @@ void nibble_api_sset(int16_t x, int16_t y, uint8_t col)
     if ((x >= NIBBLE_SPRITE_SHEET_WIDTH) || (y >= NIBBLE_SPRITE_SHEET_HEIGHT))
         return;
 
-    // printf("sset: %d, %d, %d\n", x, y, col);
+    // DEBUG_LOG("sset: %d, %d, %d\n", x, y, col);
 
     index = nibble_get_vram_byte_index(x, y, NIBBLE_SPRITE_SHEET_WIDTH);
     bitPairIndex = nibble_get_vram_bitpair_index(x, y, NIBBLE_SPRITE_SHEET_WIDTH);
@@ -466,7 +474,7 @@ int16_t nibble_api_mget(uint16_t x, uint16_t y)
     return -1;
 }
 
-void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol)
+inline void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol)
 {
     for (int j = charIndex * 8; j < (charIndex * 8 + NIBBLE_FONT_HEIGHT); j++)
     {
@@ -476,12 +484,9 @@ void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol
             {
                 nibble_api_pset(x + (7 - i), y + (j % 8), fgCol);
             }
-            else
+            else if (!is_color_transparent(bgCol))
             {
-                if (!is_color_transparent(bgCol))
-                {
-                    nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
-                }
+                nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
             }
         }
     }
@@ -493,16 +498,19 @@ void nibble_api_draw_fps(int fps)
     sprintf(fpsStr, "%d", fps);
     uint8_t fpsWidth = 4 * strlen(fpsStr) + 1;
     uint8_t fpsX = 160 - fpsWidth;
+    nibble_api_palt(0, false);
+    nibble_api_palt(3, false);
     nibble_api_rectfill(fpsX, 0, fpsWidth, 7, 0);
     nibble_api_print(fpsStr, fpsX + 1, 1, 3, 0);
+    nibble_api_palt_reset();
 }
 
-uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
+inline uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
 {
     return (y * width + x) / NIBBLE_PIXELS_IN_BYTE;
 }
 
-uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
+inline uint16_t nibble_get_vram_bitpair_index(int16_t x, int16_t y, uint16_t width)
 {
     return (y * width + x) % NIBBLE_PIXELS_IN_BYTE;
 }
@@ -535,9 +543,7 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
     uint16_t index;
     uint8_t bitPairIndex;
 
-    if ((x < 0) || (y < 0))
-        return;
-    if ((x >= NIBBLE_WIDTH) || (y >= NIBBLE_HEIGHT))
+    if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
 
     col = memory.drawState.drawPaletteMap[col & 0x0f] & 0x0f;
@@ -551,7 +557,7 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
     memory.screenData[index] |= (col << shift);
 }
 
-bool is_color_transparent(uint8_t color)
+inline bool is_color_transparent(uint8_t color)
 {
     color = color & 0x0f;
     return (memory.drawState.drawPaletteMap[color] >> 4) > 0; // upper bits indicate transparency
@@ -584,13 +590,13 @@ void printVRam()
         uint8_t value = memory.screenData[i];
         for (int bit = 7; bit >= 0; bit -= 2)
         {
-            printf("%d", ((((value >> bit) & 0x01) << 1) | ((value >> (bit - 1)) & 0x01)));
+            DEBUG_LOG("%d", ((((value >> bit) & 0x01) << 1) | ((value >> (bit - 1)) & 0x01)));
             col++;
         }
 
         if (col == NIBBLE_WIDTH)
         {
-            printf(" :%d\n", v);
+            DEBUG_LOG(" :%d\n", v);
             v++;
             col = 0;
         }

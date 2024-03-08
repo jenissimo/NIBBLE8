@@ -13,10 +13,12 @@
 extern uint32_t *frame;
 extern uint8_t *nibble_font;
 extern PaletteManager *manager;
+extern bool frame_dirty;
 static const uint8_t fullByteColors[4] = {0b00000000, 0b01010101, 0b10101010, 0b11111111};
 
-void init_video(void);
-void destroy_video(void);
+void nibble_init_video(void);
+void nibble_reset_video(void);
+void nibble_destroy_video(void);
 void nibble_load_font(void);
 void nibble_load_palettes();
 void print_char(int charIndex);

@@ -104,6 +104,7 @@ extern Memory memory;
 extern uint8_t *userLuaCode;
 extern uint8_t *clipboard;
 extern bool rebootRequested;
+extern bool shutdownRequested;
 
 void initRAM(void);
 void clearRAM();

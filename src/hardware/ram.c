@@ -8,6 +8,7 @@ Memory memory;
 uint8_t *userLuaCode;
 uint8_t *clipboard;
 bool rebootRequested = false;
+bool shutdownRequested = false;
 
 void initRAM()
 {

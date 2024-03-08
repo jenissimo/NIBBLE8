@@ -24,8 +24,8 @@ int input_update()
             int shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 1;
             callLuaKey(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
-            // printf("Key Down: %d\n", nibble_get_custom_key(e.key.keysym.sym));
-            // printf("Key Scancode: %d\n", e.key.keysym.scancode);
+            // DEBUG_LOG("Key Down: %d\n", nibble_get_custom_key(e.key.keysym.sym));
+            // DEBUG_LOG("Key Scancode: %d\n", e.key.keysym.scancode);
             if (e.key.keysym.sym == SDLK_RETURN && (SDL_GetModState() & KMOD_ALT))
             {
                 isFullscreen = !isFullscreen;
@@ -42,8 +42,8 @@ int input_update()
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 0;
             callLuaKeyUp(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
 
-            // printf("Key Up: %d\n", nibble_get_custom_key(e.key.keysym.sym));
-            // printf("Key Scancode: %d\n", e.key.keysym.scancode);
+            // DEBUG_LOG("Key Up: %d\n", nibble_get_custom_key(e.key.keysym.sym));
+            // DEBUG_LOG("Key Scancode: %d\n", e.key.keysym.scancode);
 
             switch (e.key.keysym.sym)
             {
@@ -86,7 +86,7 @@ int input_update()
         if (e.type == SDL_MOUSEBUTTONDOWN)
         {
             SDL_Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
-            printf("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
+            DEBUG_LOG("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
             callLuaMousePress(mousePos.x, mousePos.y, e.button.button);
         }
 
@@ -163,7 +163,7 @@ void nibble_sdl_save_lua_keys_constants()
     FILE *f = fopen("lib/keys_constants.lua", "w");
     if (f == NULL)
     {
-        printf("Error opening file!\n");
+        DEBUG_LOG("Error opening file!\n");
         exit(1);
     }
 
@@ -306,7 +306,7 @@ void nibble_sdl_save_lua_keys_constants()
 
     fclose(f);
 
-    printf("Constants printed'\n");
+    DEBUG_LOG("Constants printed'\n");
 }
 
 void nibble_sdl_print_lua_key(FILE *f, char *name, int key)

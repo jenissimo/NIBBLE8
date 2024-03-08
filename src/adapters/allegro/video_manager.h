@@ -13,8 +13,12 @@
 #include "../../utils/png.h"
 
 extern BITMAP *native_buffer;  // Main drawing buffer
+extern const int SCREEN_SCALE;
+extern const int SCALED_WIDTH;
+extern const int SCALED_HEIGHT;
 
 int video_init(void);
+void video_setup_palette();
 void video_update(void);
 void video_update_frame_allgero();
 void video_quit(void);

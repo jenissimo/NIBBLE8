@@ -68,7 +68,7 @@ void loadSpriteFlagsFromCart(const char *path)
         }
         else
         {
-            printf("Error: spriteFlags.bin size mismatch.\n");
+            DEBUG_LOG("Error: spriteFlags.bin size mismatch.\n");
         }
         free(flagsBuffer);
     }
@@ -97,18 +97,18 @@ int nibble_api_save_cart(char *path, char *luaCode)
 
     if (!mz_zip_writer_init_file(&zip_archive, path, 0))
     {
-        printf("Failed to initialize ZIP writer for %s\n", path);
+        DEBUG_LOG("Failed to initialize ZIP writer for %s\n", path);
         return 1;
     }
 
     // Read app.lua file
     size_t app_lua_size = strlen(userLuaCode);
 
-    printf("app.lua size: %zu\n", app_lua_size);
+    DEBUG_LOG("app.lua size: %zu\n", app_lua_size);
 
     if (!userLuaCode)
     {
-        printf("Failed to read app.lua\n");
+        DEBUG_LOG("Failed to read app.lua\n");
         mz_zip_writer_end(&zip_archive);
         return 1;
     }
@@ -116,7 +116,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     // Add app.lua to the ZIP archive
     if (!mz_zip_writer_add_mem(&zip_archive, "app.lua", userLuaCode, app_lua_size, MZ_DEFAULT_COMPRESSION))
     {
-        printf("Failed to add app.lua to cartridge.zip\n");
+        DEBUG_LOG("Failed to add app.lua to cartridge.zip\n");
         // free(app_lua_data);
         mz_zip_writer_end(&zip_archive);
         return 1;
@@ -129,7 +129,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     // Add spritesheet.png to the ZIP archive
     if (!state.data || !mz_zip_writer_add_mem(&zip_archive, "spritesheet.png", state.data, state.size, MZ_DEFAULT_COMPRESSION))
     {
-        printf("Failed to add spritesheet.png to cartridge.zip\n");
+        DEBUG_LOG("Failed to add spritesheet.png to cartridge.zip\n");
         // free(spritesheet_data);
         mz_zip_writer_end(&zip_archive);
         return 1;
@@ -138,7 +138,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     // Add spriteFlagsData to the ZIP archive
     if (!mz_zip_writer_add_mem(&zip_archive, "spriteFlags.bin", memory.spriteFlagsData, NIBBLE_SPRITE_FLAG_SIZE, MZ_DEFAULT_COMPRESSION))
     {
-        printf("Failed to add spriteFlags.bin to cartridge.zip\n");
+        DEBUG_LOG("Failed to add spriteFlags.bin to cartridge.zip\n");
         mz_zip_writer_end(&zip_archive);
         return 1;
     }
@@ -146,7 +146,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     // Add map to the ZIP archive
     if (!mz_zip_writer_add_mem(&zip_archive, "map.bin", memory.mapData, NIBBLE_MAP_SIZE, MZ_DEFAULT_COMPRESSION))
     {
-        printf("Failed to add map.bin to cartridge.zip\n");
+        DEBUG_LOG("Failed to add map.bin to cartridge.zip\n");
         mz_zip_writer_end(&zip_archive);
         return 1;
     }
@@ -154,7 +154,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     mz_zip_writer_finalize_archive(&zip_archive);
     mz_zip_writer_end(&zip_archive);
 
-    printf("Successfully created %s\n", path);
+    DEBUG_LOG("Successfully created %s\n", path);
     return 0;
 }
 
@@ -252,14 +252,14 @@ bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, 
     memset(&zip_archive, 0, sizeof(zip_archive));
     if (!mz_zip_reader_init_file(&zip_archive, zip_filename, 0))
     {
-        printf("Failed to initialize zip reader for %s\n", zip_filename);
+        DEBUG_LOG("Failed to initialize zip reader for %s\n", zip_filename);
         return false;
     }
 
     int file_index = mz_zip_reader_locate_file(&zip_archive, file_to_load, NULL, 0);
     if (file_index < 0)
     {
-        printf("Failed to locate %s in %s\n", file_to_load, zip_filename);
+        DEBUG_LOG("Failed to locate %s in %s\n", file_to_load, zip_filename);
         mz_zip_reader_end(&zip_archive);
         return false;
     }
@@ -267,7 +267,7 @@ bool extract_file_to_buffer(const char *zip_filename, const char *file_to_load, 
     mz_zip_archive_file_stat file_stat;
     if (!mz_zip_reader_file_stat(&zip_archive, file_index, &file_stat))
     {
-        printf("Zip file read error %s in %s\n", file_to_load, zip_filename);
+        DEBUG_LOG("Zip file read error %s in %s\n", file_to_load, zip_filename);
         mz_zip_reader_end(&zip_archive);
         return false;
     }
@@ -286,14 +286,14 @@ bool cart_has_file(const char *zip_filename, const char *file_to_load)
     memset(&zip_archive, 0, sizeof(zip_archive));
     if (!mz_zip_reader_init_file(&zip_archive, zip_filename, 0))
     {
-        printf("Failed to initialize zip reader for %s\n", zip_filename);
+        DEBUG_LOG("Failed to initialize zip reader for %s\n", zip_filename);
         return false;
     }
 
     int file_index = mz_zip_reader_locate_file(&zip_archive, file_to_load, NULL, 0);
     if (file_index < 0)
     {
-        printf("Failed to locate %s in %s\n", file_to_load, zip_filename);
+        DEBUG_LOG("Failed to locate %s in %s\n", file_to_load, zip_filename);
         mz_zip_reader_end(&zip_archive);
         return false;
     }
@@ -307,11 +307,11 @@ size_t load_file_from_zip(const char *zip_filename, const char *file_to_load, vo
     size_t buffer_size;
     if (extract_file_to_buffer(zip_filename, file_to_load, buffer, &buffer_size))
     {
-        printf("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
+        DEBUG_LOG("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
     }
     else
     {
-        printf("Failed to load %s into memory\n", file_to_load);
+        DEBUG_LOG("Failed to load %s into memory\n", file_to_load);
     }
 
     return buffer_size;
@@ -329,16 +329,16 @@ void load_text_from_zip(const char *zip_filename, const char *file_to_load, char
             textBuffer[buffer_size] = '\0';
             mz_free(*buffer);
             *buffer = textBuffer;
-            printf("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
+            DEBUG_LOG("%s loaded into memory successfully %zu bytes\n", file_to_load, buffer_size);
         }
         else
         {
-            printf("Failed to allocate memory for %s\n", file_to_load);
+            DEBUG_LOG("Failed to allocate memory for %s\n", file_to_load);
             mz_free(*buffer);
         }
     }
     else
     {
-        printf("Failed to load %s into memory\n", file_to_load);
+        DEBUG_LOG("Failed to load %s into memory\n", file_to_load);
     }
 }
