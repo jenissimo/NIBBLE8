@@ -16,6 +16,7 @@ int currentPaletteIndex = 0;
 
 int video_init()
 {
+    set_color_depth(8);
     // Set the graphics mode to the scaled resolution
     if (set_gfx_mode(GFX_AUTODETECT, SCALED_WIDTH, SCALED_HEIGHT, 0, 0) != 0)
     {
@@ -64,8 +65,18 @@ void video_setup_palette()
 
 inline void video_update()
 {
-    // Clear the back buffer
-    // clear_bitmap(native_buffer);
+    // Display FPS on the back buffer if enabled
+#if NIBBLE_DISPLAY_FPS
+    frameCount++;
+    int currentTime = time(NULL); // Or use Allegro's timing functions
+    if (currentTime - fpsLastTime > FPS_DELAY)
+    {
+        fpsCurrent = frameCount * 1000 / (currentTime - fpsLastTime);
+        fpsLastTime = currentTime;
+        frameCount = 0;
+    }
+    nibble_api_draw_fps(fpsCurrent);
+#endif
 
     // Perform drawing operations on native_buffer
     video_update_frame_allgero(); // Assuming this function draws the current frame
@@ -76,21 +87,8 @@ inline void video_update()
         currentPaletteIndex = manager->current_palette;
     }
 
-    // Display FPS on the back buffer if enabled
-#if NIBBLE_DISPLAY_FPS
-    frameCount++;
-    int currentTime = time(NULL); // Or use Allegro's timing functions
-    if (currentTime - fpsLastTime > FPS_DELAY)
-    {
-        fpsCurrent = frameCount * 1000 / (currentTime - fpsLastTime);
-        fpsLastTime = currentTime;
-        frameCount = 0;
-        nibble_api_draw_fps(fpsCurrent);
-    }
-#endif
-
     // Update the display (not needed for every version of Allegro, but here for completeness)
-    vsync();
+    // vsync();
 
     // Now, blit the entire back buffer (native_buffer) to the screen in one operation
     // Since we are doing double buffering, stretch_blit is used here to scale the drawing
@@ -122,7 +120,7 @@ void video_update_frame_allgero()
             y = pixelIndex / NIBBLE_WIDTH;
             //_putpixel32(native_buffer, x, y, palette->argb[col]);
             // DEBUG_LOG("x: %d, y: %d, col: %d", x, y, col);
-            putpixel(native_buffer, x, y, col);
+            _putpixel(native_buffer, x, y, col);
             pixelIndex++;
         }
     }

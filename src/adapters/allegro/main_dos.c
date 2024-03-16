@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
     LOCK_FUNCTION(timer_handler);
     LOCK_VARIABLE(ticks);
 
-    // Install a timer to increment 'ticks' 30 times per second
     if (install_int_ex(timer_handler, BPS_TO_TIMER(NIBBLE_FPS)) == -1)
     {
         fprintf(stderr, "Failed to install timer interrupt.\n");
@@ -96,7 +95,7 @@ int main(int argc, char *argv[])
             int old_ticks = ticks;
             ticks--;
             if (old_ticks <= ticks)
-            { // Ensure ticks is decreasing
+            { 
                 break;
             }
         }

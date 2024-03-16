@@ -27,6 +27,19 @@ function DisplayManager:redrawText(textEditor)
         local line = textEditor.lines[lineIndex] or ""
         local yOffset = (lineIndex - firstLineIndex) * lineHeight + startY
 
+        local batchText = ""
+        local batchXPos = 0
+        local batchColor, batchBgColor = nil, nil
+
+        -- Flushes the current batch of text by drawing it.
+        local function flushBatch()
+            if #batchText > 0 then
+                -- Draw the batched text at once.
+                print(batchText, batchXPos, yOffset, batchColor, batchBgColor)
+                batchText = "" -- Reset batch text
+            end
+        end
+
         -- Loop through each character in the line.
         for charIndex = 1, #line do
             local char = line:sub(charIndex, charIndex)
@@ -42,12 +55,20 @@ function DisplayManager:redrawText(textEditor)
             end
 
             -- Calculate the X position for this character.
-            local xPos = textEditor.x + (charIndex - 1 - textEditor.scroll.x) *
-                             charWidth
+            local xPos = textEditor.x + (charIndex - 1 - textEditor.scroll.x) * charWidth
 
-            -- Draw the character at the calculated position.
-            print(char, xPos, yOffset, color, bgColor)
+            -- Start a new batch if color changes or it's the first character.
+            if batchColor ~= color or batchBgColor ~= bgColor or #batchText == 0 then
+                flushBatch() -- Draw the current batch before starting a new one
+                batchXPos = xPos -- Update batch start position
+                batchColor, batchBgColor = color, bgColor
+            end
+
+            -- Add the current character to the batch.
+            batchText = batchText .. char
         end
+
+        flushBatch() -- Ensure the last batch of characters is drawn.
     end
 end
 

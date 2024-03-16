@@ -23,7 +23,8 @@ COMMON_SOURCES += $(wildcard $(SRCDIR)/utils/*.c)
 SOURCES := $(COMMON_SOURCES)
 OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-all: CFLAGS += -O2
+all: CFLAGS += -O3 -ffast-math -march=pentium-mmx -ffunction-sections -fdata-sections -funroll-all-loops
+all: LDFLAGS += -flto
 all: $(BUILDDIR)/$(TARGET)
 
 debug: CFLAGS += -g
@@ -31,7 +32,7 @@ debug: $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(@D)

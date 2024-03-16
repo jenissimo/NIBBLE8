@@ -11,6 +11,7 @@ uint32_t *frame;
 uint8_t *nibble_font;
 PaletteManager *manager;
 bool frame_dirty = false;
+bool transparencyCache[4];
 
 void nibble_init_video()
 {
@@ -117,19 +118,24 @@ void nibble_api_palt(uint8_t col, bool t)
     if (t)
     {
         memory.drawState.drawPaletteMap[col] |= 1UL << 4;
+        transparencyCache[col] = true;
     }
     else
     {
         memory.drawState.drawPaletteMap[col] &= ~(1UL << 4);
+        transparencyCache[col] = false;
     }
 }
 
 void nibble_api_palt_reset()
 {
     memory.drawState.drawPaletteMap[0] |= 1UL << 4;
+    transparencyCache[0] = true;
+
     for (uint8_t c = 1; c < 4; c++)
     {
         memory.drawState.drawPaletteMap[c] &= ~(1UL << 4);
+        transparencyCache[c] = false;
     }
 }
 
@@ -194,24 +200,20 @@ void nibble_api_circfill(int16_t xc, int16_t yc, int16_t r, uint8_t col)
 
 inline void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
 {
+    // Directly inline the optimized pixel-setting logic here
     x -= memory.drawState.camera_x;
     y -= memory.drawState.camera_y;
 
     if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
 
-    // Assuming NIBBLE_WIDTH is a power of 2, optimize these calculations
-    uint16_t index = (y * NIBBLE_WIDTH + x) >> 2; // Example for NIBBLE_WIDTH being 128 or another power of 2
-    uint8_t bitPairIndex = (x & 3);               // Equivalent to x % 4 for power-of-2 widths
-
-    int shift = (3 - bitPairIndex) << 1; // Optimized to use shift instead of multiplication
-
+    uint16_t index = (y * NIBBLE_WIDTH + x) >> 2; // Optimized for power-of-2 widths
+    uint8_t bitPairIndex = (x & 3);
+    int shift = (3 - bitPairIndex) << 1;
     uint8_t mask = ~(3 << shift);
     uint8_t value = (col << shift);
 
     memory.screenData[index] = (memory.screenData[index] & mask) | value;
-
-    frame_dirty = true;
 }
 
 uint8_t nibble_api_pget(int16_t x, int16_t y)
@@ -320,6 +322,62 @@ void nibble_api_rectfill(int16_t x1, int16_t y1, int16_t width, int16_t height, 
 
 int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t bg_color)
 {
+    int charIndex = 0;
+    int originalX = x; // Store the starting X position to calculate the offset after printing.
+
+    bool bgTransparent = transparencyCache[bg_color]; // Use your existing transparency check
+
+    while (text[charIndex] != '\0')
+    {
+        if (text[charIndex] == ' ')
+        {
+            x += NIBBLE_FONT_WIDTH; // Move to the next character's x position
+            charIndex++;
+            continue;
+        }
+
+        int bitmapIndex = text[charIndex] * 8; // Assuming ASCII and font starts at space (' ')
+
+        for (int j = 0; j < NIBBLE_FONT_HEIGHT; j++)
+        {
+            uint8_t fontRow = nibble_font[bitmapIndex + j];
+            for (int bit = 0; bit < NIBBLE_FONT_WIDTH; bit++)
+            {
+                int16_t posX = x + bit;
+                int16_t posY = y + j;
+
+                // Determine color based on bit value and background transparency
+                uint8_t color = (fontRow & (1 << (7 - bit))) ? fg_color : (!bgTransparent ? bg_color : 255);
+
+                // Inline version of nibble_api_pset - start
+                if (color != 255)
+                { // 255 used as a flag for no operation
+                    if ((unsigned int)posX < NIBBLE_WIDTH && (unsigned int)posY < NIBBLE_HEIGHT)
+                    {
+                        // Assuming NIBBLE_WIDTH is a power of 2 for optimization
+                        uint16_t index = (posY * NIBBLE_WIDTH + posX) >> 2; // Example for NIBBLE_WIDTH being 128 or another power of 2
+                        uint8_t bitPairIndex = (posX & 3);                  // Equivalent to posX % 4 for power-of-2 widths
+                        int shift = (3 - bitPairIndex) << 1;                // Calculate bit position
+                        uint8_t mask = ~(3 << shift);
+                        uint8_t value = (color << shift);
+                        memory.screenData[index] = (memory.screenData[index] & mask) | value;
+                        frame_dirty = true; // Mark the frame as dirty/needs refreshing
+                    }
+                }
+                // Inline version of nibble_api_pset - end
+            }
+        }
+        x += NIBBLE_FONT_WIDTH; // Move to the next character's x position
+        charIndex++;
+    }
+
+    // Return the new x position for the end of the printed string
+    return originalX + (charIndex * NIBBLE_FONT_WIDTH);
+}
+
+/*
+int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t bg_color)
+{
     int i = 0;
 
     // DEBUG_LOG("print: %s\n", text);
@@ -332,6 +390,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
 
     return x + (i * 8);
 }
+*/
 
 void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8_t flipY)
 {
@@ -498,11 +557,11 @@ void nibble_api_draw_fps(int fps)
     sprintf(fpsStr, "%d", fps);
     uint8_t fpsWidth = 4 * strlen(fpsStr) + 1;
     uint8_t fpsX = 160 - fpsWidth;
-    nibble_api_palt(0, false);
-    nibble_api_palt(3, false);
+    //nibble_api_palt(0, false);
+    //nibble_api_palt(3, false);
     nibble_api_rectfill(fpsX, 0, fpsWidth, 7, 0);
     nibble_api_print(fpsStr, fpsX + 1, 1, 3, 0);
-    nibble_api_palt_reset();
+    //nibble_api_palt_reset();
 }
 
 inline uint16_t nibble_get_vram_byte_index(int16_t x, int16_t y, uint16_t width)
