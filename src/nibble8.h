@@ -8,7 +8,7 @@
 #endif
 
 // Debug flags
-#define NIBBLE_DISPLAY_FPS        1
+#define NIBBLE_DISPLAY_FPS        0
 
 #define NIBBLE_TITLE              "Nibble-8"
 
@@ -23,7 +23,7 @@
 #define NIBBLE_DEFAULT_BG_COLOR   0
 #define NIBBLE_FULLWIDTH          (1 << NIBBLE_FULLWIDTH_BITS)
 #define NIBBLE_FULLHEIGHT         (NIBBLE_FULLWIDTH*9/16)
-#define NIBBLE_FPS                60
+#define NIBBLE_FPS                30
 
 #define NIBBLE_WINDOW_SCALE       4
 

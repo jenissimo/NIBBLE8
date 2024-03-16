@@ -243,6 +243,7 @@ function TextEditor:highlightSyntax()
         if line == nil then break end
         SyntaxHighlighter:highlightLine(line, i)
     end
+    SyntaxHighlighter:cacheVisibleLines(self)
 end
 
 return TextEditor

@@ -4,7 +4,6 @@ LIBS_LIST = lua5.4 sdl2 libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 SRCDIR = src
-VENDORDIR = vendor
 TOOLSDIR = tools
 OBJDIR = obj
 BUILDDIR = bin

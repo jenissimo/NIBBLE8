@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -w
 # Adjust the include and lib paths as necessary for your Allegro installation
-CFLAGS += -D DOS -fgnu89-inline -Ic:/djgpp/include
+CFLAGS += -D DOS -fgnu89-inline -Ic:/djgpp/include  -I$(SRCDIR)
 LIBS =  -Lc:/djgpp/lib -llua -lalleg -lpng -lm -lz
 # If you have more Allegro libraries (like allegro_image, allegro_font, etc.), add them here
 
