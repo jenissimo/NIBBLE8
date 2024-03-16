@@ -7,12 +7,12 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "../api/lua.h"
-#include "../utils/miniz.h"
-#include "../utils/png.h"
-#include "../utils/error_handling.h"
-#include "../hardware/ram.h"
-#include "../nibble8.h"
+#include "api/lua.h"
+#include "utils/miniz.h"
+#include "utils/png.h"
+#include "utils/error_handling.h"
+#include "hardware/ram.h"
+#include "nibble8.h"
 
 // Platform independent clipboard functions
 typedef char* (*GetClipboardTextFunc)();

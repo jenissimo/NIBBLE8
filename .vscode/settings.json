@@ -89,6 +89,13 @@
         "palette_manager.h": "c",
         "simple_ini.h": "c",
         "numbers": "c",
-        "input.h": "c"
+        "input.h": "c",
+        "lualib.h": "c",
+        "miniz.h": "c",
+        "stddef.h": "c",
+        "limits.h": "c",
+        "fix32.h": "c",
+        "lauxlib.h": "c",
+        "trigtables.h": "c"
     }
 }

@@ -1,7 +1,7 @@
 #ifndef nibble_video_h
 #define nibble_video_h
 
-#include "../nibble8.h"
+#include "nibble8.h"
 #include "palette_manager.h"
 #ifdef DOS
 #include <allegro.h>

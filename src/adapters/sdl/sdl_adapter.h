@@ -1,7 +1,7 @@
 #ifndef SDL_ADAPTER_H
 #define SDL_ADAPTER_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "debug/debug.h"
 #include "hardware/os.h"
 #include "api/lua.h"

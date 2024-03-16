@@ -1,10 +1,9 @@
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function -mconsole -pg
-LIBS_LIST = lua5.4 sdl2 libpng
-LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function -mconsole
+LIBS_LIST = lua5.4 sdl libpng
+LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm -lSDL_gfx
 
 SRCDIR = src
-VENDORDIR = vendor
 TOOLSDIR = tools
 OBJDIR = obj
 BUILDDIR = bin
@@ -13,11 +12,11 @@ TARGET = nibble8
 # Excluding all adapters from the common sources
 COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -type f -name *.c))
 
-# SDL2 specific sources
-SDL2_SOURCES := $(shell find $(SRCDIR)/adapters/sdl2 -type f -name *.c)
+# SDL specific sources
+SDL_SOURCES := $(shell find $(SRCDIR)/adapters/sdl -type f -name *.c)
 
-# Combine common sources with the SDL2-specific sources
-SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
+# Combine common sources with the SDL-specific sources
+SOURCES := $(COMMON_SOURCES) $(SDL_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: CFLAGS += -O2

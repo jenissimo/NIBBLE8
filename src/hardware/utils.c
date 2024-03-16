@@ -1,6 +1,6 @@
 #include "utils.h"
-#include "../nibble8.h"
-#include "../debug/debug.h"
+#include "nibble8.h"
+#include "debug/debug.h"
 
 #define TAU 6.2831853071795864769252867665590057683936
 int nibble_frame_count = 0;

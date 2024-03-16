@@ -2,15 +2,15 @@
 #define VIDEO_MANAGER_H
 
 #include <allegro.h>
-#include "../../hardware/audio.h"
-#include "../../hardware/video.h"
-#include "../../hardware/palette_manager.h"
-#include "../../hardware/input.h"
-#include "../../hardware/ram.h"
-#include "../../hardware/os.h"
-#include "../../nibble8.h"
-#include "../../api/lua.h"
-#include "../../utils/png.h"
+#include "hardware/audio.h"
+#include "hardware/video.h"
+#include "hardware/palette_manager.h"
+#include "hardware/input.h"
+#include "hardware/ram.h"
+#include "hardware/os.h"
+#include "nibble8.h"
+#include "api/lua.h"
+#include "utils/png.h"
 
 extern BITMAP *native_buffer;  // Main drawing buffer
 extern const int SCREEN_SCALE;

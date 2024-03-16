@@ -1,6 +1,6 @@
 #include "video.h"
 #include "palette_manager.h"
-#include "../debug/debug.h"
+#include "debug/debug.h"
 #include "ram.h"
 #include <math.h>
 #include <stdlib.h>

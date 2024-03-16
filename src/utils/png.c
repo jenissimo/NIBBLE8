@@ -9,8 +9,8 @@
 #include <math.h>
 #include <memory.h>
 
-#include "../nibble8.h"
-#include "../debug/debug.h"
+#include "nibble8.h"
+#include "debug/debug.h"
 #include "png.h"
 
 int find_closest_palette_index(const Palette *palette, uint8_t gray_value)
