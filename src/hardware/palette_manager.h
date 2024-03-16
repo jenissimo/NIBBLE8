@@ -9,7 +9,7 @@
 #include <stdint.h>
 #endif
 #include <string.h>
-#include "../utils/simple_ini.h"
+#include "utils/simple_ini.h"
 
 typedef struct {
     char name[256];

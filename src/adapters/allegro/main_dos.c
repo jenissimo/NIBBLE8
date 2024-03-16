@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <allegro.h>
 #include "allegro_adapter.h"
-#include "../../nibble8.h"
-#include "../../debug/debug.h"
-#include "../../hardware/os.h"
-#include "../../hardware/ram.h"
-#include "../../hardware/video.h"
-#include "../../hardware/utils.h"
-#include "../../api/lua.h"
+#include "nibble8.h"
+#include "debug/debug.h"
+#include "hardware/os.h"
+#include "hardware/ram.h"
+#include "hardware/video.h"
+#include "hardware/utils.h"
+#include "api/lua.h"
 
 int run = 1;
 volatile int ticks = 0;

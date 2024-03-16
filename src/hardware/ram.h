@@ -8,7 +8,7 @@
 #endif
 #include <stdbool.h>
 #include <string.h>
-#include "../nibble8.h"
+#include "nibble8.h"
 
 typedef struct DrawState
 {

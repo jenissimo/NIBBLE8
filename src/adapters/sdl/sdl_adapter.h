@@ -2,9 +2,9 @@
 #define SDL_ADAPTER_H
 
 #include <SDL.h>
-#include "../../debug/debug.h"
-#include "../../hardware/os.h"
-#include "../../api/lua.h"
+#include "debug/debug.h"
+#include "hardware/os.h"
+#include "api/lua.h"
 
 extern uint32_t next_time;
 

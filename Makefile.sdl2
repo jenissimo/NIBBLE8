@@ -1,9 +1,10 @@
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function -mconsole
-LIBS_LIST = lua5.4 sdl2 libpng
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function -mconsole -g
+LIBS_LIST = lua5.4 sdl2 libpng libprofiler
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 SRCDIR = src
+VENDORDIR = vendor
 TOOLSDIR = tools
 OBJDIR = obj
 BUILDDIR = bin

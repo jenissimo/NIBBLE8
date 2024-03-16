@@ -8,8 +8,8 @@
 #include <stdint.h>
 #endif
 #include "miniz.h"
-#include "../hardware/palette_manager.h"
-#include "../hardware/video.h"
+#include "hardware/palette_manager.h"
+#include "hardware/video.h"
 
 typedef struct {
     uint8_t *data;

@@ -1,15 +1,15 @@
 #ifndef nibble_lua_h
 #define nibble_lua_h
 
-#include "../nibble8.h"
-#include "../debug/debug.h"
-#include "../hardware/video.h"
-#include "../hardware/audio.h"
-#include "../hardware/input.h"
-#include "../hardware/os.h"
-#include "../hardware/cart.h"
-#include "../hardware/utils.h"
-#include "../utils/error_handling.h"
+#include "nibble8.h"
+#include "debug/debug.h"
+#include "hardware/video.h"
+#include "hardware/audio.h"
+#include "hardware/input.h"
+#include "hardware/os.h"
+#include "hardware/cart.h"
+#include "hardware/utils.h"
+#include "utils/error_handling.h"
 
 #include <lua.h>
 #include <lualib.h>

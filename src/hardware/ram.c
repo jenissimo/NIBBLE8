@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../nibble8.h"
+#include "nibble8.h"
 
 Memory memory;
 uint8_t *userLuaCode;

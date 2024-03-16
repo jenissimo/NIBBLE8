@@ -2,7 +2,7 @@
 #define INPUT_MANAGER_H
 
 #include <SDL.h>
-#include "../../hardware/input.h"
+#include "hardware/input.h"
 #include "video_manager.h"
 
 typedef struct {
