@@ -65,7 +65,7 @@ function _draw()
         currentWindow:draw()
     end
 
-    if (currentWindow ~= terminal) then
+    if currentWindow ~= terminal then
         drawPanel()
     end
     
@@ -73,7 +73,7 @@ function _draw()
         currentWindow:drawPost()
     end
 
-    if (currentWindow ~= terminal) then
+    if currentWindow ~= terminal then
         drawCursor()
     end
 end

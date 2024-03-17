@@ -8,19 +8,22 @@ int input_init()
 int input_update()
 {
     SDL_Event e;
+    bool ctrl_pressed = false;
+    bool shift_pressed = false;
+
     nibble_clear_keys();
-    while (SDL_PollEvent(&e) != 0)
+    while (SDL_PollEvent(&e))
     {
+        ctrl_pressed = ((e.key.keysym.mod & KMOD_GUI) != 0) || ((e.key.keysym.mod & KMOD_CTRL) != 0);
+        shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
+
         if (e.type == SDL_QUIT)
         {
             return 0;
         }
 
-        // TODO: Fix scancode simmiliar to lua constants
         if (e.type == SDL_KEYDOWN)
         {
-            int ctrl_pressed = ((e.key.keysym.mod & KMOD_GUI) != 0) || ((e.key.keysym.mod & KMOD_CTRL) != 0);
-            int shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 1;
             nibble_lua_call_key(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
             // DEBUG_LOG("Key Down: %d\n", nibble_get_custom_key(e.key.keysym.sym));
@@ -35,9 +38,6 @@ int input_update()
 
         if (e.type == SDL_KEYUP)
         {
-            int ctrl_pressed = (e.key.keysym.mod & KMOD_GUI) != 0;
-            int shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
-
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 0;
             nibble_lua_call_key_up(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
 
@@ -95,6 +95,7 @@ int input_update()
             nibble_lua_call_mouse_release(mousePos.x, mousePos.y, e.button.button);
         }
     }
+
     updateButtonState();
 
     return 1;

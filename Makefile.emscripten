@@ -1,6 +1,6 @@
 CC = emcc
-CFLAGS = -w -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function --embed-file bin@/
-LIBS = -s USE_SDL=2 -s USE_LIBPNG=1 -s ASYNCIFY
+CFLAGS = -w -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function --embed-file bin@/ --shell-file assets/emtemplate.html
+LIBS = -s USE_SDL=2 -s USE_LIBPNG=1
 
 SRCDIR = src
 TOOLSDIR = tools
@@ -18,7 +18,7 @@ SDL2_SOURCES := $(shell find $(SRCDIR)/adapters/sdl2 -type f -name *.c)
 SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-all: CFLAGS += -O2 -g4
+all: CFLAGS += -O2
 all: $(BUILDDIR)/$(TARGET)
 
 debug: CFLAGS += -g

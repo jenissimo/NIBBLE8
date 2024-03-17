@@ -236,6 +236,10 @@ end
 
 function TextEditor:getColor(x, y) return SyntaxHighlighter:getColor(x, y) end
 
+function TextEditor:cacheLine(lineIndex)
+    return SyntaxHighlighter:cacheLine(self, lineIndex)
+end
+
 function TextEditor:highlightSyntax()
     SyntaxHighlighter:clearColors()
     for i = self.scroll.y + 1, self.scroll.y + self.rows_on_screen + 1 do

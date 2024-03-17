@@ -20,7 +20,7 @@ int video_init()
     }
 
     window = SDL_CreateWindow("NIBBLE-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                          640, 480, SDL_WINDOW_SHOWN);
+                          640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
 
     if (window == NULL)
     {
@@ -28,7 +28,7 @@ int video_init()
         return 1;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
     {
         DEBUG_LOG("SDL Renderer Creation failed: %s", SDL_GetError());
@@ -50,12 +50,12 @@ void video_update()
     SDL_UpdateTexture(texture, NULL, frame, NIBBLE_WIDTH * sizeof(uint32_t));
     int windowWidth, windowHeight;
     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
-    updateAspectRatio(renderer, windowWidth, windowHeight, NIBBLE_WIDTH * NIBBLE_WINDOW_SCALE, NIBBLE_HEIGHT * NIBBLE_WINDOW_SCALE);
+    video_update_aspect_ratio(windowWidth, windowHeight, NIBBLE_WIDTH * NIBBLE_WINDOW_SCALE, NIBBLE_HEIGHT * NIBBLE_WINDOW_SCALE);
 
 #if NIBBLE_DISPLAY_FPS
     nibble_api_draw_fps(fpsCurrent);
 #endif
-
+    
     update_frame();
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -91,7 +91,7 @@ void video_toggle_fullscreen(bool fullscreen)
     }
 }
 
-void updateAspectRatio(SDL_Renderer *renderer, int windowWidth, int windowHeight, int targetWidth, int targetHeight)
+void video_update_aspect_ratio(int windowWidth, int windowHeight, int targetWidth, int targetHeight)
 {
     float scaleX = (float)windowWidth / targetWidth;
     float scaleY = (float)windowHeight / targetHeight;

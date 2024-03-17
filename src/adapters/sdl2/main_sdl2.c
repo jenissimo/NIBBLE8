@@ -12,12 +12,45 @@
 #include "hardware/utils.h"
 #include "api/lua.h"
 #include "sdl_adapter.h"
+#include "input_manager.h"
 
 int run = 1;
 uint32_t now_time = 0;
 uint32_t frame_time = 0;
 uint32_t last_time = 0;
 uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
+
+void main_loop()
+{
+    now_time = SDL_GetTicks();
+    frame_time = now_time - last_time;
+    last_time = now_time;
+
+    if (rebootRequested)
+    {
+        rebootRequested = false;
+        nibble_api_reboot();
+    }
+
+    if (nibble_sdl_update() == 0)
+    {
+        run = 0;
+    }
+    else
+    {
+        // sleep for remainder of time
+        if (frame_time < targetFrameTimeMs)
+        {
+            uint32_t msToSleep = targetFrameTimeMs - frame_time;
+
+            SDL_Delay(msToSleep);
+
+            last_time += msToSleep;
+        }
+        next_time += NIBBLE_FPS;
+    }
+    nibble_frame_count++;
+}
 
 int main(int argc, char *argv[])
 {
@@ -58,40 +91,14 @@ int main(int argc, char *argv[])
 
     DEBUG_LOG("NIBBLE-8 started\n");
 
+    #ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop(main_loop, -1, 1);
+    #else
     while (run)
     {
-        now_time = SDL_GetTicks();
-        frame_time = now_time - last_time;
-        last_time = now_time;
-
-        if (rebootRequested)
-        {
-            rebootRequested = false;
-            nibble_api_reboot();
-        }
-
-        if (nibble_sdl_update() == 0)
-        {
-            run = 0;
-        }
-        else
-        {
-            // sleep for remainder of time
-            if (frame_time < targetFrameTimeMs)
-            {
-                uint32_t msToSleep = targetFrameTimeMs - frame_time;
-
-                SDL_Delay(msToSleep);
-
-                last_time += msToSleep;
-            }
-            next_time += NIBBLE_FPS;
-        }
-        nibble_frame_count++;
-#ifdef __EMSCRIPTEN__
-        emscripten_sleep(0);
-#endif
+        main_loop();
     }
+    #endif
 
     nibble_lua_destroy();
     nibble_destroy_video();

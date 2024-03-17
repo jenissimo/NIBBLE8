@@ -217,6 +217,7 @@ inline void nibble_api_pset(int16_t x, int16_t y, uint8_t col)
     uint8_t value = (col << shift);
 
     memory.screenData[index] = (memory.screenData[index] & mask) | value;
+    frame_dirty = true;
 }
 
 uint8_t nibble_api_pget(int16_t x, int16_t y)

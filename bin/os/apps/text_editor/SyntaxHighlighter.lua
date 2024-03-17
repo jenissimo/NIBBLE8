@@ -163,6 +163,42 @@ function SyntaxHighlighter:highlightLine(line, lineIndex)
     end
 end
 
+function SyntaxHighlighter:cacheLine(textEditor, lineIndex)
+    local line = textEditor.lines[lineIndex] or ""
+    local drawText = ""
+    local previousColor, previousBgColor = -1, -1
+
+    for charIndex = 1, #line do
+        local char = line:sub(charIndex, charIndex)
+        local color = self:getColor(lineIndex, charIndex)
+        local bgColor = 0 -- Assume default background color for now
+
+        -- Check if the character is part of a selection.
+        if textEditor:isSelected(charIndex - 1, lineIndex - 1) then
+            color = 3
+            bgColor = 1
+        elseif textEditor:isUnderCursor(charIndex - 1, lineIndex - 1) and
+            textEditor.cursor.visible then
+            color = 3 -- Example cursor color
+        end
+
+        -- Insert color control codes before the character as needed.
+        if charIndex == 1 or previousColor ~= color or previousBgColor ~= bgColor then
+            if color ~= previousColor then
+                drawText = drawText .. chr(12) .. str(color)
+            end
+            if bgColor ~= previousBgColor then
+                drawText = drawText .. chr(14) .. str(bgColor)
+            end
+        end
+
+        drawText = drawText .. char
+        previousColor, previousBgColor = color, bgColor
+    end
+
+    return drawText
+end
+
 function SyntaxHighlighter:cacheVisibleLines(textEditor)
     local lineHeight = 6 -- Height of each line of text
     local charWidth = 4 -- Width of each character
@@ -179,43 +215,9 @@ function SyntaxHighlighter:cacheVisibleLines(textEditor)
     textEditor.drawLines = {}
 
     for lineIndex = firstLineIndex, lastLineIndex do
-        local line = textEditor.lines[lineIndex] or ""
-        local yOffset = (lineIndex - firstLineIndex) * lineHeight + startY
-        local xPos = textEditor.x - textEditor.scroll.x * charWidth
-        local drawText = ""
-        local previousColor, previousBgColor = -1, -1
-
-        for charIndex = 1, #line do
-            local char = line:sub(charIndex, charIndex)
-            local color = textEditor:getColor(lineIndex, charIndex)
-            local bgColor = 0 -- Assume default background color for now
-
-            -- Check if the character is part of a selection.
-            if textEditor:isSelected(charIndex - 1, lineIndex - 1) then
-                color = 3
-                bgColor = 1
-            elseif textEditor:isUnderCursor(charIndex - 1, lineIndex - 1) and
-                    textEditor.cursor.visible then
-                color = 3 -- Example cursor color
-            end
-
-            -- Insert color control codes before the character as needed.
-            if charIndex == 1 or previousColor ~= color or previousBgColor ~= bgColor then
-                if color ~= previousColor then
-                    drawText = drawText .. chr(12) .. str(color)
-                end
-                if bgColor ~= previousBgColor then
-                    drawText = drawText .. chr(14) .. str(bgColor)
-                end
-            end
-
-            drawText = drawText .. char
-            previousColor, previousBgColor = color, bgColor
-        end
-
+        local drawText = self:cacheLine(textEditor, lineIndex)
         textEditor.drawLines[#textEditor.drawLines + 1] = drawText
     end
-
 end
 
 return SyntaxHighlighter

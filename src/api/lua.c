@@ -14,8 +14,6 @@ void nibble_lua_init()
     currentVM = lua;
 
     nibble_lua_init_api();
-    // nibble_lua_load_file("lib/utils.lua");
-    // nibble_lua_load_file("demos/text_editor.lua");
     nibble_lua_load_file("os/os.lua");
 
     luaL_dostring(lua, "_init()");
@@ -1536,20 +1534,22 @@ inline void nibble_lua_call(const char *name)
 
     if (!lua_isfunction(currentVM, -1))
     {
-        DEBUG_LOG("%s not a function\n", name);
+        DEBUG_LOG("%s not a function", name);
         lua_pop(currentVM, 1);
         return;
     }
 
     if (lua_pcall(currentVM, 0, 0, 0) != 0)
     {
-        DEBUG_LOG("error running function `%s': %s\n", name, lua_tostring(currentVM, -1));
+        DEBUG_LOG("error running function `%s': %s", name, lua_tostring(currentVM, -1));
         lua_pop(currentVM, 1);
         return;
     }
+    //double time = nibble_api_time();
+    //DEBUG_LOG("Calling %s at %f", name, time);    
 }
 
-void nibble_lua_call_key(int key_code, int ctrl_pressed, int shift_pressed)
+void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed)
 {
     if (currentVM == NULL)
     {
@@ -1564,7 +1564,7 @@ void nibble_lua_call_key(int key_code, int ctrl_pressed, int shift_pressed)
     // DEBUG_LOG("key(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
 }
 
-void nibble_lua_call_key_up(int key_code, int ctrl_pressed, int shift_pressed)
+void nibble_lua_call_key_up(int key_code, bool ctrl_pressed, bool shift_pressed)
 {
     if (currentVM == NULL)
     {

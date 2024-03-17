@@ -98,8 +98,8 @@ static int l_update_filter(lua_State *L);
 static int l_set_note(lua_State *L);
 
 void nibble_lua_call(const char* name);
-void nibble_lua_call_key(int key_code, int ctrl_pressed, int shift_pressed);
-void nibble_lua_call_key_up(int key_code, int ctrl_pressed, int shift_pressed);
+void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed);
+void nibble_lua_call_key_up(int key_code, bool ctrl_pressed, bool shift_pressed);
 void nibble_lua_call_mouse_press(int x, int y, int button);
 void nibble_lua_call_mouse_release(int x, int y, int button);
 void nibble_lua_call_mouse_move(int x, int y);

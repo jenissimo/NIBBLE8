@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
     nibble_lua_destroy();
     destroy_video();
-    nibble_ram_destroy();
+    destroyRAM();
     debug_close();
     return nibble_sdl_quit();
 }

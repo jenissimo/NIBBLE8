@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>{{{ TITLE }}}</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Prevents scrollbars */
+            display: flex;
+            /* Use flexbox to center the canvas */
+            justify-content: center;
+            /* Center horizontally */
+            align-items: center;
+            /* Center vertically */
+            background-color: black;
+            /* Background color */
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="100%" height="100%"></canvas>
+    <script>
+        var Module = {
+            canvas: (function () {
+                var canvas = document.getElementById('canvas');
+                canvas.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                return canvas;
+            })(),
+        };
+    </script>
+    {{{ SCRIPT }}}
+</body>
+
+</html>

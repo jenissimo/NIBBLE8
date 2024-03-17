@@ -20,7 +20,7 @@ int video_init(void);
 void video_update(void);
 void video_quit(void);
 void video_toggle_fullscreen(bool enable);
-void updateAspectRatio(SDL_Renderer *renderer, int windowWidth, int windowHeight, int targetWidth, int targetHeight);
+void video_update_aspect_ratio(int windowWidth, int windowHeight, int targetWidth, int targetHeight);
 void make_screenshot(void);
 
 #endif // VIDEO_MANAGER_H

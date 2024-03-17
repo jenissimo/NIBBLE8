@@ -19,18 +19,12 @@ uint32_t time_left(void)
 
 int nibble_sdl_init()
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
-    {
-        DEBUG_LOG("SDL Initialization failed: %s", SDL_GetError());
-        return 1;
-    }
-
     if (video_init() != 0)
     {
         return 1;
     }
 
-    audio_init();
+    //audio_init();
     input_init();
 
     // init clipboard functions

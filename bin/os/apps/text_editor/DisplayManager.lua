@@ -11,13 +11,16 @@ end
 function DisplayManager:redrawText(textEditor)
     local firstLineIndex = math.max(1, math.floor(textEditor.scroll.y) + 1)
     local startY = textEditor.y + textEditor.offsetY
+    local lineHeight = 6 -- Height of each line of text
+    local charWidth = 4 -- Width of each character
+    local xPos = textEditor.x - textEditor.scroll.x * charWidth
 
     for lineIndex, drawText in ipairs(textEditor.drawLines) do
-        local lineHeight = 6 -- Height of each line of text
-        local charWidth = 4 -- Width of each character
         local yOffset = (lineIndex - firstLineIndex) * lineHeight + startY
-        local xPos = textEditor.x - textEditor.scroll.x * charWidth
-
+        local cursorDocumentY = textEditor.cursor.y + textEditor.scroll.y
+        if lineIndex == cursorDocumentY + 1 then
+            drawText = textEditor:cacheLine(lineIndex)
+        end
         print(drawText, xPos, yOffset)
     end
 end
