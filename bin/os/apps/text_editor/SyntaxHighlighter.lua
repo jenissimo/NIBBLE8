@@ -200,12 +200,6 @@ function SyntaxHighlighter:cacheLine(textEditor, lineIndex)
 end
 
 function SyntaxHighlighter:cacheVisibleLines(textEditor)
-    local lineHeight = 6 -- Height of each line of text
-    local charWidth = 4 -- Width of each character
-
-    -- Calculate the vertical offset to start drawing from, based on the scroll position.
-    local startY = textEditor.y + textEditor.offsetY
-
     -- Determine the range of lines to draw, considering partial visibility.
     local firstLineIndex = math.max(1, math.floor(textEditor.scroll.y) + 1)
     local lastLineIndex = firstLineIndex + textEditor.rows_on_screen - 1

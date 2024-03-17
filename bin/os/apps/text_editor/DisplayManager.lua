@@ -16,7 +16,7 @@ function DisplayManager:redrawText(textEditor)
     local xPos = textEditor.x - textEditor.scroll.x * charWidth
 
     for lineIndex, drawText in ipairs(textEditor.drawLines) do
-        local yOffset = (lineIndex - firstLineIndex) * lineHeight + startY
+        local yOffset = ((lineIndex + firstLineIndex - 1) - firstLineIndex) * lineHeight + startY
         local cursorDocumentY = textEditor.cursor.y + textEditor.scroll.y
         if lineIndex == cursorDocumentY + 1 then
             drawText = textEditor:cacheLine(lineIndex)

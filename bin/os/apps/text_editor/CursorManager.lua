@@ -6,7 +6,8 @@ function CursorManager:setCursor(textEditor, x, y)
     elseif x >= textEditor.cols_on_screen - 1 then
         textEditor.cursor.x = textEditor.cols_on_screen - 1
         textEditor.cursor.y = y
-        textEditor.scroll.x = textEditor.scroll.x + (x - (textEditor.cols_on_screen - 1))
+        textEditor.scroll.x = textEditor.scroll.x +
+                                  (x - (textEditor.cols_on_screen - 1))
     else
         textEditor.cursor.x = x
         textEditor.cursor.y = y
@@ -25,6 +26,8 @@ function CursorManager:moveCursor(textEditor, xDir, yDir)
     -- Calculate the new cursor position relative to the entire document
     local documentX = textEditor.cursor.x + textEditor.scroll.x + xDir
     local documentY = textEditor.cursor.y + textEditor.scroll.y + yDir
+    local initialScrollX = textEditor.scroll.x
+    local initialScrollY = textEditor.scroll.y
 
     textEditor:checkSelectionStart()
 
@@ -86,13 +89,18 @@ function CursorManager:moveCursor(textEditor, xDir, yDir)
         self:endCursor(textEditor)
     end
 
-    textEditor.syntax_highlighting_dirty = true
+    -- Set the flag only if the scroll has changed
+    if textEditor.scroll.x ~= initialScrollX or textEditor.scroll.y ~=
+        initialScrollY then
+        textEditor.syntax_highlighting_dirty = true
+    end
     textEditor:checkSelectionUpdate()
 end
 
 function CursorManager:checkAndAdjustCursorBounds(textEditor)
     local totalLines = #textEditor.lines
-    local cursorX, cursorY = textEditor.cursor.x + textEditor.scroll.x, textEditor.cursor.y + textEditor.scroll.y
+    local cursorX, cursorY = textEditor.cursor.x + textEditor.scroll.x,
+                             textEditor.cursor.y + textEditor.scroll.y
 
     -- Adjust cursor Y position if it's outside the range of total lines
     if cursorY < 1 then
@@ -102,7 +110,8 @@ function CursorManager:checkAndAdjustCursorBounds(textEditor)
     end
 
     -- Adjust cursor X position based on the length of the current line
-    local currentLineLength = textEditor.lines[cursorY] and #textEditor.lines[cursorY] or 0
+    local currentLineLength = textEditor.lines[cursorY] and
+                                  #textEditor.lines[cursorY] or 0
     if cursorX < 1 then
         cursorX = 1
     elseif cursorX > currentLineLength + 1 then
@@ -123,7 +132,8 @@ function CursorManager:checkAndAdjustCursorBounds(textEditor)
     end
 
     -- Update cursor position within the bounds of the screen
-    self:setCursor(textEditor, cursorX - textEditor.scroll.x, cursorY - textEditor.scroll.y)
+    self:setCursor(textEditor, cursorX - textEditor.scroll.x,
+                   cursorY - textEditor.scroll.y)
 end
 
 function CursorManager:moveCursorToLineStart(textEditor)

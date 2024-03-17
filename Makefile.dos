@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -w
 # Adjust the include and lib paths as necessary for your Allegro installation
-CFLAGS += -D DOS -fgnu89-inline -Ic:/djgpp/include  -I$(SRCDIR)
-LIBS =  -Lc:/djgpp/lib -llua -lalleg -lpng -lm -lz
+CFLAGS += -D DOS -fgnu89-inline -I/usr/local/djgpp/include -I$(SRCDIR)
+LIBS =  -L/usr/local/djgpp/lib -lalleg -lpng -lm -lz
 # If you have more Allegro libraries (like allegro_image, allegro_font, etc.), add them here
 
 SRCDIR = src
@@ -13,6 +13,7 @@ TARGET = nibble8.exe
 
 # Using wildcard to specify source files. Adjust or add paths as needed for your project structure.
 COMMON_SOURCES := $(wildcard $(SRCDIR)/*.c)
+COMMON_SOURCES += $(wildcard $(SRCDIR)/vendor/lua/*.c)
 COMMON_SOURCES += $(wildcard $(SRCDIR)/adapters/allegro/*.c)
 COMMON_SOURCES += $(wildcard $(SRCDIR)/api/*.c)
 COMMON_SOURCES += $(wildcard $(SRCDIR)/debug/*.c)
