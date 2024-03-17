@@ -72,7 +72,7 @@ double nibble_api_atan2(double x, double y)
 
 void nibble_api_trace(char *text)
 {
-    DEBUG_LOG("%s\n", text);
+    DEBUG_LOG("%s", text);
 }
 
 double nibble_api_min(double x, double y)

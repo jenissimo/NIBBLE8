@@ -28,18 +28,18 @@ PaletteManager *palette_manager_create(const char *ini_file)
         return NULL;
     }
 
+    DEBUG_LOG("Reading palette file: %s\n", ini_file);
+
     PaletteManager *manager = malloc(sizeof(PaletteManager));
     manager->palettes = malloc(num_palettes * sizeof(Palette));
     manager->num_palettes = num_palettes;
     manager->current_palette = 0;
 
-    printf("num_palettes: %d\n", num_palettes);
+    DEBUG_LOG("num_palettes: %d\n", num_palettes);
 
     SimpleIni ini;
     uint8_t r, g, b;
     int palette_index = 0;
-
-    printf("Reading palette file: %s\n", ini_file);
 
     if (simple_ini_open(&ini, ini_file))
     {
@@ -53,7 +53,7 @@ PaletteManager *palette_manager_create(const char *ini_file)
                 if (palette != NULL)
                 {
                     // Finalize previous palette
-                    //printf("Section %d: %s\n", palette_index - 1, ini.current_section);
+                    // printf("Section %d: %s\n", palette_index - 1, ini.current_section);
                     strncpy(palette->name, ini.current_section, sizeof(ini.current_section) - 1);
                     palette->name[sizeof(palette->name) - 1] = '\0';
                 }
@@ -79,7 +79,7 @@ PaletteManager *palette_manager_create(const char *ini_file)
         // Process the last section
         if (palette != NULL)
         {
-            //printf("Section %d: %s\n", palette_index - 1, ini.current_section);
+            // printf("Section %d: %s\n", palette_index - 1, ini.current_section);
             strncpy(palette->name, ini.current_section, sizeof(ini.current_section) - 1);
             palette->name[sizeof(palette->name) - 1] = '\0';
         }

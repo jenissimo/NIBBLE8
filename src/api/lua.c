@@ -4,7 +4,7 @@ lua_State *currentVM;
 lua_State *lua;
 lua_State *app;
 
-void initLua()
+void nibble_lua_init()
 {
     lua = luaL_newstate(); // open Lua
     if (!lua)
@@ -13,15 +13,15 @@ void initLua()
     }
     currentVM = lua;
 
-    initCoreAPI();
-    // loadLuaFile("lib/utils.lua");
-    // loadLuaFile("demos/text_editor.lua");
-    loadLuaFile("os/os.lua");
+    nibble_lua_init_api();
+    // nibble_lua_load_file("lib/utils.lua");
+    // nibble_lua_load_file("demos/text_editor.lua");
+    nibble_lua_load_file("os/os.lua");
 
     luaL_dostring(lua, "_init()");
 }
 
-void initCoreAPI()
+void nibble_lua_init_api()
 {
     luaL_openlibs(currentVM); // load Lua libraries
 
@@ -39,79 +39,79 @@ void initCoreAPI()
     luaL_dostring(currentVM, "function str(a) return tostring(a) end");
     luaL_dostring(currentVM, "function len(a) return string.len(a) end");
     luaL_dostring(currentVM, "function sub(str,str_start,str_end) return string.sub(str,str_start,str_end) end");
-    registerFunction("print", l_print);
-    registerFunction("split", l_split);
-    registerFunction("trace", l_trace);
+    nibble_lua_register_function("print", l_print);
+    nibble_lua_register_function("split", l_split);
+    nibble_lua_register_function("trace", l_trace);
 
     // Graphics
-    registerFunction("camera", l_camera);
-    registerFunction("pal", l_pal);
-    registerFunction("palt", l_palt);
-    registerFunction("pget", l_pget);
-    registerFunction("pset", l_pset);
-    registerFunction("circ", l_circ);
-    registerFunction("circfill", l_circfill);
-    registerFunction("line", l_line);
-    registerFunction("rect", l_rect);
-    registerFunction("rectfill", l_rectfill);
-    registerFunction("cls", l_cls);
+    nibble_lua_register_function("camera", l_camera);
+    nibble_lua_register_function("pal", l_pal);
+    nibble_lua_register_function("palt", l_palt);
+    nibble_lua_register_function("pget", l_pget);
+    nibble_lua_register_function("pset", l_pset);
+    nibble_lua_register_function("circ", l_circ);
+    nibble_lua_register_function("circfill", l_circfill);
+    nibble_lua_register_function("line", l_line);
+    nibble_lua_register_function("rect", l_rect);
+    nibble_lua_register_function("rectfill", l_rectfill);
+    nibble_lua_register_function("cls", l_cls);
 
     // Sprite functions
-    registerFunction("spr", l_spr);
-    registerFunction("sspr", l_sspr);
-    registerFunction("sset", l_sset);
-    registerFunction("sget", l_sget);
-    registerFunction("fget", l_fget);
-    registerFunction("fset", l_fset);
+    nibble_lua_register_function("spr", l_spr);
+    nibble_lua_register_function("sspr", l_sspr);
+    nibble_lua_register_function("sset", l_sset);
+    nibble_lua_register_function("sget", l_sget);
+    nibble_lua_register_function("fget", l_fget);
+    nibble_lua_register_function("fset", l_fset);
 
     // Map Functions
-    registerFunction("map", l_map);
-    registerFunction("mget", l_mget);
-    registerFunction("mset", l_mset);
+    nibble_lua_register_function("map", l_map);
+    nibble_lua_register_function("mget", l_mget);
+    nibble_lua_register_function("mset", l_mset);
 
     // Utils
-    registerFunction("rnd", l_rnd);
-    registerFunction("chr", l_chr);
-    registerFunction("time", l_time);
-    registerFunction("t", l_time);
+    nibble_lua_register_function("rnd", l_rnd);
+    nibble_lua_register_function("chr", l_chr);
+    nibble_lua_register_function("time", l_time);
+    nibble_lua_register_function("t", l_time);
 
     // Math
-    registerFunction("flr", l_flr);
-    registerFunction("ceil", l_ceil);
-    registerFunction("sin", l_sin);
-    registerFunction("cos", l_cos);
-    registerFunction("atan2", l_atan2);
-    registerFunction("mid", l_mid);
-    registerFunction("min", l_min);
-    registerFunction("max", l_max);
+    nibble_lua_register_function("flr", l_flr);
+    nibble_lua_register_function("ceil", l_ceil);
+    nibble_lua_register_function("sin", l_sin);
+    nibble_lua_register_function("cos", l_cos);
+    nibble_lua_register_function("atan2", l_atan2);
+    nibble_lua_register_function("mid", l_mid);
+    nibble_lua_register_function("min", l_min);
+    nibble_lua_register_function("max", l_max);
 
     // OS
-    registerFunction("key", l_key);
-    registerFunction("keyp", l_keyp);
-    registerFunction("btn", l_btn);
-    registerFunction("btnp", l_btnp);
-    registerFunction("get_clipboard_text", l_get_clipboard_text);
-    registerFunction("set_clipboard_text", l_set_clipboard_text);
-    registerFunction("reboot", l_reboot);
-    registerFunction("get_code", l_get_code);
-    registerFunction("run_code", l_run_code);
-    registerFunction("load_file", l_load_file);
-    registerFunction("read_file", l_read_file);
-    registerFunction("ls", l_ls);
-    registerFunction("cd", l_change_dir);
-    registerFunction("load_cart", l_load_cart);
-    registerFunction("save_cart", l_save_cart);
-    registerFunction("import_png", l_import_png);
-    registerFunction("export_png", l_export_png);
-    registerFunction("import_lua", l_import_lua);
-    registerFunction("export_lua", l_export_lua);
+    nibble_lua_register_function("key", l_key);
+    nibble_lua_register_function("keyp", l_keyp);
+    nibble_lua_register_function("btn", l_btn);
+    nibble_lua_register_function("btnp", l_btnp);
+    nibble_lua_register_function("get_clipboard_text", l_get_clipboard_text);
+    nibble_lua_register_function("set_clipboard_text", l_set_clipboard_text);
+    nibble_lua_register_function("reboot", l_reboot);
+    nibble_lua_register_function("get_code", l_get_code);
+    nibble_lua_register_function("run_code", l_run_code);
+    nibble_lua_register_function("load_file", l_load_file);
+    nibble_lua_register_function("read_file", l_read_file);
+    nibble_lua_register_function("ls", l_ls);
+    nibble_lua_register_function("cd", l_change_dir);
+    nibble_lua_register_function("load_cart", l_load_cart);
+    nibble_lua_register_function("save_cart", l_save_cart);
+    nibble_lua_register_function("import_png", l_import_png);
+    nibble_lua_register_function("export_png", l_export_png);
+    nibble_lua_register_function("import_lua", l_import_lua);
+    nibble_lua_register_function("export_lua", l_export_lua);
 
     // Audio
-    registerFunction("note_on", l_note_on);
-    registerFunction("note_off", l_note_off);
-    registerFunction("update_synth", l_update_synth);
-    registerFunction("update_filter", l_update_filter);
-    registerFunction("set_note", l_set_note);
+    nibble_lua_register_function("note_on", l_note_on);
+    nibble_lua_register_function("note_off", l_note_off);
+    nibble_lua_register_function("update_synth", l_update_synth);
+    nibble_lua_register_function("update_filter", l_update_filter);
+    nibble_lua_register_function("set_note", l_set_note);
 
     // Load Custom Libs
     luaL_dostring(currentVM, "package.path = package.path .. \";lib/?.lua\" .. \";os/?.lua\"");
@@ -782,7 +782,7 @@ static int l_load_file(lua_State *L)
     if (top >= 1)
     {
         const char *filename = lua_tostring(L, 1);
-        runLuaAppFile(filename);
+        nibble_lua_run_file(filename);
         // DEBUG_LOG("load(%s) = %d
         // lua_pushnumber(L, result);
         return 1;
@@ -1265,7 +1265,7 @@ static int l_save_cart(lua_State *L)
         const char *filename = lua_tostring(L, 1);
         const char *code = lua_tostring(L, 2);
 
-        DEBUG_LOG("%s\n", code);
+        //DEBUG_LOG("%s\n", code);
 
         int result = nibble_api_save_cart(filename, code);
         // DEBUG_LOG("save(%s) = %d\n", filename, result);
@@ -1373,9 +1373,9 @@ static int l_update_filter(lua_State *L)
     return 0;
 }
 
-int luaTraceback(lua_State *L)
+int nibble_lua_traceback(lua_State *L)
 {
-    DEBUG_LOG("Entered luaTraceback");
+    DEBUG_LOG("Entered nibble_lua_traceback");
 
     // Check if the error is a string
     if (lua_isstring(L, 1))
@@ -1401,7 +1401,7 @@ int luaTraceback(lua_State *L)
     return 1;
 }
 
-int executeLuaCode(const char *code)
+int nibble_lua_execute_code(const char *code)
 {
     int load_status = luaL_loadstring(currentVM, code); // load Lua script
 
@@ -1412,8 +1412,8 @@ int executeLuaCode(const char *code)
         return 2;
     }
 
-    // Push the error handler (luaTraceback) function onto the stack
-    lua_pushcfunction(currentVM, luaTraceback);
+    // Push the error handler (nibble_lua_traceback) function onto the stack
+    lua_pushcfunction(currentVM, nibble_lua_traceback);
     // Move the error handler (traceback) function before the loaded Lua script
     lua_insert(currentVM, -2);
 
@@ -1428,7 +1428,7 @@ int executeLuaCode(const char *code)
     return 0;
 }
 
-int loadLuaFile(const char *filename)
+int nibble_lua_load_file(const char *filename)
 {
     int load_status = luaL_loadfile(currentVM, filename); // load Lua script
 
@@ -1440,8 +1440,8 @@ int loadLuaFile(const char *filename)
         return 2;
     }
 
-    // Push the error handler (luaTraceback) function onto the stack
-    lua_pushcfunction(currentVM, luaTraceback);
+    // Push the error handler (nibble_lua_traceback) function onto the stack
+    lua_pushcfunction(currentVM, nibble_lua_traceback);
     // Move the error handler (traceback) function before the loaded Lua script
     lua_insert(currentVM, -2);
 
@@ -1457,7 +1457,7 @@ int loadLuaFile(const char *filename)
     return 0;
 }
 
-void runLuaAppFile(const char *filename)
+void nibble_lua_run_file(const char *filename)
 {
     if (app != NULL)
     {
@@ -1467,14 +1467,14 @@ void runLuaAppFile(const char *filename)
     app = luaL_newstate();
     currentVM = app;
 
-    initCoreAPI();
+    nibble_lua_init_api();
 
-    loadLuaFile(filename);
+    nibble_lua_load_file(filename);
 
     luaL_dostring(currentVM, "_init()");
 }
 
-void runLuaAppCode(const char *code)
+void nibble_lua_run_code(const char *code)
 {
     if (app != NULL)
     {
@@ -1484,16 +1484,16 @@ void runLuaAppCode(const char *code)
     app = luaL_newstate();
     currentVM = app;
 
-    initCoreAPI();
+    nibble_lua_init_api();
 
-    executeLuaCode(code);
+    nibble_lua_execute_code(code);
 
     luaL_dostring(currentVM, "_init()");
 }
 
-void closeLuaApp()
+void nibble_lua_close_app()
 {
-    DEBUG_LOG("Closing Lua App...\n");
+    DEBUG_LOG("Closing Lua App...");
     if (app != NULL)
     {
         lua_close(app);
@@ -1504,14 +1504,14 @@ void closeLuaApp()
     currentVM = lua;
 }
 
-void registerFunction(const char *name, lua_CFunction func)
+void nibble_lua_register_function(const char *name, lua_CFunction func)
 {
     // DEBUG_LOG("%s\n", name);
     lua_pushcfunction(currentVM, func);
     lua_setglobal(currentVM, name);
 }
 
-static char *printString(lua_State *L, int index)
+static char *nibble_lua_print_string(lua_State *L, int index)
 {
     lua_getglobal(L, "tostring");
     lua_pushvalue(L, -1);
@@ -1525,7 +1525,7 @@ static char *printString(lua_State *L, int index)
     return text;
 }
 
-inline void callLuaFunction(const char *name)
+inline void nibble_lua_call(const char *name)
 {
     if (currentVM == NULL)
     {
@@ -1549,7 +1549,7 @@ inline void callLuaFunction(const char *name)
     }
 }
 
-void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed)
+void nibble_lua_call_key(int key_code, int ctrl_pressed, int shift_pressed)
 {
     if (currentVM == NULL)
     {
@@ -1564,7 +1564,7 @@ void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed)
     // DEBUG_LOG("key(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
 }
 
-void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed)
+void nibble_lua_call_key_up(int key_code, int ctrl_pressed, int shift_pressed)
 {
     if (currentVM == NULL)
     {
@@ -1579,7 +1579,7 @@ void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed)
     // DEBUG_LOG("keyup(%d, %d, %d)\n", key_code, ctrl_pressed, shift_pressed);
 }
 
-void callLuaMouseMove(int x, int y)
+void nibble_lua_call_mouse_move(int x, int y)
 {
     if (currentVM == NULL)
     {
@@ -1593,7 +1593,7 @@ void callLuaMouseMove(int x, int y)
     // DEBUG_LOG("mouse_move(%d, %d)\n", x, y);
 }
 
-void callLuaMousePress(int x, int y, int button)
+void nibble_lua_call_mouse_press(int x, int y, int button)
 {
     if (currentVM == NULL)
     {
@@ -1608,7 +1608,7 @@ void callLuaMousePress(int x, int y, int button)
     // DEBUG_LOG("mouse_press(%d, %d, %d)\n", x, y, button);
 }
 
-void callLuaMouseRelease(int x, int y, int button)
+void nibble_lua_call_mouse_release(int x, int y, int button)
 {
     if (currentVM == NULL)
     {
@@ -1623,7 +1623,7 @@ void callLuaMouseRelease(int x, int y, int button)
     // DEBUG_LOG("mouse_release(%d, %d, %d)\n", x, y, button);
 }
 
-void destroyLua()
+void nibble_lua_destroy()
 {
     if (app != NULL)
     {

@@ -11,26 +11,26 @@
 #include "hardware/utils.h"
 #include "utils/error_handling.h"
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include "vendor/lua/lua.h"
+#include "vendor/lua/lualib.h"
+#include "vendor/lua/lauxlib.h"
 
 extern lua_State* currentVM;
 extern lua_State *lua;
 extern lua_State *app;
 
-void initLua(void);
-void initCoreAPI(void);
-void destroyLua(void);
-int luaTraceback(lua_State *L);
-int executeLuaCode(const char *code);
-int loadLuaFile(const char* filename);
-void runLuaAppFile(const char *filename);
-void runLuaAppCode(const char *code);
-void closeLuaApp(void);
-void registerFunction(const char* name, lua_CFunction func);
+void nibble_lua_init(void);
+void nibble_lua_init_api(void);
+void nibble_lua_destroy(void);
+int nibble_lua_traceback(lua_State *L);
+int nibble_lua_execute_code(const char *code);
+int nibble_lua_load_file(const char* filename);
+void nibble_lua_run_file(const char *filename);
+void nibble_lua_run_code(const char *code);
+void nibble_lua_close_app(void);
+void nibble_lua_register_function(const char* name, lua_CFunction func);
 
-static char* printString(lua_State* lua, int index);
+static char* nibble_lua_print_string(lua_State* lua, int index);
 static int l_camera(lua_State *L);
 static int l_pal(lua_State *L);
 static int l_palt(lua_State *L);
@@ -97,10 +97,10 @@ static int l_update_synth(lua_State *L);
 static int l_update_filter(lua_State *L);
 static int l_set_note(lua_State *L);
 
-void callLuaFunction(const char* name);
-void callLuaKey(int key_code, int ctrl_pressed, int shift_pressed);
-void callLuaKeyUp(int key_code, int ctrl_pressed, int shift_pressed);
-void callLuaMousePress(int x, int y, int button);
-void callLuaMouseRelease(int x, int y, int button);
-void callLuaMouseMove(int x, int y);
+void nibble_lua_call(const char* name);
+void nibble_lua_call_key(int key_code, int ctrl_pressed, int shift_pressed);
+void nibble_lua_call_key_up(int key_code, int ctrl_pressed, int shift_pressed);
+void nibble_lua_call_mouse_press(int x, int y, int button);
+void nibble_lua_call_mouse_release(int x, int y, int button);
+void nibble_lua_call_mouse_move(int x, int y);
 #endif

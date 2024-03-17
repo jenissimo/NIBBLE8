@@ -20,7 +20,7 @@ typedef int (*SetClipboardTextFunc)(const char *);
 typedef void (*FreeClipboardTextFunc)(void*);
 
 extern GetClipboardTextFunc getClipboardText;
-extern GetClipboardTextFunc setClipboardText;
+extern SetClipboardTextFunc setClipboardText;
 extern FreeClipboardTextFunc freeClipboardText;
 
 // Other methods

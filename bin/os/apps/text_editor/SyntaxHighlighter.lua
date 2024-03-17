@@ -202,7 +202,7 @@ function SyntaxHighlighter:cacheVisibleLines(textEditor)
             -- Insert color control codes before the character as needed.
             if charIndex == 1 or previousColor ~= color or previousBgColor ~= bgColor then
                 if color ~= previousColor then
-                    drawText = drawText .. chr(15) .. str(color)
+                    drawText = drawText .. chr(12) .. str(color)
                 end
                 if bgColor ~= previousBgColor then
                     drawText = drawText .. chr(14) .. str(bgColor)

@@ -21,6 +21,7 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.importCodeCallback = importCodeCallback
 
     cls()
+    trace("Terminal started")
     self:printLn("", 2)
     self:printLn("nibble-8", 2)
     self:printLn("version 0.0.1", 2)
@@ -264,6 +265,8 @@ function Terminal:key(key_code, ctrl_pressed, shift_pressed)
         self.cursorPos = math.min(self.cursorPos + 1, #self.input)
     end
 end
+
+function Terminal:keyup(key_code, ctrl_pressed, shift_pressed) end
 
 function Terminal:init() end
 

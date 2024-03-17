@@ -45,8 +45,8 @@ inline void nibble_allegro_update()
     lua_getglobal(currentVM, "_draw");
     lua_pcall(currentVM, 0, 0, 0);
     
-    //callLuaFunction("_update");
-    //callLuaFunction("_draw");
+    //nibble_lua_call("_update");
+    //nibble_lua_call("_draw");
 
     if (frame_dirty)
     {

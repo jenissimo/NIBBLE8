@@ -22,7 +22,7 @@ int input_update()
             int ctrl_pressed = ((e.key.keysym.mod & KMOD_CTRL) != 0 || (e.key.keysym.mod & KMOD_META) != 0);
             int shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 1;
-            callLuaKey(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
+            nibble_lua_call_key(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
             // printf("Key Down: %d\n", nibble_get_custom_key(e.key.keysym.sym));
             // printf("Key Scancode: %d\n", e.key.keysym.scancode);
         }
@@ -33,7 +33,7 @@ int input_update()
             int shift_pressed = (e.key.keysym.mod & KMOD_SHIFT) != 0;
 
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 0;
-            callLuaKeyUp(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
+            nibble_lua_call_key_up(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
 
             // printf("Key Up: %d\n", nibble_get_custom_key(e.key.keysym.sym));
             // printf("Key Scancode: %d\n", e.key.keysym.scancode);
@@ -41,7 +41,7 @@ int input_update()
             switch (e.key.keysym.sym)
             {
             case SDLK_ESCAPE:
-                closeLuaApp();
+                nibble_lua_close_app();
                 break;
             case SDLK_F4:
                 nibble_sdl_save_lua_keys_constants();
@@ -50,7 +50,7 @@ int input_update()
                 prevPalette(manager);
                 break;
             case SDLK_F8:
-                dumpRAM();
+                nibble_ram_dump();
                 break;
             case SDLK_F9:
                 nextPalette(manager);
@@ -62,8 +62,8 @@ int input_update()
                 //make_screenshot();
                 break;
             case SDLK_F12:
-                destroyLua();
-                initLua();
+                nibble_lua_destroy();
+                nibble_lua_init();
                 break;
             default:
                 break;
@@ -73,20 +73,20 @@ int input_update()
         if (e.type == SDL_MOUSEMOTION)
         {
             Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
-            callLuaMouseMove(mousePos.x, mousePos.y);
+            nibble_lua_call_mouse_move(mousePos.x, mousePos.y);
         }
 
         if (e.type == SDL_MOUSEBUTTONDOWN)
         {
             Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
             printf("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
-            callLuaMousePress(mousePos.x, mousePos.y, e.button.button);
+            nibble_lua_call_mouse_press(mousePos.x, mousePos.y, e.button.button);
         }
 
         if (e.type == SDL_MOUSEBUTTONUP)
         {
             Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
-            callLuaMouseRelease(mousePos.x, mousePos.y, e.button.button);
+            nibble_lua_call_mouse_release(mousePos.x, mousePos.y, e.button.button);
         }
     }
     updateButtonState();

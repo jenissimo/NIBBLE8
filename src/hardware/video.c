@@ -78,6 +78,9 @@ void nibble_destroy_video()
 
 void nibble_api_cursor(int16_t x, int16_t y, uint8_t col)
 {
+    memory.drawState.text_x = x;
+    memory.drawState.text_y = y;
+    memory.drawState.color = col;
 }
 
 void nibble_api_cls(uint8_t col)
@@ -342,7 +345,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
         { // Control code detected
             switch (currentChar)
             {
-            case 15:
+            case '\f':
             { // Set foreground color
                 charIndex++;
                 fg_color = nibble_print_parse_parameter(text[charIndex]);

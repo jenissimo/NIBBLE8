@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "debug/debug.h"
 #ifdef DOS
 #include <allegro.h>
 #else

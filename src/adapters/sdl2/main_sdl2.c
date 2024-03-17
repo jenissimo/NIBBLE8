@@ -1,3 +1,6 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -11,22 +14,21 @@
 #include "sdl_adapter.h"
 
 int run = 1;
+uint32_t now_time = 0;
+uint32_t frame_time = 0;
+uint32_t last_time = 0;
+uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
 int main(int argc, char *argv[])
 {
-    uint32_t now_time = 0;
-    uint32_t frame_time = 0;
-    uint32_t last_time = 0;
-    uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
-
     printf("Welcome to NIBBLE-8!\n");
     fflush(stdout);
 
     srand(time(NULL)); // Initialization, should only be called once.
 
-    initRAM();
+    nibble_ram_init();
     nibble_init_video();
-    initLua();
+    nibble_lua_init();
     nibble_sdl_init();
 
     next_time = SDL_GetTicks() + NIBBLE_FPS;
@@ -53,6 +55,8 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    DEBUG_LOG("NIBBLE-8 started\n");
 
     while (run)
     {
@@ -84,11 +88,14 @@ int main(int argc, char *argv[])
             next_time += NIBBLE_FPS;
         }
         nibble_frame_count++;
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(0);
+#endif
     }
 
-    destroyLua();
+    nibble_lua_destroy();
     nibble_destroy_video();
-    destroyRAM();
+    nibble_ram_destroy();
     debug_close();
     return nibble_sdl_quit();
 }

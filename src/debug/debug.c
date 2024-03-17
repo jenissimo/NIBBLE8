@@ -38,8 +38,10 @@ void debug_init(const char *logFile)
 
 void debug_log(const char *file, int line, const char *format, ...)
 {
-    // TODO: Fix for DOS
+    // for DOS builds, we don't want to print to console
+    #ifdef DOS
     return;
+    #endif
     va_list args;
     va_start(args, format);
 

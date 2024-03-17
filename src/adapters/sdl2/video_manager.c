@@ -19,8 +19,8 @@ int video_init()
         return 1;
     }
 
-    window = SDL_CreateWindow("NIBBLE-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                          640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("NIBBLE-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                          640, 480, SDL_WINDOW_SHOWN);
 
     if (window == NULL)
     {
@@ -28,7 +28,7 @@ int video_init()
         return 1;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL)
     {
         DEBUG_LOG("SDL Renderer Creation failed: %s", SDL_GetError());
@@ -83,7 +83,7 @@ void video_toggle_fullscreen(bool fullscreen)
 {
     if (fullscreen)
     {
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else
     {

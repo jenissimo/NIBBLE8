@@ -51,8 +51,8 @@ int nibble_sdl_update()
         return 0; // Quit signal received
     }
 
-    callLuaFunction("_update");
-    callLuaFunction("_draw");
+    nibble_lua_call("_update");
+    nibble_lua_call("_draw");
 
     video_update();
 

@@ -65,9 +65,9 @@ int main(int argc, char *argv[])
 
     srand(time(NULL)); // Initialization, should only be called once.
 
-    initRAM();
+    nibble_ram_init();
     nibble_init_video();
-    initLua();
+    nibble_lua_init();
     nibble_allegro_init();
     check_params(argc, argv);
 
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    destroyLua();
+    nibble_lua_destroy();
     nibble_destroy_video();
-    destroyRAM();
+    nibble_ram_destroy();
     debug_close();
 
     nibble_allegro_quit();

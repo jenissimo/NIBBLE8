@@ -1,14 +1,14 @@
 #include "os.h"
 
 GetClipboardTextFunc getClipboardText;
-GetClipboardTextFunc setClipboardText;
+SetClipboardTextFunc setClipboardText;
 FreeClipboardTextFunc freeClipboardText;
 
 void nibble_api_reboot()
 {
-    destroyLua();
-    initLua();
-    clearRAM();
+    nibble_lua_destroy();
+    nibble_lua_init();
+    nibble_ram_clear();
     nibble_reset_video();
 }
 
@@ -102,8 +102,11 @@ const uint8_t *nibble_api_get_clipboard_text()
 
 int nibble_api_set_clipboard_text(const uint8_t *text)
 {
-    // printf("Setting clipboard: %s\n", text);
-    return setClipboardText(text);
+    if (setClipboardText(text) != NULL)
+    {
+        return -1; // Indicate failure
+    }
+    return 0; // Indicate success
 }
 
 int nibble_api_save_code(char *code)
@@ -120,5 +123,5 @@ const char *nibble_api_get_code()
 void nibble_api_run_code(char *code)
 {
     userLuaCode = code;
-    runLuaAppCode(userLuaCode);
+    nibble_lua_run_code(userLuaCode);
 }

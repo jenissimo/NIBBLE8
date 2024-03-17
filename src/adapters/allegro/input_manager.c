@@ -52,7 +52,7 @@ int input_update()
         if (key[i] && !old_key[i])
         {
             // Key was just pressed
-            callLuaKey(custom_key, ctrl_pressed, shift_pressed);
+            nibble_lua_call_key(custom_key, ctrl_pressed, shift_pressed);
             lastKeyPressTime[i] = currentTime; // Record the time of this key press
             inRepeatPhase[i] = 0;              // Reset the repeat phase
         }
@@ -62,7 +62,7 @@ int input_update()
             if ((!inRepeatPhase[i] && (currentTime - lastKeyPressTime[i] >= INITIAL_DELAY)) ||
                 (inRepeatPhase[i] && (currentTime - lastKeyPressTime[i] >= REPEAT_RATE)))
             {
-                callLuaKey(custom_key, ctrl_pressed, shift_pressed);
+                nibble_lua_call_key(custom_key, ctrl_pressed, shift_pressed);
                 lastKeyPressTime[i] = currentTime; // Update the time for this repeat
                 inRepeatPhase[i] = 1;              // We are now in repeat phase
             }
@@ -70,7 +70,7 @@ int input_update()
         else if (!key[i] && old_key[i])
         {
             // Key was released
-            callLuaKeyUp(custom_key, ctrl_pressed, shift_pressed);
+            nibble_lua_call_key_up(custom_key, ctrl_pressed, shift_pressed);
             inRepeatPhase[i] = 0; // Reset repeat phase upon key release
             input_check_hotkey(i);
         }
@@ -83,26 +83,26 @@ int input_update()
     {
         if ((mouse_b & 1) && !(old_mouse_b & 1))
         {
-            callLuaMousePress(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 1);
+            nibble_lua_call_mouse_press(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 1);
         }
         else if (!(mouse_b & 1) && (old_mouse_b & 1))
         {
-            callLuaMouseRelease(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 1);
+            nibble_lua_call_mouse_release(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 1);
         }
         else if ((mouse_b & 2) && !(old_mouse_b & 2))
         {
-            callLuaMousePress(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 2);
+            nibble_lua_call_mouse_press(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 2);
         }
         else if (!(mouse_b & 2) && (old_mouse_b & 2))
         {
-            callLuaMouseRelease(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 2);
+            nibble_lua_call_mouse_release(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE, 2);
         }
         old_mouse_b = mouse_b;
     }
 
     if (mouse_x != old_mouse_x || mouse_y != old_mouse_y)
     {
-        callLuaMouseMove(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE);
+        nibble_lua_call_mouse_move(mouse_x / SCREEN_SCALE, mouse_y / SCREEN_SCALE);
         old_mouse_x = mouse_x;
         old_mouse_y = mouse_y;
     }
@@ -122,7 +122,7 @@ void input_check_hotkey(int key)
     switch (key)
     {
     case KEY_ESC:
-        closeLuaApp();
+        nibble_lua_close_app();
         break;
     case KEY_F7:
         prevPalette(manager);

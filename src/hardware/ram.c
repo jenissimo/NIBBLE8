@@ -10,18 +10,18 @@ uint8_t *clipboard;
 bool rebootRequested = false;
 bool shutdownRequested = false;
 
-void initRAM()
+void nibble_ram_init()
 {
-    //saveMemoryLayout();
+    //nibble_save_memory_layout();
 }
 
-void clearRAM()
+void nibble_ram_clear()
 {
     memset(memory.data, 0, sizeof(memory.data));
     userLuaCode = NULL;
 }
 
-void saveMemoryLayout()
+void nibble_save_memory_layout()
 {
     char *filename = "bin/docs/memory_layout.txt";
     FILE *fp = fopen(filename, "w");
@@ -45,7 +45,7 @@ void saveMemoryLayout()
     fclose(fp);
 }
 
-void dumpPart(char *name, void *start, int size)
+void nibble_ram_dump_part(char *name, void *start, int size)
 {
     /*
     FILE *f = fopen(name, "wb");
@@ -55,20 +55,20 @@ void dumpPart(char *name, void *start, int size)
     */
 }
 
-void dumpRAM()
+void nibble_ram_dump()
 {
-    dumpPart("dump/ram.bin", memory.data, NIBBLE_MEMORY_SIZE);
-    dumpPart("dump/sprite_sheet.bin", memory.spriteSheetData, NIBBLE_SPRITE_SHEET_SIZE);
-    dumpPart("dump/sprite_flags.bin", memory.spriteFlagsData, NIBBLE_SPRITE_FLAG_SIZE);
-    dumpPart("dump/map.bin", memory.mapData, NIBBLE_MAP_SIZE);
-    dumpPart("dump/music.bin", memory.musicData, NIBBLE_MUSIC_SIZE);
-    dumpPart("dump/sfx.bin", memory.sfxData, NIBBLE_SFX_SIZE);
+    nibble_ram_dump_part("dump/ram.bin", memory.data, NIBBLE_MEMORY_SIZE);
+    nibble_ram_dump_part("dump/sprite_sheet.bin", memory.spriteSheetData, NIBBLE_SPRITE_SHEET_SIZE);
+    nibble_ram_dump_part("dump/sprite_flags.bin", memory.spriteFlagsData, NIBBLE_SPRITE_FLAG_SIZE);
+    nibble_ram_dump_part("dump/map.bin", memory.mapData, NIBBLE_MAP_SIZE);
+    nibble_ram_dump_part("dump/music.bin", memory.musicData, NIBBLE_MUSIC_SIZE);
+    nibble_ram_dump_part("dump/sfx.bin", memory.sfxData, NIBBLE_SFX_SIZE);
     //dumpPart("dump/draw_state.bin", (uint8_t *)memory.drawState, sizeof(DrawState));
-    dumpPart("dump/hardware_state.bin", memory.hardwareState, NIBBLE_HARDWARE_STATE_SIZE);
-    dumpPart("dump/screen.bin", memory.screenData, NIBBLE_SCREEN_DATA_SIZE);
+    nibble_ram_dump_part("dump/hardware_state.bin", memory.hardwareState, NIBBLE_HARDWARE_STATE_SIZE);
+    nibble_ram_dump_part("dump/screen.bin", memory.screenData, NIBBLE_SCREEN_DATA_SIZE);
 }
 
-void printMap()
+void nibble_ram_print_map()
 {
     for (int y = 0; y < NIBBLE_MAP_HEIGHT; y++)
     {
@@ -80,7 +80,7 @@ void printMap()
     }
 }
 
-void destroyRAM()
+void nibble_ram_destroy()
 {
     // free(state->memory);
     // free(memory);

@@ -120,6 +120,35 @@ function _keyup(key_code, ctrl_pressed, shift_pressed)
     currentWindow:keyup(key_code, ctrl_pressed, shift_pressed)
 end
 
+function _mousep(x, y, button)
+    if (y < 7 and x < 37) then
+        local offset = 0
+        for i = 1, #tabs do
+            local tab = tabs[i]
+            if (x >= offset and x < offset + tab.width) then
+                currentWindow = tab.window
+                break
+            end
+            offset = offset + tab.width
+        end
+    elseif currentWindow.mousep then
+        currentWindow:mousep(x, y, button)
+    end
+end
+
+function _mouser(x, y, button)
+    if currentWindow.mouser then
+        currentWindow:mouser(x, y, button)
+    end
+end
+
+function _mousem(x, y, button)
+    if currentWindow.mousem then
+        currentWindow:mousem(x, y)
+    end
+    mouse_coords = {x = x, y = y}
+end
+
 function draw_note_icon(x, y, col)
     rectfill(x, y + 3, 2, 2, col)
     line(x + 1, y, x + 1, y + 3, col)
@@ -177,33 +206,6 @@ function drawCursor()
             end
         end
     end
-end
-
-function _mousep(x, y, button)
-    if (y < 7 and x < 37) then
-        local offset = 0
-        for i = 1, #tabs do
-            local tab = tabs[i]
-            if (x >= offset and x < offset + tab.width) then
-                currentWindow = tab.window
-                break
-            end
-            offset = offset + tab.width
-        end
-    else
-        currentWindow:mousep(x, y, button)
-    end
-end
-
-function _mouser(x, y, button)
-    currentWindow:mouser(x, y, button)
-end
-
-function _mousem(x, y, button)
-    if currentWindow.mousem then
-        currentWindow:mousem(x, y)
-    end
-    mouse_coords = {x = x, y = y}
 end
 
 function editFile(file)
