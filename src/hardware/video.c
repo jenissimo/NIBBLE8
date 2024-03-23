@@ -49,6 +49,7 @@ void nibble_load_palettes()
         DEBUG_LOG("Error: Unable to create palette manager.\n");
     }
     manager->current_palette = 1;
+    DEBUG_LOG("%s (%d)", manager->palettes[manager->current_palette].name, manager->current_palette);
 }
 
 void print_char(int charIndex)
@@ -285,6 +286,7 @@ void nibble_api_hline(int16_t x1, int16_t x2, int16_t y, uint8_t color)
     if (x2 >= NIBBLE_WIDTH)
         x2 = NIBBLE_WIDTH - 1;
 
+    /*
     // Stage 1: Draw remaining pixels at the beginning of the line
     while (x1 < x2 && x1 % 4 != 0)
     {
@@ -301,6 +303,7 @@ void nibble_api_hline(int16_t x1, int16_t x2, int16_t y, uint8_t color)
     }
 
     // Stage 3: Draw remaining pixels at the end of the line
+    */
     while (x1 <= x2)
     {
         nibble_api_pset(x1, y, color);
@@ -331,6 +334,9 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
     char currentChar;
 
     bool bgTransparent = transparencyCache[bg_color]; // Use your existing transparency check
+
+    x -= memory.drawState.camera_x;
+    y -= memory.drawState.camera_y;
 
     while (text[charIndex] != '\0')
     {
@@ -430,25 +436,30 @@ inline int nibble_print_parse_parameter(uint8_t parameter)
     return 0; // Default case, might want to handle this more gracefully
 }
 
-void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8_t flipY)
+inline void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX, uint8_t flipY)
 {
     uint16_t spriteX = (sprIndex % (NIBBLE_SPRITE_SHEET_WIDTH / NIBBLE_TILE_SIZE)) * NIBBLE_TILE_SIZE;
     uint16_t spriteY = (sprIndex / (NIBBLE_SPRITE_SHEET_WIDTH / NIBBLE_TILE_SIZE)) * NIBBLE_TILE_SIZE;
-    uint8_t incX = flipX ? -1 : 1;
-    uint8_t incY = flipY ? -1 : 1;
+    int8_t incX = flipX ? -1 : 1;
+    int8_t incY = flipY ? -1 : 1;
     uint16_t startX = flipX ? spriteX + NIBBLE_TILE_SIZE - 1 : spriteX;
     uint16_t startY = flipY ? spriteY + NIBBLE_TILE_SIZE - 1 : spriteY;
-    uint16_t endX = flipX ? spriteX - 1 : spriteX + NIBBLE_TILE_SIZE;
-    uint16_t endY = flipY ? spriteY - 1 : spriteY + NIBBLE_TILE_SIZE;
+    int16_t endX = flipX ? spriteX - 1 : spriteX + NIBBLE_TILE_SIZE;
+    int16_t endY = flipY ? spriteY - 1 : spriteY + NIBBLE_TILE_SIZE;
 
-    for (uint16_t sprY = startY; sprY != endY; sprY += incY)
+    //DEBUG_LOG("spr: %d, %d, %d, %d, %d, %d, %d, %d\n", sprIndex, x, y, flipX, flipY, startX, startY, endX, endY);
+
+    for (int16_t sprY = startY; flipY ? sprY > endY : sprY < endY; sprY += incY)
     {
-        for (uint16_t sprX = startX; sprX != endX; sprX += incX)
+        for (int16_t sprX = startX; flipX ? sprX > endX : sprX < endX; sprX += incX)
         {
             uint8_t color = nibble_api_sget(sprX, sprY);
             if (!is_color_transparent(color))
             {
-                set_pixel_from_sprite(x + sprX - startX, y + sprY - startY, color);
+                // Adjusting drawing position for both flipped and non-flipped cases
+                int16_t drawX = x + (flipX ? startX - sprX : sprX - startX);
+                int16_t drawY = y + (flipY ? startY - sprY : sprY - startY);
+                set_pixel_from_sprite(drawX, drawY, color);
             }
         }
     }
@@ -626,6 +637,12 @@ void set_camera_position(int16_t x, int16_t y)
 
 void set_and_get_camera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
 {
+    // set dirty flag
+    if (memory.drawState.camera_x != x || memory.drawState.camera_y != y)
+    {
+        frame_dirty = true;
+    }
+
     // Store the current camera position
     *prev_x = memory.drawState.camera_x;
     *prev_y = memory.drawState.camera_y;
@@ -639,6 +656,9 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
 {
     uint16_t index;
     uint8_t bitPairIndex;
+
+    x-= memory.drawState.camera_x;
+    y-= memory.drawState.camera_y;
 
     if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;

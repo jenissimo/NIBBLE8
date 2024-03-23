@@ -909,17 +909,17 @@ static int l_spr(lua_State *L)
         int16_t n = (int16_t)lua_tonumber(L, 1);
         int16_t x = (int16_t)lua_tonumber(L, 2);
         int16_t y = (int16_t)lua_tonumber(L, 3);
-        uint8_t flip_x = 0;
-        uint8_t flip_y = 0;
+        bool flip_x = false;
+        bool flip_y = false;
 
         if (top >= 4)
         {
-            flip_x = (uint8_t)lua_tonumber(L, 4);
+            flip_x = (bool)lua_toboolean(L, 4);
         }
 
         if (top >= 5)
         {
-            flip_y = (uint8_t)lua_tonumber(L, 5);
+            flip_y = (bool)lua_toboolean(L, 5);
         }
 
         // DEBUG_LOG("spr(%d, %d, %d, %d, %d)\n", n, x, y, flip_x, flip_y);
