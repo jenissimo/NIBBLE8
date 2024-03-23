@@ -32,6 +32,7 @@ void nibble_lua_register_function(const char* name, lua_CFunction func);
 
 static char* nibble_lua_print_string(lua_State* lua, int index);
 static int l_camera(lua_State *L);
+static int l_cpal(lua_State *L);
 static int l_pal(lua_State *L);
 static int l_palt(lua_State *L);
 static int l_cls(lua_State *L);

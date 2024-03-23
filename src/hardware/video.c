@@ -27,6 +27,8 @@ void nibble_reset_video()
     nibble_api_pal_reset();
     frame_dirty = true;
 
+    nibble_video_reset_colors();
+
     memory.drawState.camera_x = 0;
     memory.drawState.camera_y = 0;
 }
@@ -89,6 +91,16 @@ void nibble_api_cls(uint8_t col)
     memset(memory.screenData, fullByteColors[col], NIBBLE_SCREEN_DATA_SIZE);
 }
 
+void nibble_api_cpal(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
+{
+    if (color < 4)
+    {
+        memory.drawState.colorPalette.r[color] = r;
+        memory.drawState.colorPalette.g[color] = g;
+        memory.drawState.colorPalette.b[color] = b;
+        frame_dirty = true;
+    }
+}
 void nibble_api_pal(uint8_t c0, uint8_t c1, uint8_t p)
 {
     // 0-15 alowed
@@ -447,7 +459,7 @@ inline void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX
     int16_t endX = flipX ? spriteX - 1 : spriteX + NIBBLE_TILE_SIZE;
     int16_t endY = flipY ? spriteY - 1 : spriteY + NIBBLE_TILE_SIZE;
 
-    //DEBUG_LOG("spr: %d, %d, %d, %d, %d, %d, %d, %d\n", sprIndex, x, y, flipX, flipY, startX, startY, endX, endY);
+    // DEBUG_LOG("spr: %d, %d, %d, %d, %d, %d, %d, %d\n", sprIndex, x, y, flipX, flipY, startX, startY, endX, endY);
 
     for (int16_t sprY = startY; flipY ? sprY > endY : sprY < endY; sprY += incY)
     {
@@ -657,8 +669,8 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
     uint16_t index;
     uint8_t bitPairIndex;
 
-    x-= memory.drawState.camera_x;
-    y-= memory.drawState.camera_y;
+    x -= memory.drawState.camera_x;
+    y -= memory.drawState.camera_y;
 
     if ((unsigned int)x >= NIBBLE_WIDTH || (unsigned int)y >= NIBBLE_HEIGHT)
         return;
@@ -680,12 +692,38 @@ inline bool is_color_transparent(uint8_t color)
     return (memory.drawState.drawPaletteMap[color] >> 4) > 0; // upper bits indicate transparency
 }
 
+void nibble_video_reset_colors()
+{
+    Palette palette = manager->palettes[manager->current_palette];
+
+    memory.drawState.colorPalette.flip = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        memory.drawState.colorPalette.r[i] = palette.color[i][0];
+        memory.drawState.colorPalette.g[i] = palette.color[i][1];
+        memory.drawState.colorPalette.b[i] = palette.color[i][2];
+    }
+}
+
 void update_frame()
 {
     int pixelIndex = 0;
-    const Palette *palette = currentPalette(manager);
+    // const Palette *palette = currentPalette(manager);
     uint8_t value;
     uint8_t col;
+    uint32_t argb[4] = {0};
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (memory.drawState.colorPalette.flip)
+        {
+            argb[i] = 0xff000000 | (memory.drawState.colorPalette.r[3 - i] << 16) | (memory.drawState.colorPalette.g[3 - i] << 8) | memory.drawState.colorPalette.b[3 - i];
+        }
+        else
+        {
+            argb[i] = 0xff000000 | (memory.drawState.colorPalette.r[i] << 16) | (memory.drawState.colorPalette.g[i] << 8) | memory.drawState.colorPalette.b[i];
+        }
+    }
 
     for (int i = 0; i < NIBBLE_SCREEN_DATA_SIZE; i++)
     {
@@ -693,7 +731,7 @@ void update_frame()
         for (int bit = 7; bit >= 0; bit -= 2)
         {
             col = ((((value >> bit) & 0x01) << 1) | ((value >> (bit - 1)) & 0x01));
-            frame[pixelIndex++] = palette->argb[col];
+            frame[pixelIndex++] = argb[col];
         }
     }
 }

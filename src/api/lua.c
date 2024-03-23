@@ -43,6 +43,7 @@ void nibble_lua_init_api()
 
     // Graphics
     nibble_lua_register_function("camera", l_camera);
+    nibble_lua_register_function("cpal", l_cpal);
     nibble_lua_register_function("pal", l_pal);
     nibble_lua_register_function("palt", l_palt);
     nibble_lua_register_function("pget", l_pget);
@@ -392,6 +393,47 @@ static int l_camera(lua_State *L)
     lua_pushinteger(L, prev_x);
     lua_pushinteger(L, prev_y);
     return 2; // Number of return values
+}
+
+static int l_cpal(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    // Check if only one argument is passed and if it's a boolean
+    if (top == 1 && lua_isboolean(L, 1))
+    {
+        bool flip = lua_toboolean(L, 1);
+
+        // Assuming you have a way to set the invert flag in your palette
+        // For example:
+        memory.drawState.colorPalette.flip = flip;
+        // You'll need to replace this with the actual way to set your invert flag
+
+        // DEBUG_LOG("cpal(invert: %d)\n", invert);
+        return 0;
+    }
+    else if (top >= 3)
+    {
+        // This part remains mostly unchanged, but ensure proper bounds and argument checks
+        uint8_t color = (uint8_t)lua_tonumber(L, 1) % NIBBLE_PALETTE_SIZE;
+        uint8_t r = (uint8_t)lua_tonumber(L, 2);
+        uint8_t g = (uint8_t)lua_tonumber(L, 3);
+        uint8_t b = lua_isnumber(L, 4) ? (uint8_t)lua_tonumber(L, 4) : 0; // Ensure there's a 4th arg and it's a number
+
+        // DEBUG_LOG("cpal(%d, %d, %d, %d)\n", color, r, g, b);
+
+        // Assuming nibble_api_cpal is a function that sets the color in the palette
+        // You'd call it like before:
+        nibble_api_cpal(color, r, g, b);
+        
+        return 0;
+    }
+
+    // In case of incorrect usage, you might want to return an error or usage message
+    // lua_pushstring(L, "Usage: cpal([color, r, g, b]) or cpal(invert)");
+    // return lua_error(L);
+
+    return 0;
 }
 
 static int l_pal(lua_State *L)

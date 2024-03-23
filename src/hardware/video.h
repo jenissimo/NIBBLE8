@@ -24,6 +24,7 @@ void nibble_load_font(void);
 void nibble_load_palettes();
 void print_char(int charIndex);
 void nibble_api_cls(uint8_t col);
+void nibble_api_cpal(uint8_t color, uint8_t r, uint8_t g, uint8_t b);
 void nibble_api_pal(uint8_t c0, uint8_t c1, uint8_t p);
 void nibble_api_pal_reset();
 void nibble_api_palt(uint8_t col, bool t);
@@ -60,6 +61,7 @@ void set_and_get_camera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y);
 void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col);
 bool is_color_transparent(uint8_t color);
 void update_frame(void);
+void nibble_video_reset_colors();
 
 // debug
 void nibble_api_draw_fps(int fps);

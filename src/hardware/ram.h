@@ -10,8 +10,17 @@
 #include <string.h>
 #include "nibble8.h"
 
+typedef struct ColorPalette
+{
+    bool flip : 1;   // Flip flag
+    uint8_t r[4];    // Array of red components for 4 colors
+    uint8_t g[4];    // Array of green components for 4 colors
+    uint8_t b[4];    // Array of blue components for 4 colors
+} ColorPalette;
+
 typedef struct DrawState
 {
+    ColorPalette colorPalette;
     uint8_t drawPaletteMap[4];
     uint8_t screenPaletteMap[4];
 

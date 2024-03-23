@@ -11,10 +11,10 @@ local KEYWORDS = {
     "function", "class", "super", "for", "do", "local", "while", "if", "then",
     "else", "elseif", "return", "continue", "break", "true", "false", "print",
     "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
-    "palt", "spr", "sspr", "fset", "mget", "mset", "peek", "poke", "peek4",
-    "poke4", "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line",
-    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs", "in","and","not","or",
-    "camera","map"
+    "cpal", "palt", "pal", "spr", "sspr", "fset", "mget", "mset", "peek",
+    "poke", "peek4", "poke4", "peek2", "poke2", "circ", "circfill", "rect",
+    "rectfill", "line", "flr", "sin", "cos", "rnd", "t", "time", "pairs",
+    "ipairs", "in", "and", "not", "or", "camera", "map", "btn", "btnp",
 }
 local TERMINATORS = {
     "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",
@@ -184,7 +184,8 @@ function SyntaxHighlighter:cacheLine(textEditor, lineIndex)
         end
 
         -- Insert color control codes before the character as needed.
-        if charIndex == 1 or previousColor ~= color or previousBgColor ~= bgColor then
+        if charIndex == 1 or previousColor ~= color or previousBgColor ~=
+            bgColor then
             if color ~= previousColor then
                 drawText = drawText .. chr(12) .. str(color)
             end
