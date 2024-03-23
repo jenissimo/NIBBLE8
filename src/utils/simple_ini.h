@@ -10,6 +10,7 @@ typedef struct
     FILE *file;
     bool new_section_encountered;
     char current_section[256];
+    bool current_section_changed; // Add this line
 } SimpleIni;
 
 bool simple_ini_open(SimpleIni *ini, const char *filename);
