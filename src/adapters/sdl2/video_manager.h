@@ -15,6 +15,8 @@
 extern bool isFullscreen;
 extern SDL_Window *window;
 extern SDL_Rect viewport;
+extern int windowWidth;
+extern int windowHeight;
 
 int video_init(void);
 void video_update(void);

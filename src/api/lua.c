@@ -3,6 +3,9 @@
 lua_State *currentVM;
 lua_State *lua;
 lua_State *app;
+char *cartPath = NULL;
+char *cartBase64 = NULL;
+bool playerMode = false;
 
 void nibble_lua_init()
 {
@@ -15,8 +18,22 @@ void nibble_lua_init()
 
     nibble_lua_init_api();
     nibble_lua_load_file("os/os.lua");
-
     luaL_dostring(lua, "_init()");
+
+    if (cartPath)
+    {
+        nibble_api_load_cart(cartPath, NULL);
+        nibble_api_run_code(userLuaCode);
+        // free(cartPath);
+    }
+
+    if (cartBase64)
+    {
+        DEBUG_LOG("Loading cart from base64");
+        loadCartFromBase64(cartBase64);
+        nibble_api_run_code(userLuaCode);
+        // free(cartBase64);
+    }
 }
 
 void nibble_lua_init_api()
@@ -425,7 +442,7 @@ static int l_cpal(lua_State *L)
         // Assuming nibble_api_cpal is a function that sets the color in the palette
         // You'd call it like before:
         nibble_api_cpal(color, r, g, b);
-        
+
         return 0;
     }
 
@@ -1277,23 +1294,34 @@ static int l_load_cart(lua_State *L)
     if (top >= 1)
     {
         const char *filename = lua_tostring(L, 1);
-        // const char *code = nibble_api_load_cart(filename);
-        ErrorCode result = nibble_api_load_cart(filename);
+        char *adjustedFilename = NULL;                                        // Correct type for a string pointer
+        ErrorCode result = nibble_api_load_cart(filename, &adjustedFilename); // Pass the address of adjustedFilename
+
+        DEBUG_LOG("load_cart(%s) = %d", filename, result);
+
         if (result != ERROR_SUCCESS)
         {
-            // DEBUG_LOG("Houston, we have a problem: %s\n", get_error_text(result, filename));
+            // Assuming get_error_text is implemented and returns a const char*
             lua_pushnil(L);
-            lua_pushstring(L, get_error_text(result, filename));
+            lua_pushstring(L, get_error_text(result, filename)); // Push error text
+            lua_pushnil(L);
         }
         else
         {
-            lua_pushstring(L, userLuaCode);
-            lua_pushnil(L);
+            lua_pushstring(L, userLuaCode);                              // Push user code
+            lua_pushnil(L);                                              // Assuming second pushnil is intended for a specific purpose
+            lua_pushstring(L, adjustedFilename ? adjustedFilename : ""); // Push adjusted filename or empty string
         }
-        // DEBUG_LOG("load_cart(%s) = %d", filename, result);
-        return 2;
+
+        if (adjustedFilename)
+        {
+            free(adjustedFilename); // Free dynamically allocated memory
+        }
+
+        return 3; // Number of values returned to Lua
     }
-    return 0;
+
+    return 0; // Return zero if the function signature doesn't match expected input
 }
 
 static int l_save_cart(lua_State *L)
@@ -1305,7 +1333,7 @@ static int l_save_cart(lua_State *L)
         const char *filename = lua_tostring(L, 1);
         const char *code = lua_tostring(L, 2);
 
-        //DEBUG_LOG("%s\n", code);
+        // DEBUG_LOG("%s\n", code);
 
         int result = nibble_api_save_cart(filename, code);
         // DEBUG_LOG("save(%s) = %d\n", filename, result);
@@ -1587,8 +1615,8 @@ inline void nibble_lua_call(const char *name)
         lua_pop(currentVM, 1);
         return;
     }
-    //double time = nibble_api_time();
-    //DEBUG_LOG("Calling %s at %f", name, time);    
+    // double time = nibble_api_time();
+    // DEBUG_LOG("Calling %s at %f", name, time);
 }
 
 void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed)

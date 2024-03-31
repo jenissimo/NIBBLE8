@@ -10,7 +10,7 @@
 // Debug flags
 #define NIBBLE_DISPLAY_FPS        0
 
-#define NIBBLE_TITLE              "Nibble-8"
+#define NIBBLE_TITLE              "NIBBLE8"
 
 #define NIBBLE_WIDTH              160
 #define NIBBLE_HEIGHT             120

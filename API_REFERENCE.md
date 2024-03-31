@@ -1,4 +1,4 @@
-NIBBLE-8 API Reference
+NIBBLE8 API Reference
 Resolution: 160x120 pixels
 Color Palette: 4 colors
 Programming Language: Lua

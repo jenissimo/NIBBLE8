@@ -11,6 +11,9 @@ Uint32 fpsLastTime = 0;
 int frameCount = 0;
 int fpsCurrent = 0;
 
+int windowWidth = 640;
+int windowHeight = 480;
+
 int video_init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -19,8 +22,8 @@ int video_init()
         return 1;
     }
 
-    window = SDL_CreateWindow("NIBBLE-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                          640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("NIBBLE8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                          windowWidth, windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
 
     if (window == NULL)
     {
@@ -35,7 +38,7 @@ int video_init()
         return 1;
     }
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, NIBBLE_WIDTH, NIBBLE_HEIGHT);
-    SDL_RenderSetScale(renderer, NIBBLE_WINDOW_SCALE, NIBBLE_WINDOW_SCALE);
+    SDL_RenderSetScale(renderer, windowWidth / NIBBLE_WIDTH, windowHeight / NIBBLE_HEIGHT);
 
     DEBUG_LOG("SDL Initialized");
 

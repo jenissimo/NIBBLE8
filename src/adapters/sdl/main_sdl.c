@@ -9,6 +9,7 @@
 #include "hardware/utils.h"
 #include "api/lua.h"
 #include "sdl_adapter.h"
+#include "utils/base64.h"
 
 int run = 1;
 
@@ -19,7 +20,7 @@ int main(int argc, char *argv[])
     uint32_t last_time = 0;
     uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
-    printf("Welcome to NIBBLE-8!\n");
+    printf("Welcome to NIBBLE8!\n");
     fflush(stdout);
 
     srand(time(NULL)); // Initialization, should only be called once.
@@ -90,5 +91,6 @@ int main(int argc, char *argv[])
     destroy_video();
     destroyRAM();
     debug_close();
+    base64_cleanup();
     return nibble_sdl_quit();
 }

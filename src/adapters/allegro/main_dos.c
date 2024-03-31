@@ -10,6 +10,7 @@
 #include "hardware/video.h"
 #include "hardware/utils.h"
 #include "api/lua.h"
+#include "utils/base64.h"
 
 int run = 1;
 volatile int ticks = 0;
@@ -53,7 +54,7 @@ void check_params(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    printf("Welcome to NIBBLE-8 for DOS!\n");
+    printf("Welcome to NIBBLE8 for DOS!\n");
 
     if (check_param("--debug", argc, argv) > -1)
     {
@@ -120,6 +121,7 @@ int main(int argc, char *argv[])
     nibble_destroy_video();
     nibble_ram_destroy();
     debug_close();
+    base64_cleanup();
 
     nibble_allegro_quit();
     return 0;

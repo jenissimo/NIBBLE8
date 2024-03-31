@@ -5,7 +5,7 @@
 #include "nibble8.h"
 
 Memory memory;
-uint8_t *userLuaCode;
+uint8_t *userLuaCode = NULL;
 uint8_t *clipboard;
 bool rebootRequested = false;
 bool shutdownRequested = false;

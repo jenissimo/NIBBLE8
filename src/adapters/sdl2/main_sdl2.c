@@ -11,6 +11,7 @@
 #include "hardware/video.h"
 #include "hardware/utils.h"
 #include "api/lua.h"
+#include "utils/base64.h"
 #include "sdl_adapter.h"
 #include "input_manager.h"
 
@@ -54,17 +55,10 @@ void main_loop()
 
 int main(int argc, char *argv[])
 {
-    printf("Welcome to NIBBLE-8!\n");
+    printf("Welcome to NIBBLE8!\n");
     fflush(stdout);
 
     srand(time(NULL)); // Initialization, should only be called once.
-
-    nibble_ram_init();
-    nibble_init_video();
-    nibble_lua_init();
-    nibble_sdl_init();
-
-    next_time = SDL_GetTicks() + NIBBLE_FPS;
 
     // parse params
     for (int i = 0; i < argc; i++)
@@ -76,33 +70,67 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[i], "--fullscreen") == 0)
         {
-            goFullScreen();
+            isFullscreen = true;
+        }
+        else if (strcmp(argv[i], "--width") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                windowWidth = atoi(argv[i + 1]);
+            }
+        }
+        else if (strcmp(argv[i], "--height") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                windowHeight = atoi(argv[i + 1]);
+            }
         }
         else if (strcmp(argv[i], "--cart") == 0)
         {
             if (i + 1 < argc)
             {
-                lua_getglobal(currentVM, "loadAndPlayCart");
-                lua_pushstring(currentVM, argv[i + 1]);
-                lua_pcall(currentVM, 1, 0, 0);
+                cartPath = argv[i + 1];
+            }
+        }
+        else if (strcmp(argv[i], "--cartb64") == 0)
+        {
+            DEBUG_LOG("Loading cart from base64\n");
+            if (i + 1 < argc)
+            {
+                cartBase64 = argv[i + 1];
+            }
+        }
+        else if (strcmp(argv[i], "--player") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                playerMode = (bool)atoi(argv[i + 1]);
             }
         }
     }
 
-    DEBUG_LOG("NIBBLE-8 started\n");
+    nibble_ram_init();
+    nibble_init_video();
+    nibble_lua_init();
+    nibble_sdl_init();
+    next_time = SDL_GetTicks() + NIBBLE_FPS;
 
-    #ifdef __EMSCRIPTEN__
-        emscripten_set_main_loop(main_loop, -1, 1);
-    #else
+    DEBUG_LOG("NIBBLE8 started\n");
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(main_loop, -1, 1);
+#else
     while (run)
     {
         main_loop();
     }
-    #endif
+#endif
 
     nibble_lua_destroy();
     nibble_destroy_video();
     nibble_ram_destroy();
     debug_close();
+    base64_cleanup();
     return nibble_sdl_quit();
 }

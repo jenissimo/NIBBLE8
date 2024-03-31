@@ -1,0 +1,168 @@
+/* Reset and box sizing */
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+/* Base styles */
+html {
+    height: 100%;
+    font-family: "Roboto Mono", monospace;
+    background-color: #211e20;
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    font-weight: 700;
+    color: #555568;
+}
+
+/* Link styles */
+a {
+    color: #edb4a1;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #e9efec;
+}
+
+.logo a{
+    font-size: 2em;
+    color: #e9efec;
+}
+
+/* Assuming that the .terminal-container and .terminal-header-container share the same max-width value */
+.terminal-header, .terminal-footer, .terminal-container {
+    max-width: 1170px; /* Ensure this is the same for all */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem; /* The horizontal padding should be the same for all */
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between; /* This aligns children (logo, nav, sign-in) on each side */
+    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* If there is a specific container for header content like a div, make sure to add it here. */
+.terminal-header-container {
+    width: 100%; /* Take up the full width */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* No horizontal padding needed here if .terminal-header has it */
+}
+
+/* For the logo, nav, and sign-in to take full height */
+.logo, .terminal-nav, .login-signin {
+    display: flex;
+    align-items: center; /* Align the text vertically */
+    height: 100%; /* They should take the full height of the header */
+}
+
+/* Adjust the .terminal-container if needed */
+.terminal-container {
+    padding-top: 2rem; /* This is just an example, adjust as needed */
+    padding-bottom: 2rem;
+    /* Other styles */
+}
+
+/* Terminal container styling */
+.terminal-container {
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Player styling */
+#player {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Header styles */
+.terminal-header {
+    background-color: #764462;
+    padding: 0.5rem 0; /* Only vertical padding; horizontal padding removed */
+    display: flex;
+    justify-content: center; /* This centers the header-container */
+    align-items: center;
+}
+
+/* Header container to match terminal-container width */
+.terminal-header-container {
+    max-width: 1170px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Adjust space between logo, nav, and sign-in */
+    align-items: center;
+    padding: 0 1rem; /* Add horizontal padding here */
+}
+
+/* Header and footer shared styles */
+.terminal-header, .terminal-footer {
+    color: #e9efec;
+    background-color: #764462;
+    border-bottom: 1px solid #555568;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Navigation styles */
+.terminal-nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.terminal-nav ul li {
+    display: flex;
+}
+
+.terminal-nav ul li a {
+    padding: 14px 15px;
+    transition: color 0.3s ease;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+/* Content styles */
+.terminal-content h2 {
+    color: #a0a08b;
+    font-size: 1.5em;
+}
+
+.terminal-content p {
+    margin-bottom: 2rem;
+    color: #e9efec;
+}
+
+/* Responsive styling */
+@media (max-width: 1200px) {
+    .terminal-container, .terminal-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .terminal-nav ul {
+        flex-direction: column;
+    }
+
+    .terminal-nav ul li a {
+        margin-bottom: 0.5rem;
+    }
+
+    .terminal-footer {
+        padding: 0.5rem;
+    }
+}

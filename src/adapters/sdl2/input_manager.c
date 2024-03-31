@@ -47,7 +47,10 @@ int input_update()
             switch (e.key.keysym.sym)
             {
             case SDLK_ESCAPE:
-                nibble_lua_close_app();
+                if (!playerMode)
+                {
+                    nibble_lua_close_app();
+                }
                 break;
             case SDLK_F4:
                 nibble_sdl_save_lua_keys_constants();
@@ -68,8 +71,11 @@ int input_update()
                 make_screenshot();
                 break;
             case SDLK_F12:
-                nibble_lua_destroy();
-                nibble_lua_init();
+                if (!playerMode)
+                {
+                    nibble_lua_destroy();
+                    nibble_lua_init();
+                }
                 break;
             default:
                 break;

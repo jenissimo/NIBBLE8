@@ -122,6 +122,9 @@ const char *nibble_api_get_code()
 
 void nibble_api_run_code(char *code)
 {
-    userLuaCode = code;
-    nibble_lua_run_code(userLuaCode);
+    if (userLuaCode != NULL)
+    {
+        userLuaCode = code;
+        nibble_lua_run_code(userLuaCode);
+    }
 }

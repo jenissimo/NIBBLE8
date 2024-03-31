@@ -222,27 +222,28 @@ function editSprite(file)
 end
 
 function loadCart(path)
-    local result, errorMsg = load_cart(path)
+    local result, errorMsg, adjustedPath = load_cart(path)
 
     if errorMsg ~= nil then
         trace(errorMsg)
         return errorMsg
     else
+        trace("cart loaded: " .. adjustedPath)
         textEditor:init(result)
         spriteEditor.init()
-        currentCartPath = path
+        currentCartPath = adjustedPath or path -- Use adjusted path if available
     end
 end
 
 function loadAndPlayCart(path)
-    local result, errorMsg = load_cart(path)
+    local result, errorMsg, adjustedPath = load_cart(path)
 
     if errorMsg ~= nil then
         trace(errorMsg)
         return errorMsg
     else
         textEditor:init(result)
-        currentCartPath = path
+        currentCartPath = adjustedPath or path -- Use adjusted path if available
         runCart()
     end
 end

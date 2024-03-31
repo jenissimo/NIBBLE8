@@ -18,6 +18,9 @@
 extern lua_State* currentVM;
 extern lua_State *lua;
 extern lua_State *app;
+extern char *cartPath;
+extern char *cartBase64;
+extern bool playerMode;
 
 void nibble_lua_init(void);
 void nibble_lua_init_api(void);

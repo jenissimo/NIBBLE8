@@ -23,7 +23,7 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     cls()
     trace("Terminal started")
     self:printLn("", 2)
-    self:printLn("nibble-8", 2)
+    self:printLn("nibble8", 2)
     self:printLn("version 0.0.1", 2)
     self:printLn("", 2)
     self:printLn("type help for help", 2)
@@ -57,7 +57,6 @@ function Terminal:printLs(path)
 end
 
 function Terminal:loadCart(path)
-    if sub(path, -4) ~= ".n8" then path = path .. ".n8" end
     local errorMsg = self.loadCartCallback(path)
     if errorMsg ~= nil then
         self:printLn(errorMsg, 2)
