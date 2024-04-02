@@ -130,18 +130,10 @@ void loadLuaCodeFromCart(mz_zip_archive *zip_archive)
     if (cart_has_file(zip_archive, "app.lua"))
     {
         load_text_from_zip(zip_archive, "app.lua", &luaCode);
-        if (userLuaCode)
-        {
-            free(userLuaCode); // Correctly deallocate previous code
-        }
         userLuaCode = luaCode; // Assign newly loaded code
     }
     else
     {
-        if (userLuaCode)
-        {
-            free(userLuaCode); // Ensure to free previous code
-        }
         userLuaCode = strdup(""); // Allocate a new empty string if not found
     }
 }

@@ -57,12 +57,14 @@ int input_update()
                 break;
             case SDLK_F7:
                 prevPalette(manager);
+                nibble_video_reset_colors();
                 break;
             case SDLK_F8:
                 nibble_ram_dump();
                 break;
             case SDLK_F9:
                 nextPalette(manager);
+                nibble_video_reset_colors();
                 break;
             // case SDLK_F10:
             //     printVRam();
