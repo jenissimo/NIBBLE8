@@ -1,6 +1,3 @@
-[submodule "src/vendor/--force"]
-	path = src/vendor/--force
-	url = https://github.com/rombankzero/pocketmod
 [submodule "src/vendor/pocketmod"]
 	path = src/vendor/pocketmod
 	url = https://github.com/rombankzero/pocketmod
