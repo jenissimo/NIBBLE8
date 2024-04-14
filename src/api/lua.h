@@ -102,6 +102,8 @@ static int l_map(lua_State *L);
 static int l_mget(lua_State *L);
 static int l_mset(lua_State *L);
 
+static int l_exit(lua_State *L);
+
 void nibble_lua_call(const char* name);
 void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed);
 void nibble_lua_call_key_up(int key_code, bool ctrl_pressed, bool shift_pressed);

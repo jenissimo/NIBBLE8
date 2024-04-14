@@ -7,7 +7,6 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
 
     self.input = ""
     self.cursorBlink = 0
-    self.cursorVisible = true
     self.history = {}
     self.commandsHistory = {}
     self.commandsHistoryIndex = 1
@@ -20,16 +19,23 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.saveCartCallback = saveCartCallback
     self.importCodeCallback = importCodeCallback
 
+    self.messageQueue = {}
+    self.queueTimer = 0
+
     cls()
-    trace("Terminal started")
-    self:printLn("", 2)
-    self:printLn("nibble8", 2)
-    self:printLn("version 0.0.1", 2)
-    self:printLn("", 2)
-    self:printLn("type help for help", 2)
-    self:printLn("", 2)
+    --trace("Terminal started")
+    self:queueMessage("", 2, 0.05)
+    self:queueMessage("nibble8", 2, 0.1)
+    self:queueMessage("version 0.0.1", 2, 0.1)
+    self:queueMessage("", 2, 0.05)
+    self:queueMessage("type \f2help\f3 for help", 3, 0.1)
+    self:queueMessage("", 2, 0.1)
 
     return self;
+end
+
+function Terminal:queueMessage(text, color, delay)
+    table.insert(self.messageQueue, {text = text, color = color, delay = delay})
 end
 
 function Terminal:printLn(line, color)
@@ -152,6 +158,8 @@ function Terminal:executeInput()
         self:printLs(command[2])
     elseif command[1] == "load" then
         self:loadCart(command[2])
+    elseif command[1] == "run" then
+        runCart(command[2])
     elseif command[1] == "import" then
         self:import(command[2])
     elseif command[1] == "export" then
@@ -175,21 +183,22 @@ function Terminal:executeInput()
         self:printLn("", 1)
         self:printLn("commands", 3)
         self:printLn("", 1)
-        self:printLn("load <file> - load a cart", 2)
-        self:printLn("save <file> - save a cart", 2)
-        self:printLn("import <file> - import spritesheet png", 2)
-        self:printLn("export <file> - export spritesheet png", 2)
-        self:printLn("cd - change directory", 2)
-        self:printLn("ls - list files", 2)
-        self:printLn("cls - clear screen", 2)
-        self:printLn("exit - quit terminal", 2)
+        self:printLn("\f2load <filename>\f3 - load a cart", 3)
+        self:printLn("\f2save <filename>\f3 - save a cart", 3)
+        self:printLn("\f2run (or ctrl+r)\f3 - run", 3)
+        self:printLn("\f2import <file>\f3 - import spritesheet png", 3)
+        self:printLn("\f2export <file>\f3 - export spritesheet png", 3)
+        self:printLn("\f2cd\f3 - change directory", 3)
+        self:printLn("\f2ls\f3 - list files", 3)
+        self:printLn("\f2cls\f3 - clear screen", 3)
+        self:printLn("\f2exit\f3 - quit terminal", 3)
         self:printLn("", 2)
-        self:printLn("press esc to toggle editor view", 2)
+        self:printLn("press \f2esc\f3 to toggle editor view", 3)
     elseif command[1] == "exit" then
-        self:printLn("Bye Bye!", 2)
+        exit()
     else
-        self:printLn("invalid command: " .. command, 1)
-        self:printLn("type 'help' for a list of commands", 1)
+        self:printLn("invalid command: \f2" .. command[1].."\f1", 1)
+        self:printLn("type \f2help\f3 for a list of commands", 3)
     end
 
     table.insert(self.commandsHistory, self.input)
@@ -200,6 +209,8 @@ function Terminal:executeInput()
 end
 
 function Terminal:key(key_code, ctrl_pressed, shift_pressed)
+    if #self.messageQueue > 0 then return end
+
     local inputText = UTILS.handle_text_input(key_code, ctrl_pressed,
                                               shift_pressed)
     local leftPart = ""
@@ -270,17 +281,24 @@ function Terminal:keyup(key_code, ctrl_pressed, shift_pressed) end
 function Terminal:init() end
 
 function Terminal:update()
-    self.cursorBlink = self.cursorBlink + 1
-    if self.cursorBlink % 20 == 0 then
-        self.cursorVisible = not self.cursorVisible
+    if #self.messageQueue > 0 then
+        self.queueTimer = self.queueTimer + 0.02  -- Assuming 50 FPS, adjust based on actual frame rate
+        local msg = self.messageQueue[1]
+        if self.queueTimer >= msg.delay then
+            self:printLn(msg.text, msg.color)
+            table.remove(self.messageQueue, 1)
+            self.queueTimer = 0
+        end
     end
 end
 
 function Terminal:draw()
     cls()
     self:printHistory()
-    if self.cursorVisible then
-        print(chr(16), (self.cursorPos + 2) * 4, #self.history * 8, 2)
+    if #self.messageQueue > 0 then return end
+
+    if t()*10%20 > 10 then
+        print(chr(16), (self.cursorPos + 2) * 4, #self.history * 8, 1)
     end
     print("> " .. self.input, 0, #self.history * 8, 3)
 end

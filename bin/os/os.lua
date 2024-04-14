@@ -1,3 +1,4 @@
+local Intro  = require("os/Intro")
 local TextEditor = require("os/apps/text_editor/TextEditor")
 local Terminal = require("os/apps/terminal/Terminal")
 local MapEditor = require("os/apps/map_editor/MapEditor")
@@ -49,18 +50,24 @@ function _init()
         width = 7,
         iconfn = draw_note_icon,
         window = musicTracker
-    }}--, {
---        width = 7,
---        iconfn = draw_note_icon,
---        window = synth
---    }}
+    }}
+    Intro:init(1.3, 30)
 end
 
 function _update()
+    if Intro.active then
+        return
+    end
+
     currentWindow:update()
 end
 
 function _draw()
+    if Intro.active then
+        Intro:draw()
+        return
+    end
+
     if currentWindow.draw then
         currentWindow:draw()
     end
@@ -100,7 +107,7 @@ function _key(key_code, ctrl_pressed, shift_pressed)
         currentWindow = mapEditor
     elseif key_code == KEYCODE.KEY_F4 then
         hot_key_pressed = true
-        currentWindow = synth
+        currentWindow = musicTracker
     elseif key_code == KEYCODE.KEY_ESCAPE then
         hot_key_pressed = true
         if (currentWindow == terminal) then
@@ -261,9 +268,17 @@ function saveCart(path)
     end
 end
 
-function runCart()
+function runCart(path)
     trace("running cart")
-    return run_code(textEditor:getText())
+    local errorMsg = nil
+    
+    if path then
+        errorMsg = loadCart(path)
+    end
+
+    if errorMsg == nil then
+        run_code(textEditor:getText())
+    end
 end
 
 function importCode(code)

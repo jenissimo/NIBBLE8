@@ -29,12 +29,15 @@ void main_loop()
 
     if (rebootRequested)
     {
-        DEBUG_LOG("Rebooting Nibble8");
         rebootRequested = false;
         nibble_api_reboot();
     }
 
     if (nibble_sdl_update() == 0)
+    {
+        run = 0;
+    }
+    else if (shutdownRequested)
     {
         run = 0;
     }

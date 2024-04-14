@@ -71,6 +71,10 @@ int main(int argc, char *argv[])
         {
             run = 0;
         }
+        else if (shutdownRequested)
+        {
+            run = 0;
+        }
         else
         {
             // sleep for remainder of time

@@ -132,6 +132,8 @@ void nibble_lua_init_api()
     nibble_lua_register_function("import_lua", l_import_lua);
     nibble_lua_register_function("export_lua", l_export_lua);
 
+    nibble_lua_register_function("exit", l_exit);
+
     // Load Custom Libs
     luaL_dostring(currentVM, "package.path = package.path .. \";lib/?.lua\" .. \";os/?.lua\"");
     luaL_dostring(currentVM, "KEYCODE = require(\"keys_constants\")");
@@ -1333,7 +1335,7 @@ static int l_get_clipboard_text(lua_State *L)
     int top = lua_gettop(L);
 
     char *result = nibble_api_get_clipboard_text();
-    DEBUG_LOG("get_clipboard_text() = %s\n", result);
+    // DEBUG_LOG("get_clipboard_text() = %s\n", result);
     lua_pushstring(L, result);
     freeClipboardText(result);
     return 1;
@@ -1454,6 +1456,12 @@ static int l_change_dir(lua_State *L)
         lua_pushnumber(L, result);
         return 1;
     }
+    return 0;
+}
+
+static int l_exit(lua_State *L)
+{
+    shutdownRequested = true;
     return 0;
 }
 
