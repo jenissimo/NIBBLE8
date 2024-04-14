@@ -23,11 +23,12 @@ function SelectionManager:checkSelectionUpdate(textEditor)
 end
 
 function SelectionManager:selectAll(textEditor)
-    textEditor:setCursor(0, 0)
+    --textEditor:setCursor(0, 0)
     textEditor.selection.x1 = 0
     textEditor.selection.y1 = 0
     textEditor.selection.x2 = #textEditor.lines[#textEditor.lines]
     textEditor.selection.y2 = #textEditor.lines - 1
+    textEditor.syntax_highlighting_dirty = true
 end
 
 function SelectionManager:selectText(textEditor)

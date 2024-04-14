@@ -78,11 +78,10 @@ function TextEditor:createTab(contentLines)
 end
 
 function TextEditor:switchToTab(tabIndex, checkEmptyTab)
-    if tabIndex ~= self.currentTab then
-        TextManipulation:saveCurrentTab(self)
-    end
+    if tabIndex ~= self.currentTab then TextManipulation:saveCurrentTab(self) end
     -- Check if the current tab is empty before switching
-    if checkEmptyTab and self.currentTab > 1 and #self.tabs > 1 and self.tabs[self.currentTab] and
+    if checkEmptyTab and self.currentTab > 1 and #self.tabs > 1 and
+        self.tabs[self.currentTab] and
         #self.tabs[self.currentTab].text:gsub("%s+", "") == 0 then
         -- Remove the empty tab
         table.remove(self.tabs, self.currentTab)
@@ -113,9 +112,7 @@ function TextEditor:key(key_code, ctrl_pressed, shift_pressed)
     InputHandler.handleKeyInput(self, key_code, ctrl_pressed, shift_pressed)
 end
 
-function TextEditor:mousem(x, y, button)
-    TabBar:mousem(self, x, y, button)
-end
+function TextEditor:mousem(x, y, button) TabBar:mousem(self, x, y, button) end
 
 function TextEditor:mousep(x, y, button)
     InputHandler:handleMouseInput(self, x, y, button)

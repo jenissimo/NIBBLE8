@@ -90,8 +90,9 @@ function CursorManager:moveCursor(textEditor, xDir, yDir)
     end
 
     -- Set the flag only if the scroll has changed
-    if textEditor.scroll.x ~= initialScrollX or textEditor.scroll.y ~=
-        initialScrollY then textEditor.syntax_highlighting_dirty = true end
+    --    if textEditor.scroll.x ~= initialScrollX or textEditor.scroll.y ~=
+    --      initialScrollY then textEditor.syntax_highlighting_dirty = true end
+    textEditor.syntax_highlighting_dirty = true
     textEditor:checkSelectionUpdate()
 end
 
@@ -254,14 +255,18 @@ function CursorManager:showCursor(textEditor)
 end
 
 function CursorManager:drawCursor(textEditor)
+    rectfill(textEditor.cursor.x * 4 + textEditor.x,
+    textEditor.cursor.y * 6 + textEditor.y + textEditor.offsetY, 3, 5,
+    1)
+
     local cursorX = textEditor.cursor.x + textEditor.scroll.x
     local cursorY = textEditor.cursor.y + textEditor.scroll.y
+
+    if cursorY >= #textEditor.lines then return end
+
     local cursorLine = textEditor.lines[cursorY + 1]
     local cursorChar = cursorLine:sub(cursorX + 1, cursorX + 1)
-    
-    rectfill(textEditor.cursor.x * 4 + textEditor.x,
-             textEditor.cursor.y * 6 + textEditor.y + textEditor.offsetY, 4, 5,
-             2)
+
     print(cursorChar, textEditor.x + textEditor.cursor.x * 4,
           textEditor.y + textEditor.cursor.y * 6 + textEditor.offsetY, 3)
 end

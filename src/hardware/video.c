@@ -361,7 +361,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
     {
         currentChar = text[charIndex];
 
-        if (currentChar == ' ')
+        if (currentChar == ' ' && bgTransparent)
         {
             x += NIBBLE_FONT_WIDTH; // Move to the next character's x position
             charIndex++;

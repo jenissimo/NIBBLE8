@@ -8,169 +8,195 @@ local SYNTAX_SCHEME = {
     ["DEFAULT"] = 3
 }
 local KEYWORDS = {
-    "function", "class", "super", "for", "do", "local", "while", "if", "then",
-    "else", "elseif", "return", "continue", "break", "true", "false", "print",
-    "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
-    "cpal", "palt", "pal", "spr", "sspr", "fset", "mget", "mset", "peek",
-    "poke", "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line",
-    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs", "in", "and",
-    "not", "or", "camera", "map", "btn", "btnp", "cursor", "color"
+    ["function"] = true,
+    ["class"] = true,
+    ["super"] = true,
+    ["for"] = true,
+    ["do"] = true,
+    ["local"] = true,
+    ["while"] = true,
+    ["if"] = true,
+    ["then"] = true,
+    ["else"] = true,
+    ["elseif"] = true,
+    ["return"] = true,
+    ["continue"] = true,
+    ["break"] = true,
+    ["true"] = true,
+    ["false"] = true,
+    ["print"] = true,
+    ["begin"] = true,
+    ["end"] = true,
+    ["cls"] = true,
+    ["trace"] = true,
+    ["pset"] = true,
+    ["pget"] = true,
+    ["sget"] = true,
+    ["sset"] = true,
+    ["fget"] = true,
+    ["cpal"] = true,
+    ["palt"] = true,
+    ["pal"] = true,
+    ["spr"] = true,
+    ["sspr"] = true,
+    ["fset"] = true,
+    ["mget"] = true,
+    ["mset"] = true,
+    ["peek"] = true,
+    ["poke"] = true,
+    ["peek2"] = true,
+    ["poke2"] = true,
+    ["circ"] = true,
+    ["circfill"] = true,
+    ["rect"] = true,
+    ["rectfill"] = true,
+    ["line"] = true,
+    ["flr"] = true,
+    ["sin"] = true,
+    ["cos"] = true,
+    ["rnd"] = true,
+    ["t"] = true,
+    ["time"] = true,
+    ["pairs"] = true,
+    ["ipairs"] = true,
+    ["in"] = true,
+    ["and"] = true,
+    ["not"] = true,
+    ["or"] = true,
+    ["camera"] = true,
+    ["map"] = true,
+    ["btn"] = true,
+    ["btnp"] = true,
+    ["cursor"] = true,
+    ["color"] = true
 }
 local TERMINATORS = {
-    "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",
-    " "
+    ["\n"] = true,
+    ["{"] = true,
+    ["}"] = true,
+    ["("] = true,
+    [")"] = true,
+    [" "] = true,
+    ["["] = true,
+    ["]"] = true,
+    [","] = true,
+    ["="] = true,
+    ["."] = true,
+    ["*"] = true,
+    ["-"] = true,
+    ["+"] = true,
+    ["/"] = true
 }
 
-function SyntaxHighlighter:clearColors() self.colors = {} end
+function SyntaxHighlighter:clearColors(lineIndex)
+    if not self.colors then self.colors = {} end
+
+    if lineIndex == nil then
+        self.colors = {}
+        return
+    end
+
+    self.colors[lineIndex] = {}
+end
 
 function SyntaxHighlighter:setColor(lineIndex, index, color)
-    if self.colors[lineIndex] == nil then self.colors[lineIndex] = {} end
+    if not self.colors[lineIndex] then self.colors[lineIndex] = {} end
     self.colors[lineIndex][index] = color
 end
 
 function SyntaxHighlighter:getColor(lineIndex, index)
-    if self.colors[lineIndex] == nil then return SYNTAX_SCHEME.DEFAULT end
-    return self.colors[lineIndex][index]
+    return self.colors[lineIndex] and self.colors[lineIndex][index] or
+               SYNTAX_SCHEME.DEFAULT
 end
 
-function SyntaxHighlighter:peek(line, index)
-    if index > #line then return nil end
-    return sub(line, index, index)
-end
-
-function SyntaxHighlighter:match(line, index, values, terminateValues)
-    local found = true
-    local resultIndex = nil
-
-    for valueIndex = 1, #values do
-        found = true
-        for charIndex = 1, #values[valueIndex] do
-            if self:peek(line, index + charIndex - 1) ~=
-                self:peek(values[valueIndex], charIndex) then
-                found = false
-                break
-            end
-        end
-
-        if found == true then
-            local endIndex = index + #values[valueIndex]
-            local nextChar = self:peek(line, endIndex)
-            local prevChar = index > 1 and self:peek(line, index - 1) or nil
-
-            -- Check for word boundaries
-            if not (self:isWordCharacter(prevChar) or
-                self:isWordCharacter(nextChar)) then
-                return endIndex -- Include the last character in the keyword
-            end
-        end
+function SyntaxHighlighter:highlightComment(line, lineIndex, startIndex)
+    for i = startIndex, #line do
+        self:setColor(lineIndex, i, SYNTAX_SCHEME.COMMENT)
     end
-
-    return nil
-end
-
-function SyntaxHighlighter:isWordCharacter(char)
-    return char and char:match("[%w_]")
-end
-
-function SyntaxHighlighter:isNumber(char, nextChar)
-    -- Check for standard numbers or hexadecimal numbers
-    if char:match("%d") or
-        (char == "0" and (nextChar == "x" or nextChar == "X")) then
-        return true
-    elseif (char:match("[a-fA-F]") and (nextChar == "x" or nextChar == "X")) then
-        return false -- To avoid recognizing letters as part of a hex number without the prefix
-    end
-    return false
+    return #line + 1
 end
 
 function SyntaxHighlighter:highlightString(line, lineIndex, startIndex,
                                            quoteType)
     local i = startIndex
-    repeat
-        SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
-        i = i + 1
-        if i > #line then break end
-    until sub(line, i, i) == quoteType
-    SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
-    return i + 1
-end
-
-function SyntaxHighlighter:highlightComment(line, lineIndex, startIndex)
-    for i = startIndex, #line do
-        SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.COMMENT)
-    end
-    return #line + 1 -- Move to the end of the line
-end
-
-function SyntaxHighlighter:highlightKeyword(line, lineIndex, startIndex)
-    local endIndex = self:match(line, startIndex, KEYWORDS, TERMINATORS)
-    if endIndex then
-        for i = startIndex, endIndex - 1 do
-            SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.KEYWORD)
-        end
-        return endIndex
-    else
-        -- If no keyword is found, move to the next character
-        return startIndex + 1
-    end
-end
-
-function SyntaxHighlighter:highlightNumber(line, lineIndex, startIndex)
-    local i = startIndex
-    local isHex = false
-    if sub(line, i, i + 1) == "0x" or sub(line, i, i + 1) == "0X" then
-        SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER) -- Color '0'
-        SyntaxHighlighter:setColor(lineIndex, i + 1, SYNTAX_SCHEME.NUMBER) -- Color 'x'
-        i = i + 2 -- Skip past "0x" or "0X"
-        isHex = true
-    end
-
+    self:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
+    i = i + 1
     while i <= #line do
         local char = sub(line, i, i)
-        if char:match("[%d]") or (isHex and char:match("[a-fA-F]")) then
-            SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER)
-            i = i + 1
-        else
-            break
+        if char == quoteType and sub(line, i - 1, i - 1) ~= "\\" then
+            self:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
+            return i + 1
         end
+        self:setColor(lineIndex, i, SYNTAX_SCHEME.STRING)
+        i = i + 1
     end
     return i
 end
 
+function SyntaxHighlighter:highlightNumber(line, lineIndex, startIndex)
+    local i = startIndex
+    local isHex = (sub(line, i, i + 1) == "0x" or sub(line, i, i + 1) == "0X")
+    local pattern = isHex and "[%dA-Fa-f]" or "%d"
+
+    if isHex then
+        self:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER) -- Color '0'
+        self:setColor(lineIndex, i + 1, SYNTAX_SCHEME.NUMBER) -- Color 'x'
+        i = i + 2
+    end
+
+    while i <= #line and (sub(line, i, i):match(pattern) or
+        (not isHex and sub(line, i, i) == "." and
+            sub(line, i + 1, i + 1):match("%d"))) do
+        self:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER)
+        i = i + 1
+    end
+    return i
+end
+
+function SyntaxHighlighter:highlightKeyword(line, lineIndex, startIndex)
+    -- Find the start of a potential keyword or identifier
+    local wordStart, wordEnd, word = line:find("([%w_]+)", startIndex)
+    if not wordStart then return startIndex end -- Move past non-alphanumeric characters
+
+    if KEYWORDS[word] then
+        -- Ensure the word is isolated by checking the characters around the keyword
+        local precedingChar = wordStart > 1 and
+                                  sub(line, wordStart - 1, wordStart - 1) or " "
+        local followingChar = wordEnd < #line and
+                                  sub(line, wordEnd + 1, wordEnd + 1) or " "
+
+        -- Check for non-word characters (non-alphanumeric and not '_')
+        if not precedingChar:match("[%w_]") and not followingChar:match("[%w_]") then
+            for j = wordStart, wordEnd do
+                self:setColor(lineIndex, j, SYNTAX_SCHEME.KEYWORD)
+            end
+            return wordEnd + 1
+        end
+    end
+    -- If not a keyword, continue from the end of the current word
+    return wordEnd + 1
+end
+
 function SyntaxHighlighter:highlightLine(line, lineIndex)
+    self:clearColors(lineIndex)
     local i = 1
-
-    self.colors[lineIndex] = {}
-
     while i <= #line do
         local char = sub(line, i, i)
-        local prevChar = i > 1 and sub(line, i - 1, i - 1) or nil
         local nextChar = (i < #line) and sub(line, i + 1, i + 1) or ""
+        local prevChar = (i > 1) and sub(line, i - 1, i - 1) or ""
 
-        -- String highlighting (double quotes)
-        if char == "\"" then
-            i = self:highlightString(line, lineIndex, i, "\"")
-
-            -- String highlighting (single quotes)
-        elseif char == "'" then
-            i = self:highlightString(line, lineIndex, i, "'")
-
-            -- Comment highlighting
-        elseif char == "-" and self:peek(line, i + 1) == "-" then
+        if char == "\"" or char == "'" then
+            i = self:highlightString(line, lineIndex, i, char)
+        elseif char == "-" and nextChar == "-" then
             self:highlightComment(line, lineIndex, i)
             break
-
-            -- Keyword highlighting
-        elseif self:match(line, i, KEYWORDS, TERMINATORS) then
+        elseif char:match("%d") or
+            (char == "0" and (nextChar == "x" or nextChar == "X")) then
+            i = self:highlightNumber(line, lineIndex, i)
+        elseif char:match("[%w_]") then
             i = self:highlightKeyword(line, lineIndex, i)
-            -- Number highlighting
-        elseif char == "0" and (nextChar == "x" or nextChar == "X") then
-            i = self:highlightNumber(line, lineIndex, i)
-        elseif self:isNumber(char, prevChar) then
-            i = self:highlightNumber(line, lineIndex, i)
-            -- Default highlighting
         else
-            self.colors[lineIndex][i] = SYNTAX_SCHEME.DEFAULT
+            self:setColor(lineIndex, i, SYNTAX_SCHEME.DEFAULT)
             i = i + 1
         end
     end
@@ -222,7 +248,6 @@ function SyntaxHighlighter:cacheVisibleLines(textEditor)
     for lineIndex = firstLineIndex, lastLineIndex do
         local drawText = self:cacheLine(textEditor, lineIndex)
         textEditor.drawText = textEditor.drawText .. drawText .. "\n"
-        --textEditor.drawLines[#textEditor.drawLines + 1] = drawText
     end
 end
 

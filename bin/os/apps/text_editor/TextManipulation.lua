@@ -160,8 +160,26 @@ function TextManipulation:removeSelectedText(textEditor)
     textEditor:clearSelection()
     textEditor.syntax_highlighting_dirty = true
 
-    textEditor:setCursor(startX, startY)
-    textEditor:checkAndAdjustCursorBounds()
+    local adjustedX = startX
+    local adjustedY = startY
+
+    if startY == (textEditor.cursor.y + textEditor.scroll.y) then
+        adjustedY = textEditor.cursor.y
+    else
+        textEditor.scroll.y = 0
+    end
+
+    if startX == (textEditor.cursor.x + textEditor.scroll.x) then
+        adjustedX = textEditor.cursor.x
+    else
+        textEditor.scroll.x = 0
+    end
+    
+    --trace("Selection pos: " .. startX .. "," .. startY)
+    --trace("Cursor pos: " .. textEditor.cursor.x .. "," .. textEditor.cursor.y)
+    --trace("Scroll: " .. textEditor.scroll.x .. "," .. textEditor.scroll.y)
+
+    textEditor:setCursor(adjustedX, adjustedY)
 end
 
 function TextManipulation:copy(textEditor)
