@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
 
     nibble_lua_destroy();
     destroy_video();
+    nibble_audio_destroy();
     destroyRAM();
     debug_close();
     base64_cleanup();

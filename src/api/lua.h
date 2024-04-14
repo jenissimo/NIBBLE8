@@ -33,6 +33,11 @@ void nibble_lua_run_code(const char *code);
 void nibble_lua_close_app(void);
 void nibble_lua_register_function(const char* name, lua_CFunction func);
 
+static int l_peek(lua_State *L);
+static int l_poke(lua_State *L);
+static int l_peek2(lua_State *L);
+static int l_poke2(lua_State *L);
+
 static char* nibble_lua_print_string(lua_State* lua, int index);
 static int l_camera(lua_State *L);
 static int l_cpal(lua_State *L);
@@ -40,6 +45,9 @@ static int l_pal(lua_State *L);
 static int l_palt(lua_State *L);
 static int l_cls(lua_State *L);
 static int l_print(lua_State *L);
+static int l_cursor(lua_State *L);
+static int l_color(lua_State *L);
+
 static int l_split(lua_State *L);
 static int l_trace(lua_State *L);
 static int l_pset(lua_State *L);
@@ -93,13 +101,6 @@ static int l_fset(lua_State *L);
 static int l_map(lua_State *L);
 static int l_mget(lua_State *L);
 static int l_mset(lua_State *L);
-
-// audio functions
-static int l_note_on(lua_State *L);
-static int l_note_off(lua_State *L);
-static int l_update_synth(lua_State *L);
-static int l_update_filter(lua_State *L);
-static int l_set_note(lua_State *L);
 
 void nibble_lua_call(const char* name);
 void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed);

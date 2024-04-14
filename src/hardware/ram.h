@@ -6,16 +6,23 @@
 #else
 #include <stdint.h>
 #endif
+#include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include "nibble8.h"
+#include "hardware/empty_mod_file.h"
+#include "debug/debug.h"
+#include "utils/pocketmod.h"
+
+extern pocketmod_context *modContext;
 
 typedef struct ColorPalette
 {
-    bool flip : 1;   // Flip flag
-    uint8_t r[4];    // Array of red components for 4 colors
-    uint8_t g[4];    // Array of green components for 4 colors
-    uint8_t b[4];    // Array of blue components for 4 colors
+    bool flip : 1; // Flip flag
+    uint8_t r[4];  // Array of red components for 4 colors
+    uint8_t g[4];  // Array of green components for 4 colors
+    uint8_t b[4];  // Array of blue components for 4 colors
 } ColorPalette;
 
 typedef struct DrawState
@@ -39,12 +46,6 @@ typedef struct DrawState
 
     uint8_t drawMode;
 
-    uint8_t devkitMode;
-
-    uint8_t persistPalette;
-
-    uint8_t soundPauseState;
-
     uint8_t suppressPause;
 
     uint8_t fillPattern[2];
@@ -64,31 +65,19 @@ typedef struct DrawState
     int16_t line_y;
 } DrawState;
 
-typedef struct Note
+typedef struct SoundState
 {
-    uint8_t custom : 1;     // note height (0-1)
-    uint8_t pitch : 6;     // note height (0-63)
-    uint8_t instrument : 3; // instrument index (0-7)
-    uint8_t volume : 3;     // note volume (0-7)
-    uint8_t effect : 3;     // effect index (0-7)
-} Note;
-
-typedef struct SFX
-{
-    uint8_t noteDuration;             // Note duration (0-255)
-    uint8_t loopStart;                // Loop start (0-63)
-    uint8_t loopEnd;                  // Loop end (0-63)
-    Note notes[NIBBLE_SFX_MAX_NOTES]; // Array of notes for this SFX
-} SFX;
+    bool soundEnabled : 1;
+    uint8_t musicFrame;
+} SoundState;
 
 typedef struct MemoryLayout
 {
     uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
     uint16_t mapData[NIBBLE_MAP_COUNT];
     uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
-    uint8_t musicData[NIBBLE_MUSIC_SIZE];
-    uint8_t sfxData[NIBBLE_SFX_SIZE];
     DrawState drawState;
+    SoundState soundState;
     uint8_t hardwareState[NIBBLE_HARDWARE_STATE_SIZE];
     uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
 } MemoryLayout;
@@ -100,9 +89,8 @@ typedef union
         uint8_t spriteSheetData[NIBBLE_SPRITE_SHEET_SIZE];
         uint16_t mapData[NIBBLE_MAP_COUNT];
         uint8_t spriteFlagsData[NIBBLE_SPRITE_FLAG_SIZE];
-        uint8_t musicData[NIBBLE_MUSIC_SIZE];
-        SFX sfxData[NIBBLE_SFX_COUNT];
         DrawState drawState;
+        SoundState soundState;
         uint8_t hardwareState[NIBBLE_HARDWARE_STATE_SIZE];
         uint8_t screenData[NIBBLE_SCREEN_DATA_SIZE];
     };

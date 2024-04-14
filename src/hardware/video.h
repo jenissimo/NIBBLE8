@@ -38,7 +38,9 @@ void nibble_api_rectfill(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t col
 void nibble_api_line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t col);
 void nibble_api_hline(int16_t x1, int16_t x2, int16_t y, uint8_t color);
 int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t bg_color);
-inline int nibble_print_parse_parameter(uint8_t parameter);
+void nibble_api_cursor(int16_t x, int16_t y);
+void nibble_api_color(uint8_t col);
+int nibble_print_parse_parameter(uint8_t parameter);
 void nibble_api_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, bool flip_x, bool flip_y);
 void nibble_api_sset(int16_t x, int16_t y, uint8_t col);
 uint8_t nibble_api_sget(int16_t x, int16_t y);

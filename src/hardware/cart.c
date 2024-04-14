@@ -484,12 +484,24 @@ void load_text_from_zip(mz_zip_archive *zip_archive, const char *file_to_load, c
     }
 
     size_t buffer_size = 0;
+
     *buffer = (char *)mz_zip_reader_extract_file_to_heap(zip_archive, file_to_load, &buffer_size, 0);
     if (*buffer)
     {
-        // realloc is not needed here as we directly allocate enough space and NULL-terminate
-        (*buffer)[buffer_size] = '\0'; // Ensure NULL-termination
-        DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+        size_t actual_size_needed = buffer_size + 1;             // Correctly calculate after buffer_size is known
+        char *new_buffer = realloc(*buffer, actual_size_needed); // Attempt to resize the buffer
+        if (new_buffer)
+        {
+            *buffer = new_buffer;          // Update pointer if realloc was successful
+            (*buffer)[buffer_size] = '\0'; // Null-terminate the buffer
+            DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+        }
+        else
+        {
+            free(*buffer);  // Important: free the original buffer to avoid memory leaks if realloc fails
+            *buffer = NULL; // Set to NULL to avoid using a freed pointer
+            DEBUG_LOG("Failed to reallocate memory for %s", file_to_load);
+        }
     }
     else
     {

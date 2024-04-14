@@ -96,6 +96,9 @@
         "limits.h": "c",
         "fix32.h": "c",
         "lauxlib.h": "c",
-        "trigtables.h": "c"
+        "trigtables.h": "c",
+        "pocketmod.h": "c",
+        "empty_mod.h": "c",
+        "empty_mod_file.h": "c"
     }
 }

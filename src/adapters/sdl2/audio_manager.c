@@ -1,41 +1,52 @@
 #include "audio_manager.h"
 
-static int16_t audioBuffer[NUM_SAMPLES];
-
-void audio_callback(void *userdata, uint8_t *stream, int len)
+static void audio_callback(void *userdata, Uint8 *buffer, int bytes)
 {
-    int16_t *audioStream = (int16_t *)stream;
-    int audioLength = len / sizeof(int16_t);
-
-    nibble_audio_update(audioBuffer, audioLength);
-    memcpy(audioStream, audioBuffer, len);
+    memset(buffer, 0, bytes);
+    if (memory.soundState.soundEnabled)
+    {
+        int i = 0;
+        while (i < bytes)
+        {
+            i += pocketmod_render(modContext, buffer + i, bytes - i);
+        }
+    }
 }
 
 void audio_init()
 {
-    SDL_AudioSpec desired_spec, obtained_spec;
+    const Uint32 allowed_changes = SDL_AUDIO_ALLOW_FREQUENCY_CHANGE;
+    SDL_AudioSpec format;
 
-    desired_spec.freq = SAMPLE_RATE;
-    desired_spec.format = AUDIO_S16SYS;
-    desired_spec.channels = NUM_CHANNELS;
-    desired_spec.samples = NUM_SAMPLES;
-    desired_spec.callback = audio_callback;
-    desired_spec.userdata = NULL;
+    format.freq = NIBBLE_SAMPLERATE;
+    format.format = AUDIO_F32;
+    format.channels = NIBBLE_SAMPLE_CHANNELS;
+    format.samples = 4096;
+    format.callback = audio_callback;
+    //format.userdata = modContext;
 
-    if (SDL_OpenAudio(&desired_spec, &obtained_spec) < 0)
+    device = SDL_OpenAudioDevice(NULL, 0, &format, &format, allowed_changes);
+    if (!device)
     {
-        DEBUG_LOG("Failed to open audio device: %s", SDL_GetError());
-        fprintf(stderr, "Failed to open audio device: %s\n", SDL_GetError());
+        DEBUG_LOG("Failed to SDL_OpenAudioDevice(): %s", SDL_GetError());
         exit(1); // Consider a more graceful exit
     }
+    DEBUG_LOG("Audio format: freq=%d, format=%d, channels=%d, samples=%d", format.freq, format.format, format.channels, format.samples);
+    nibble_audio_init(format.freq);
 
-    memset(audioBuffer, 0, sizeof(audioBuffer));
-    SDL_Delay(50);
-    SDL_PauseAudio(0);
+    // memset(audioBuffer, 0, sizeof(audioBuffer));
+    SDL_PauseAudioDevice(device, 0);
 }
 
 void audio_quit()
 {
-    SDL_PauseAudio(1);
+    static const int silence = 0;
+    memory.soundState.soundEnabled = false;
+    SDL_PauseAudioDevice(device, 1); // Stop playback
+    SDL_ClearQueuedAudio(device); // Clear all queued audio data
+    SDL_QueueAudio(device, &silence, sizeof(silence)); // Queue a single sample of silence
+    SDL_PauseAudioDevice(device, 0); // Resume playback to flush the buffer
+    SDL_Delay(100); // Short delay to let the silence play out
+
     SDL_CloseAudio();
 }

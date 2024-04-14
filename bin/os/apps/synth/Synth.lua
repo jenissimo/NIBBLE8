@@ -48,9 +48,9 @@ function Synth.new(x, y)
 
     keyboard = Keyboard.new(41, 89, 2)
     octaveLeftArrow = ArrowButton.new(keyboard.x - 4, self.y + keyboard.y,
-                                      "left", self.prevOctave)
+                                      "left", 3, nil, self.prevOctave)
     octaveRightArrow = ArrowButton.new(keyboard.x + keyboard.width + 4,
-                                       self.y + keyboard.y, "right",
+                                       self.y + keyboard.y, "right", 3, nil,
                                        self.nextOctave)
 
     uiManager:addElement(keyboard)
@@ -108,10 +108,10 @@ function Synth.invalidateFilter()
     local mode = 0
 
     -- Set the appropriate bits based on the toggle switch states
-    --if highPassSwitch.state then mode = mode | HP_BIT end
-    --if lowPassSwitch.state then mode = mode | LP_BIT end
-    --if bandPassSwitch.state then mode = mode | BP_BIT end
-    --if notchSwitch.state then mode = mode | NT_BIT end
+    -- if highPassSwitch.state then mode = mode | HP_BIT end
+    -- if lowPassSwitch.state then mode = mode | LP_BIT end
+    -- if bandPassSwitch.state then mode = mode | BP_BIT end
+    -- if notchSwitch.state then mode = mode | NT_BIT end
 
     -- Call the update_filter function with the bit field mode
     update_filter(knobCO.value, knobRES.value, mode)

@@ -54,11 +54,21 @@ void nibble_lua_init_api()
     luaL_dostring(currentVM, "function str(a) return tostring(a) end");
     luaL_dostring(currentVM, "function len(a) return string.len(a) end");
     luaL_dostring(currentVM, "function sub(str,str_start,str_end) return string.sub(str,str_start,str_end) end");
-    nibble_lua_register_function("print", l_print);
+
     nibble_lua_register_function("split", l_split);
     nibble_lua_register_function("trace", l_trace);
 
+    // Low level memory functions
+    nibble_lua_register_function("peek", l_peek);
+    nibble_lua_register_function("poke", l_poke);
+    nibble_lua_register_function("peek2", l_peek2);
+    nibble_lua_register_function("poke2", l_poke2);
+
+
     // Graphics
+    nibble_lua_register_function("print", l_print);
+    nibble_lua_register_function("cursor", l_cursor);
+    nibble_lua_register_function("color", l_color);
     nibble_lua_register_function("camera", l_camera);
     nibble_lua_register_function("cpal", l_cpal);
     nibble_lua_register_function("pal", l_pal);
@@ -122,13 +132,6 @@ void nibble_lua_init_api()
     nibble_lua_register_function("import_lua", l_import_lua);
     nibble_lua_register_function("export_lua", l_export_lua);
 
-    // Audio
-    nibble_lua_register_function("note_on", l_note_on);
-    nibble_lua_register_function("note_off", l_note_off);
-    nibble_lua_register_function("update_synth", l_update_synth);
-    nibble_lua_register_function("update_filter", l_update_filter);
-    nibble_lua_register_function("set_note", l_set_note);
-
     // Load Custom Libs
     luaL_dostring(currentVM, "package.path = package.path .. \";lib/?.lua\" .. \";os/?.lua\"");
     luaL_dostring(currentVM, "KEYCODE = require(\"keys_constants\")");
@@ -145,8 +148,8 @@ static int l_print(lua_State *L)
     }
 
     // Assume x = 0, y = 0, fg_color = NIBBLE_DEFAULT_COLOR, bg_color = NIBBLE_DEFAULT_BG_COLOR by default
-    int16_t x = 0, y = 0;
-    uint8_t fg_color = NIBBLE_DEFAULT_COLOR, bg_color = NIBBLE_DEFAULT_BG_COLOR;
+    int16_t x = memory.drawState.text_x, y = memory.drawState.text_y;
+    uint8_t fg_color = memory.drawState.color, bg_color = NIBBLE_DEFAULT_BG_COLOR;
 
     // Validate and get arguments
     const char *text = luaL_checkstring(L, 1);
@@ -165,6 +168,37 @@ static int l_print(lua_State *L)
     int size = nibble_api_print(text, x, y, fg_color, bg_color);
     lua_pushinteger(L, size);
     return 1;
+}
+
+static int l_cursor(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    if (nargs < 2)
+    {
+        return luaL_error(L, "Expected at least 2 arguments");
+    }
+
+    int16_t x = (int16_t)lua_tonumber(L, 1);
+    int16_t y = (int16_t)lua_tonumber(L, 2);
+
+    nibble_api_cursor(x, y);
+
+    return 0;
+}
+
+static int l_color(lua_State *L)
+{
+    int nargs = lua_gettop(L);
+    if (nargs < 1)
+    {
+        return luaL_error(L, "Expected at least 1 argument");
+    }
+
+    uint8_t color = (uint8_t)lua_tonumber(L, 1) % NIBBLE_PALETTE_SIZE;
+
+    nibble_api_color(color);
+
+    return 0;
 }
 
 static int l_split(lua_State *L)
@@ -202,6 +236,70 @@ static int l_trace(lua_State *L)
             const char *text = lua_tostring(L, i);
             nibble_api_trace(text ? text : "nil");
         }
+        return 0;
+    }
+
+    return 0;
+}
+
+static int l_peek(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint8_t result = nibble_api_peek(addr);
+        // DEBUG_LOG("peek(%d) = %d\n", addr, result);
+        lua_pushinteger(L, result);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int l_poke(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 2)
+    {
+        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint8_t value = (uint8_t)lua_tonumber(L, 2);
+        // DEBUG_LOG("poke(%d, %d)\n", addr, value);
+        nibble_api_poke(addr, value);
+        return 0;
+    }
+
+    return 0;
+}
+
+static int l_peek2(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint16_t result = nibble_api_peek2(addr);
+        // DEBUG_LOG("peek2(%d) = %d\n", addr, result);
+        lua_pushinteger(L, result);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int l_poke2(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 2)
+    {
+        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint16_t value = (uint16_t)lua_tonumber(L, 2);
+        // DEBUG_LOG("poke2(%d, %d)\n", addr, value);
+        nibble_api_poke2(addr, value);
         return 0;
     }
 
@@ -869,9 +967,10 @@ static int l_run_code(lua_State *L)
     {
         const char *code = lua_tostring(L, 1);
         nibble_api_run_code(code);
-        // DEBUG_LOG("run(%s) = %d
+        //DEBUG_LOG("run(%s) = true \n", code);
         // lua_pushnumber(L, result);
-        return 0;
+        lua_pushboolean(L, true);
+        return 1;
     }
     return 0;
 }
@@ -1355,89 +1454,6 @@ static int l_change_dir(lua_State *L)
         lua_pushnumber(L, result);
         return 1;
     }
-    return 0;
-}
-
-// audio functions
-static int l_note_on(lua_State *L)
-{
-    int top = lua_gettop(L);
-
-    if (top >= 2)
-    {
-        uint8_t note = (int)lua_tonumber(L, 1);
-        uint8_t octave = (int)lua_tonumber(L, 2);
-        uint8_t instrument = (int)lua_tonumber(L, 3);
-        nibble_api_note_on(note, octave, instrument);
-        DEBUG_LOG("note_on(%d, %d, %d)\n", note, octave, instrument);
-        return 0;
-    }
-
-    return 0;
-}
-
-static int l_note_off(lua_State *L)
-{
-    int top = lua_gettop(L);
-
-    nibble_api_note_off();
-
-    return 0;
-}
-
-static int l_set_note(lua_State *L)
-{
-    int top = lua_gettop(L);
-
-    if (top >= 6)
-    {
-        uint8_t sfx_index = (int)lua_tonumber(L, 1);
-        uint8_t note_index = (int)lua_tonumber(L, 2);
-        uint8_t pitch = (int)lua_tonumber(L, 3);
-        uint8_t instrument = (int)lua_tonumber(L, 4);
-        uint8_t volume = (int)lua_tonumber(L, 5);
-        uint8_t effect = (int)lua_tonumber(L, 6);
-
-        nibble_api_set_note(sfx_index, note_index, pitch, instrument, volume, effect);
-        // DEBUG_LOG("set_note(%d, %d, %d, %d, %d, %d)\n", sfx_index, note_index, pitch, instrument, volume, effect);
-
-        return 0;
-    }
-}
-
-static int l_update_synth(lua_State *L)
-{
-    int top = lua_gettop(L);
-
-    if (top >= 6)
-    {
-        uint8_t osc = (int)lua_tonumber(L, 1);
-        double attackTime = (double)lua_tonumber(L, 2);
-        double decayTime = (double)lua_tonumber(L, 3);
-        double sustainAmplitude = (double)lua_tonumber(L, 4);
-        double releaseTime = (double)lua_tonumber(L, 5);
-        double startAmplitude = (double)lua_tonumber(L, 6);
-        nibble_api_update_synth(osc, attackTime, decayTime, sustainAmplitude, releaseTime, startAmplitude);
-        return 0;
-    }
-
-    return 0;
-}
-
-static int l_update_filter(lua_State *L)
-{
-    int top = lua_gettop(L);
-
-    if (top >= 3)
-    {
-        float cutoff = (float)lua_tonumber(L, 1);
-        float resonance = (float)lua_tonumber(L, 2);
-        int16_t mode = (int16_t)lua_tonumber(L, 3);
-        DEBUG_LOG("update_filter(%f, %f, %d)\n", cutoff, resonance, mode);
-        nibble_api_update_filter(cutoff, resonance, mode);
-        return 0;
-    }
-
     return 0;
 }
 

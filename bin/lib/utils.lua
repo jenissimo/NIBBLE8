@@ -3,7 +3,7 @@ local utils = {}
 function utils.handle_text_input(key_code, ctrl_pressed, shift_pressed)
     local result = ""
 
-    --trace("key: "..str(key_code).." ctrl: "..str(ctrl_pressed).." shift: "..str(shift_pressed))
+    trace("key: "..str(key_code).." ctrl: "..str(ctrl_pressed).." shift: "..str(shift_pressed))
 
     if key_code >= 32 and key_code <= 126 then
         if shift_pressed then
@@ -25,6 +25,7 @@ function utils.handle_text_input(key_code, ctrl_pressed, shift_pressed)
             elseif key_code == KEYCODE.KEY_SEMICOLON then result = ":"
             elseif key_code == KEYCODE.KEY_QUOTE then result = "\""
             elseif key_code == KEYCODE.KEY_COMMA then result = "<"
+            elseif key_code == KEYCODE.KEY_COLON then result = "\""
             elseif key_code == KEYCODE.KEY_PERIOD then result = ">"
             elseif key_code == KEYCODE.KEY_SLASH then result = "?"
             elseif key_code == KEYCODE.KEY_BACKSLASH then result = "|"

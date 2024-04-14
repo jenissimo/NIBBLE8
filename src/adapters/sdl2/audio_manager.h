@@ -3,10 +3,14 @@
 
 #include <SDL2/SDL.h>
 #include <string.h> // For memcpy
-#include "hardware/audio.h" // Adjust path as needed
+#include "hardware/ram.h"
+#include "hardware/audio.h"
+#include "utils/pocketmod.h"
 #include "debug/debug.h"
 
-void audio_callback(void *userdata, uint8_t *stream, int len);
+SDL_AudioDeviceID device;
+
+static void audio_callback(void *userdata, Uint8 *buffer, int bytes);
 void audio_init();
 void audio_quit();
 

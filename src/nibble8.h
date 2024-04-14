@@ -66,8 +66,6 @@
 #define NIBBLE_KEY_PRESS_DELAY   60 // 15 frames delay before key repeat
 #define NIBBLE_KEY_BUFFER        4
 #define NIBBLE_SAMPLERATE        44100
-#define NIBBLE_SAMPLETYPE        s16
-#define NIBBLE_SAMPLESIZE        sizeof(NIBBLE_SAMPLETYPE)
 #define NIBBLE_SAMPLE_CHANNELS   2
 #define NIBBLE_FRAMERATE         30
 

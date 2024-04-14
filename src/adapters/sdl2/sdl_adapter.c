@@ -24,7 +24,7 @@ int nibble_sdl_init()
         return 1;
     }
 
-    //audio_init();
+    audio_init();
     input_init();
 
     // init clipboard functions

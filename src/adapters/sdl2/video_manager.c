@@ -16,14 +16,14 @@ int windowHeight = 480;
 
 int video_init()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0)
     {
         DEBUG_LOG("SDL Video Initialization failed: %s", SDL_GetError());
         return 1;
     }
 
     window = SDL_CreateWindow("NIBBLE8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                          windowWidth, windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+                              windowWidth, windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
 
     if (window == NULL)
     {
@@ -43,7 +43,7 @@ int video_init()
     DEBUG_LOG("SDL Initialized");
 
     screen = SDL_GetWindowSurface(window);
-    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     return 0;
 }
@@ -58,7 +58,7 @@ void video_update()
 #if NIBBLE_DISPLAY_FPS
     nibble_api_draw_fps(fpsCurrent);
 #endif
-    
+
     update_frame();
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);

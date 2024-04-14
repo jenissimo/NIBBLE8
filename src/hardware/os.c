@@ -6,9 +6,11 @@ FreeClipboardTextFunc freeClipboardText;
 
 void nibble_api_reboot()
 {
+    DEBUG_LOG("Rebooting Nibble8");
     nibble_lua_destroy();
     nibble_lua_init();
     nibble_ram_clear();
+    nibble_ram_init();
     nibble_reset_video();
 }
 
@@ -120,9 +122,9 @@ const char *nibble_api_get_code()
     return userLuaCode;
 }
 
-void nibble_api_run_code(char *code)
+void nibble_api_run_code(uint8_t *code)
 {
-    if (userLuaCode != NULL)
+    if (code != NULL)
     {
         userLuaCode = code;
         nibble_lua_run_code(userLuaCode);

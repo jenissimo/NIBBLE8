@@ -29,6 +29,9 @@ void nibble_reset_video()
 
     nibble_video_reset_colors();
 
+    memory.drawState.color = 3;
+    memory.drawState.text_x = 0;
+    memory.drawState.text_y = 0;
     memory.drawState.camera_x = 0;
     memory.drawState.camera_y = 0;
 }
@@ -77,13 +80,6 @@ void print_char(int charIndex)
 void nibble_destroy_video()
 {
     free(frame);
-}
-
-void nibble_api_cursor(int16_t x, int16_t y, uint8_t col)
-{
-    memory.drawState.text_x = x;
-    memory.drawState.text_y = y;
-    memory.drawState.color = col;
 }
 
 void nibble_api_cls(uint8_t col)
@@ -339,6 +335,17 @@ void nibble_api_rectfill(int16_t x1, int16_t y1, int16_t width, int16_t height, 
     }
 }
 
+void nibble_api_color(uint8_t col)
+{
+    memory.drawState.color = col;
+}
+
+void nibble_api_cursor(int16_t x, int16_t y)
+{
+    memory.drawState.text_x = x;
+    memory.drawState.text_y = y;
+}
+
 int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t bg_color)
 {
     int charIndex = 0;
@@ -357,6 +364,13 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
         if (currentChar == ' ')
         {
             x += NIBBLE_FONT_WIDTH; // Move to the next character's x position
+            charIndex++;
+            continue;
+        }
+        else if (currentChar == '\n')
+        {
+            y += NIBBLE_FONT_HEIGHT + 1;               // Move down one line
+            x = originalX - memory.drawState.camera_x; // Reset x to the initial position
             charIndex++;
             continue;
         }
@@ -429,7 +443,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
     return originalX + (charIndex * NIBBLE_FONT_WIDTH);
 }
 
-inline int nibble_print_parse_parameter(uint8_t parameter)
+int nibble_print_parse_parameter(uint8_t parameter)
 {
     if (parameter >= '0' && parameter <= '9')
     {

@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
     nibble_lua_destroy();
     nibble_destroy_video();
     nibble_ram_destroy();
+    nibble_audio_destroy();
     debug_close();
     base64_cleanup();
 

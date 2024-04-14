@@ -32,6 +32,6 @@ int nibble_api_write_file(char *path, char *data);
 const uint8_t *nibble_api_get_clipboard_text();
 int nibble_api_set_clipboard_text(const uint8_t *text);
 const char *nibble_api_get_code();
-void nibble_api_run_code(char *code);
+void nibble_api_run_code(uint8_t *code);
 
 #endif

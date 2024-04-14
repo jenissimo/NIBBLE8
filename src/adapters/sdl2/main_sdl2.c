@@ -29,6 +29,7 @@ void main_loop()
 
     if (rebootRequested)
     {
+        DEBUG_LOG("Rebooting Nibble8");
         rebootRequested = false;
         nibble_api_reboot();
     }
@@ -117,7 +118,6 @@ int main(int argc, char *argv[])
     next_time = SDL_GetTicks() + NIBBLE_FPS;
 
     DEBUG_LOG("NIBBLE8 started\n");
-
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, -1, 1);
 #else
@@ -130,6 +130,7 @@ int main(int argc, char *argv[])
     nibble_lua_destroy();
     nibble_destroy_video();
     nibble_ram_destroy();
+    nibble_audio_destroy();
     debug_close();
     base64_cleanup();
     return nibble_sdl_quit();

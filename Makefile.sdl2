@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function -mconsole -pg
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
 LIBS_LIST = sdl2 libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
@@ -22,7 +22,7 @@ OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: CFLAGS += -O2
 all: $(BUILDDIR)/$(TARGET)
 
-debug: CFLAGS += -g
+debug: CFLAGS += -g -fsanitize=address
 debug: $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)

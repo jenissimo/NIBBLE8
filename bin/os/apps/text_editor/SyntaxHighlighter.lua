@@ -12,9 +12,9 @@ local KEYWORDS = {
     "else", "elseif", "return", "continue", "break", "true", "false", "print",
     "begin", "end", "cls", "trace", "pset", "pget", "sget", "sset", "fget",
     "cpal", "palt", "pal", "spr", "sspr", "fset", "mget", "mset", "peek",
-    "poke", "peek4", "poke4", "peek2", "poke2", "circ", "circfill", "rect",
-    "rectfill", "line", "flr", "sin", "cos", "rnd", "t", "time", "pairs",
-    "ipairs", "in", "and", "not", "or", "camera", "map", "btn", "btnp",
+    "poke", "peek2", "poke2", "circ", "circfill", "rect", "rectfill", "line",
+    "flr", "sin", "cos", "rnd", "t", "time", "pairs", "ipairs", "in", "and",
+    "not", "or", "camera", "map", "btn", "btnp", "cursor", "color"
 }
 local TERMINATORS = {
     "\n", "{", "}", "(", ")", " ", "[", "]", ",", "=", ".", "*", "-", "+", "/",
@@ -72,15 +72,13 @@ function SyntaxHighlighter:isWordCharacter(char)
     return char and char:match("[%w_]")
 end
 
-function SyntaxHighlighter:isNumber(char, prevChar)
-    -- Check if the character is a digit, but not part of a variable name
-    -- A variable name part would be a digit following a letter or an underscore
-    if char and char:match("%d") then
-        if prevChar and (prevChar:match("[%a_]")) then
-            return false -- Part of a variable name, not a standalone number
-        else
-            return true -- Standalone number or part of a number
-        end
+function SyntaxHighlighter:isNumber(char, nextChar)
+    -- Check for standard numbers or hexadecimal numbers
+    if char:match("%d") or
+        (char == "0" and (nextChar == "x" or nextChar == "X")) then
+        return true
+    elseif (char:match("[a-fA-F]") and (nextChar == "x" or nextChar == "X")) then
+        return false -- To avoid recognizing letters as part of a hex number without the prefix
     end
     return false
 end
@@ -119,9 +117,22 @@ end
 
 function SyntaxHighlighter:highlightNumber(line, lineIndex, startIndex)
     local i = startIndex
-    while i <= #line and self:isNumber(sub(line, i, i), sub(line, i - 1, i - 1)) do
-        SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER)
-        i = i + 1
+    local isHex = false
+    if sub(line, i, i + 1) == "0x" or sub(line, i, i + 1) == "0X" then
+        SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER) -- Color '0'
+        SyntaxHighlighter:setColor(lineIndex, i + 1, SYNTAX_SCHEME.NUMBER) -- Color 'x'
+        i = i + 2 -- Skip past "0x" or "0X"
+        isHex = true
+    end
+
+    while i <= #line do
+        local char = sub(line, i, i)
+        if char:match("[%d]") or (isHex and char:match("[a-fA-F]")) then
+            SyntaxHighlighter:setColor(lineIndex, i, SYNTAX_SCHEME.NUMBER)
+            i = i + 1
+        else
+            break
+        end
     end
     return i
 end
@@ -134,6 +145,7 @@ function SyntaxHighlighter:highlightLine(line, lineIndex)
     while i <= #line do
         local char = sub(line, i, i)
         local prevChar = i > 1 and sub(line, i - 1, i - 1) or nil
+        local nextChar = (i < #line) and sub(line, i + 1, i + 1) or ""
 
         -- String highlighting (double quotes)
         if char == "\"" then
@@ -151,11 +163,11 @@ function SyntaxHighlighter:highlightLine(line, lineIndex)
             -- Keyword highlighting
         elseif self:match(line, i, KEYWORDS, TERMINATORS) then
             i = self:highlightKeyword(line, lineIndex, i)
-
             -- Number highlighting
+        elseif char == "0" and (nextChar == "x" or nextChar == "X") then
+            i = self:highlightNumber(line, lineIndex, i)
         elseif self:isNumber(char, prevChar) then
             i = self:highlightNumber(line, lineIndex, i)
-
             -- Default highlighting
         else
             self.colors[lineIndex][i] = SYNTAX_SCHEME.DEFAULT
@@ -178,9 +190,6 @@ function SyntaxHighlighter:cacheLine(textEditor, lineIndex)
         if textEditor:isSelected(charIndex - 1, lineIndex - 1) then
             color = 3
             bgColor = 1
-        elseif textEditor:isUnderCursor(charIndex - 1, lineIndex - 1) and
-            textEditor.cursor.visible then
-            color = 3 -- Example cursor color
         end
 
         -- Insert color control codes before the character as needed.
@@ -208,11 +217,12 @@ function SyntaxHighlighter:cacheVisibleLines(textEditor)
 
     -- Ensure we don't try to draw more lines than exist.
     lastLineIndex = math.min(lastLineIndex, #textEditor.lines)
-    textEditor.drawLines = {}
+    textEditor.drawText = ""
 
     for lineIndex = firstLineIndex, lastLineIndex do
         local drawText = self:cacheLine(textEditor, lineIndex)
-        textEditor.drawLines[#textEditor.drawLines + 1] = drawText
+        textEditor.drawText = textEditor.drawText .. drawText .. "\n"
+        --textEditor.drawLines[#textEditor.drawLines + 1] = drawText
     end
 end
 

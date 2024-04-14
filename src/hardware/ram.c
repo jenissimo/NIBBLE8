@@ -1,18 +1,18 @@
 #include "ram.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "nibble8.h"
 
-Memory memory;
+pocketmod_context *modContext = NULL;
 uint8_t *userLuaCode = NULL;
 uint8_t *clipboard;
 bool rebootRequested = false;
 bool shutdownRequested = false;
 
+Memory memory;
+
 void nibble_ram_init()
 {
-    //nibble_save_memory_layout();
+    memory.soundState.soundEnabled = false;
+    memory.soundState.musicFrame = 254;
+    DEBUG_LOG("Memory offset: %lu", sizeof(memory.spriteSheetData)+sizeof(memory.mapData)+sizeof(memory.spriteFlagsData)+sizeof(memory.drawState));
 }
 
 void nibble_ram_clear()
@@ -57,15 +57,17 @@ void nibble_ram_dump_part(char *name, void *start, int size)
 
 void nibble_ram_dump()
 {
+    /*
     nibble_ram_dump_part("dump/ram.bin", memory.data, NIBBLE_MEMORY_SIZE);
     nibble_ram_dump_part("dump/sprite_sheet.bin", memory.spriteSheetData, NIBBLE_SPRITE_SHEET_SIZE);
     nibble_ram_dump_part("dump/sprite_flags.bin", memory.spriteFlagsData, NIBBLE_SPRITE_FLAG_SIZE);
     nibble_ram_dump_part("dump/map.bin", memory.mapData, NIBBLE_MAP_SIZE);
     nibble_ram_dump_part("dump/music.bin", memory.musicData, NIBBLE_MUSIC_SIZE);
     nibble_ram_dump_part("dump/sfx.bin", memory.sfxData, NIBBLE_SFX_SIZE);
-    //dumpPart("dump/draw_state.bin", (uint8_t *)memory.drawState, sizeof(DrawState));
+    dumpPart("dump/draw_state.bin", (uint8_t *)memory.drawState, sizeof(DrawState));
     nibble_ram_dump_part("dump/hardware_state.bin", memory.hardwareState, NIBBLE_HARDWARE_STATE_SIZE);
     nibble_ram_dump_part("dump/screen.bin", memory.screenData, NIBBLE_SCREEN_DATA_SIZE);
+    */
 }
 
 void nibble_ram_print_map()
