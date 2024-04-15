@@ -1,6 +1,6 @@
 var Module = {
     arguments: [
-        '--cart', 'demos/hello.n8',
+        '--cart', 'demos/synthwave.n8',
         '--width', '480',
         '--height', '360',
         '--player', '1',

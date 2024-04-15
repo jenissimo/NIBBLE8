@@ -1,5 +1,5 @@
 CC = emcc
-CFLAGS = -w -I$(SRCDIR) -I$(VENDORDIR) -Wno-unused-function --embed-file bin@/ --shell-file assets/emtemplate.html
+CFLAGS = -w -I$(SRCDIR) -Wno-unused-function --embed-file bin@/ --shell-file assets/emtemplate.html
 LIBS = -s USE_SDL=2 -s USE_LIBPNG=1
 
 SRCDIR = src

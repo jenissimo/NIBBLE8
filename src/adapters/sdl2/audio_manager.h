@@ -8,7 +8,7 @@
 #include "utils/pocketmod.h"
 #include "debug/debug.h"
 
-SDL_AudioDeviceID device;
+extern SDL_AudioDeviceID device;
 
 static void audio_callback(void *userdata, Uint8 *buffer, int bytes);
 void audio_init();

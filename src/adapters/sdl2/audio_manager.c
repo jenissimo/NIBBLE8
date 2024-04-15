@@ -1,5 +1,7 @@
 #include "audio_manager.h"
 
+SDL_AudioDeviceID device;
+
 static void audio_callback(void *userdata, Uint8 *buffer, int bytes)
 {
     memset(buffer, 0, bytes);
