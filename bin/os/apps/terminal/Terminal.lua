@@ -5,12 +5,55 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
                       saveCartCallback, importCodeCallback)
     local self = setmetatable({}, Terminal)
 
+    self.logo = {
+        0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 3, 2, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 3, 3, 0, 0, 0, 3, 2, 0, 0, 0, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3,
+        0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0,
+        0, 2, 3, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0,
+        3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 3, 3,
+        0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0,
+        2, 2, 2, 2, 0, 3, 0, 2, 0, 0, 0, 3, 0, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0, 3,
+        3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 0,
+        0, 0, 3, 0, 0, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 0, 0, 0, 0, 0,
+        2, 2, 2, 0, 3, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 3, 3, 0, 0, 3, 3,
+        0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0,
+        0, 3, 0, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 0, 0, 3, 0, 0, 0, 0, 0, 2,
+        2, 2, 2, 3, 2, 3, 2, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 3, 3, 0, 0, 3, 3, 0,
+        0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 0,
+        3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 2, 2,
+        3, 2, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 3, 0, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0,
+        3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0, 0, 3,
+        0, 0, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 2, 2, 2, 0, 2, 3,
+        3, 3, 3, 3, 3, 0, 0, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0, 3,
+        3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 3, 3, 3, 3, 0,
+        0, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 0, 0, 3, 2, 2, 2, 2, 2, 2, 0, 0, 2,
+        3, 3, 3, 0, 0, 0, 3, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 0, 3, 3, 0, 0, 0, 0,
+        0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0,
+        0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 0, 2, 2, 2, 2, 2, 2, 3, 0, 0,
+        0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 2, 2, 2, 0, 2, 2, 3, 3, 2, 0,
+        0, 0, 0, 0, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 2, 0, 0, 2, 3, 0, 2, 3, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    }
+    self.logoWidth = 71
+    self.logoHeight = 13
     self.input = ""
     self.cursorBlink = 0
     self.history = {}
     self.commandsHistory = {}
     self.commandsHistoryIndex = 1
-    self.linesOnScreen = 120 / 8
+    self.linesOnScreen = 120 / 6 - 1
     self.cursorPos = 0
 
     self.editCallback = editCallback
@@ -23,32 +66,82 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.queueTimer = 0
 
     cls()
-    --trace("Terminal started")
-    self:queueMessage("", 2, 0.05)
-    self:queueMessage("nibble8", 2, 0.1)
-    self:queueMessage("version 0.0.1", 2, 0.1)
+    -- trace("Terminal started")
+    self:queueImage(self.logo, self.logoWidth, self.logoHeight, 0.1)
+    self:queueMessage("nibble8 v.0.0.1", 2, 0.1)
     self:queueMessage("", 2, 0.05)
     self:queueMessage("type \f2help\f3 for help", 3, 0.1)
-    self:queueMessage("", 2, 0.1)
+    self:queueMessage("", 2, 0.05)
 
     return self;
+end
+
+function Terminal:queueImage(image, width, height, delay)
+    table.insert(self.messageQueue,
+                 {image = image, width = width, height = height, delay = delay})
 end
 
 function Terminal:queueMessage(text, color, delay)
     table.insert(self.messageQueue, {text = text, color = color, delay = delay})
 end
 
+function Terminal:printImage(image, width, height)
+    local item = {image = image, width = width, height = height}
+    table.insert(self.history, item)
+    -- Calculate how many terminal lines the image occupies
+    local imageLines = math.ceil(height / 8) -- Assuming each terminal line is 8 pixels tall
+    for i = 1, imageLines - 1 do
+        -- Insert empty placeholders for the extra lines the image occupies
+        table.insert(self.history, {text = "", color = 0})
+    end
+    -- Adjust the history to keep within the terminal's line capacity
+    while #self.history > self.linesOnScreen do table.remove(self.history, 1) end
+end
+
+function Terminal:getCursorY()
+    -- Recalculate the cursor Y position based on the number of lines in the history
+    local cursorY = 0
+    for i = 1, #self.history do
+        if self.history[i].image then
+            -- If the item is an image, increment the Y cursor by the height of the image in terminal lines
+            cursorY = cursorY + math.ceil(self.history[i].height / 8)
+        else
+            -- If the item is text, increment the Y cursor by 1
+            cursorY = cursorY + 1
+        end
+    end
+
+    return cursorY
+end
+
 function Terminal:printLn(line, color)
-    item = {text = line, color = color}
+    local item = {text = line, color = color}
     table.insert(self.history, item)
     if #self.history > self.linesOnScreen - 1 then
         table.remove(self.history, 1)
     end
 end
 
+function Terminal:drawImage(image, width, tx, ty)
+    local x
+    local y
+    for i = 1, #image do
+        pset((i - 1) % width + tx, flr((i - 1) / width) + tx, image[i])
+    end
+end
+
 function Terminal:printHistory()
-    for i = 1, #self.history, 1 do
-        print(self.history[i].text, 0, (i - 1) * 8, self.history[i].color)
+    local y = 0
+    for _, item in ipairs(self.history) do
+        if item.image then
+            -- Draw each image at its respective starting line
+            self:drawImage(item.image, item.width, 1, y)
+            y = y + math.ceil(item.height / 6) - 1 -- Move Y cursor by the height of the image in terminal lines
+        else
+            -- Draw text items at their line position
+            print(item.text, 1, y * 6, item.color)
+            y = y + 1
+        end
     end
 end
 
@@ -59,7 +152,11 @@ function Terminal:printLs(path)
     else
         files = split(ls(), "\n")
     end
-    for i = 1, #files, 1 do self:printLn(files[i], 2) end
+    for i = 1, #files, 1 do
+        if #files[i] > 0 then
+            self:printLn(files[i], 2)
+        end
+    end
 end
 
 function Terminal:loadCart(path)
@@ -75,7 +172,7 @@ function Terminal:loadCart(path)
             end
         end
 
-        self:printLn("cart "..cartname.." loaded sucessfully", 2)
+        self:printLn("cart " .. cartname .. " loaded sucessfully", 2)
     end
 end
 
@@ -121,7 +218,7 @@ function Terminal:import(path)
         else
             self:printLn("error: specify png or lua extension", 2)
         end
-        
+
     end
 end
 
@@ -150,7 +247,9 @@ function Terminal:executeInput()
 
     trace("command: \"" .. command[1] .. "\"")
 
-    if command[1] == "cls" then
+    if command[1] == "" then
+        return
+    elseif command[1] == "cls" then
         self.history = {}
     elseif command[1] == "cd" then
         cd(command[2])
@@ -197,7 +296,7 @@ function Terminal:executeInput()
     elseif command[1] == "exit" then
         exit()
     else
-        self:printLn("invalid command: \f2" .. command[1].."\f1", 1)
+        self:printLn("invalid command: \f2" .. command[1] .. "\f1", 1)
         self:printLn("type \f2help\f3 for a list of commands", 3)
     end
 
@@ -282,10 +381,14 @@ function Terminal:init() end
 
 function Terminal:update()
     if #self.messageQueue > 0 then
-        self.queueTimer = self.queueTimer + 0.02  -- Assuming 50 FPS, adjust based on actual frame rate
+        self.queueTimer = self.queueTimer + 0.02 -- Assuming 50 FPS, adjust based on actual frame rate
         local msg = self.messageQueue[1]
         if self.queueTimer >= msg.delay then
-            self:printLn(msg.text, msg.color)
+            if msg.image then
+                self:printImage(msg.image, msg.width, msg.height)
+            elseif msg.text then
+                self:printLn(msg.text, msg.color)
+            end
             table.remove(self.messageQueue, 1)
             self.queueTimer = 0
         end
@@ -297,10 +400,15 @@ function Terminal:draw()
     self:printHistory()
     if #self.messageQueue > 0 then return end
 
-    if t()*10%20 > 10 then
-        print(chr(16), (self.cursorPos + 2) * 4, #self.history * 8, 1)
+    local cursorX = (self.cursorPos + 2) * 4 + 1 -- Calculating cursor's X position
+    local cursorY = self:getCursorY() * 6
+
+    if t() * 10 % 20 > 10 then
+        -- Draw cursor if it's time to blink it on
+        print(chr(16), cursorX, cursorY, 1)
     end
-    print("> " .. self.input, 0, #self.history * 8, 3)
+    -- Draw the current input line
+    print("> " .. self.input, 1, cursorY, 3)
 end
 
 return Terminal
