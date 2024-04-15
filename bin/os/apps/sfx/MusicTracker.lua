@@ -8,6 +8,16 @@ local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
 local UIUtils = require("ui/UIUtils")
 local NUM_CHANNELS = 4
 local NOTES = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"}
+-- Define the width of each column in the pattern editor
+local columnWidths = {
+    3, -- Note
+    1, -- Instrument 1
+    1, -- Instrument 2
+    1, -- Command
+    1, -- Param
+    1, -- Param
+    1 -- Channel separator
+}
 
 local uiManager
 local posSelector
@@ -21,6 +31,20 @@ function MusicTracker.new(x, y)
     local self = setmetatable({}, MusicTracker)
     self.x = x
     self.y = y
+    self.cursorRow = 1 -- Start at the first row
+    self.cursorColumn = 1
+    self.visibleLines = 10
+    self.topVisibleLine = 1
+    self.numColumns = 6 * NUM_CHANNELS
+    self.cursorX = self.x + 2
+
+    self.columnWidths = {}
+    for i = 1, NUM_CHANNELS do
+        for _, width in ipairs(columnWidths) do
+            table.insert(self.columnWidths, width)
+        end
+    end
+    self.numColumns = #self.columnWidths
 
     uiManager = UIManager.new()
     -- First row
@@ -30,8 +54,8 @@ function MusicTracker.new(x, y)
                                        self.patternChanged)
     bpmSelector = FancyStepper.new(x + 86, y + 1, 0, 255, "bpm", bpmChanged)
     bpmSelector.value = 125
-    --lengthSelector = FancyStepper.new(x + 124, y + 1, 0, 63, "len", function(
-        --value) trace("length: " .. str(value)) end)
+    -- lengthSelector = FancyStepper.new(x + 124, y + 1, 0, 63, "len", function(
+    -- value) trace("length: " .. str(value)) end)
 
     -- Second row
     volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 40, "volume", function(
@@ -50,7 +74,7 @@ function MusicTracker.new(x, y)
     uiManager:addElement(posSelector)
     uiManager:addElement(patternSelector)
     uiManager:addElement(bpmSelector)
-    --uiManager:addElement(lengthSelector)
+    -- uiManager:addElement(lengthSelector)
     uiManager:addElement(volumeSelector)
     uiManager:addElement(instrumentSelector)
 
@@ -74,34 +98,51 @@ function MusicTracker.patternChanged(value) trace("pattern: " .. str(value)) end
 function MusicTracker.bpmChanged(value) trace("bpm: " .. str(value)) end
 
 function MusicTracker:updateText()
-    local visibleLines = 11
     self.lines = ""
-    for i = 1, visibleLines do
-        local line
+    for i = self.topVisibleLine, self.topVisibleLine + self.visibleLines - 1 do
+        self.lines = self.lines .. self:getLineText(i, true) .. "\n"
+    end
+end
+
+function MusicTracker:getLineText(i, highlight)
+    local line = ""
+
+    if highlight then
         if (i - 1) % 4 == 0 then
             line = "\f2" .. string.format("%02d", i - 1) .. " "
         else
             line = "\f1" .. string.format("%02d", i - 1) .. " "
         end
-        for j = 1, NUM_CHANNELS do
-            local index = (i - 1) * NUM_CHANNELS + j
-            local note = self.track[index]
-            local noteName = NOTES[note[1]]
-            local octave = string.format("%d", note[2])
-            local instrument = string.format("%02d", note[3])
-            local command = string.format("%x", note[4])
-            local param = string.format("%02d", note[5])
-            local noteText = ""
+    else
+        line = string.format("%02d", i - 1) .. " "
+    end
 
+    for j = 1, NUM_CHANNELS do
+        local index = (i - 1) * NUM_CHANNELS + j
+        local note = self.track[index]
+        local noteName = NOTES[note[1]]
+        local octave = string.format("%d", note[2])
+        local instrument = string.format("%02d", note[3])
+        local command = string.format("%x", note[4])
+        local param = string.format("%02d", note[5])
+        local noteText = ""
+
+        if highlight then
             noteText = noteText .. "\f3" .. noteName .. octave
             noteText = noteText .. "\f1" .. instrument
             noteText = noteText .. "\f2" .. command
             noteText = noteText .. "\f3" .. param
-
-            line = line .. noteText .. " "
+        else
+            noteText = noteText .. noteName .. octave
+            noteText = noteText .. instrument
+            noteText = noteText .. command
+            noteText = noteText .. param
         end
-        self.lines = self.lines .. line .. "\n"
+
+        line = line .. noteText .. " "
     end
+    line = string.sub(line, 1, -2)
+    return line
 end
 
 function MusicTracker:drawPanel()
@@ -113,18 +154,36 @@ end
 function MusicTracker:drawPatternEditor()
     local baseY = self.y + 48
     palt(0, false)
+
+    -- Draw the background
     rectfill(self.x + 2, baseY - 7, 156, 70, 0)
+
+    -- Draw the text
     print(self.lines, self.x + 4, baseY + 3, 1)
-    -- for i, line in ipairs(self.lines) do
-    --  print(line, self.x + 4, baseY + i * 6 - 3, 1)
-    -- end
+
+    -- Draw the cursor
+    local cursorY = baseY + ((self.cursorRow - self.topVisibleLine) * 6)
+    rectfill(self.x + 3, cursorY + 2, 153, 7, 1)
+    -- draw second cursor
+    rectfill(self.cursorX + 13, cursorY + 2,
+             self.columnWidths[self.cursorColumn] * 4 + 1, 7, 2)
+
+    -- Draw the cursor text
+    palt(1, true)
+    print(self:getLineText(self.cursorRow, false), self.x + 4, cursorY + 3, 0, 1)
+    palt(1, false)
+
+    -- draw grid border with shadow
     UIUtils.fancyRect(self.x + 1, baseY - 8, 156, 70, 2, 3)
     line(3, 119, 157, 119, 0) -- bottom shadow
     line(158, 118, 158, baseY - 6, 0) -- right shadow
+
     -- draw channels separators
     for i = 1, NUM_CHANNELS do
         local xPos = self.x + 2 + i * 36 - 25
+        line(xPos - 1, baseY - 7, xPos - 1, 117, 0)
         line(xPos, baseY - 7, xPos, 117, 1)
+        line(xPos + 1, baseY - 7, xPos + 1, 117, 0)
     end
 
     print("#", 6, baseY - 6, 3)
@@ -140,7 +199,76 @@ function MusicTracker:drawPatternEditor()
     palt(0, true)
 end
 
+function MusicTracker:key(key_code, ctrl_pressed, shift_pressed)
+    local rowChanged = false
+    local cursorMoved = false
+
+    if (key_code == KEYCODE.KEY_UP) and (not ctrl_pressed) then
+        self.cursorRow = max(1, self.cursorRow - 1)
+        rowChanged = true
+    elseif (key_code == KEYCODE.KEY_DOWN) and (not ctrl_pressed) then
+        self.cursorRow = min(64, self.cursorRow + 1)
+        rowChanged = true
+    elseif key_code == KEYCODE.KEY_PGUP or
+        (key_code == KEYCODE.KEY_UP and ctrl_pressed) then
+        self.cursorRow = max(1, self.cursorRow - self.visibleLines)
+        rowChanged = true
+    elseif key_code == KEYCODE.KEY_PGDOWN or
+        (key_code == KEYCODE.KEY_DOWN and ctrl_pressed) then
+        self.cursorRow = min(64, self.cursorRow + self.visibleLines)
+        rowChanged = true
+    elseif key_code == KEYCODE.KEY_LEFT then
+        -- Move cursor left, skipping separators
+        if self.cursorColumn > 1 then
+            self.cursorColumn = self.cursorColumn - 1
+            -- Check if it's a separator and skip it
+            if self.cursorColumn % 7 == 0 then -- Assuming separator is every 7th column
+                self.cursorColumn = self.cursorColumn - 1
+            end
+        else
+            self.cursorColumn = #self.columnWidths -- Wrap to last column, avoiding separators
+            if self.cursorColumn % 7 == 0 then
+                self.cursorColumn = self.cursorColumn - 1
+            end
+        end
+        cursorMoved = true
+    elseif key_code == KEYCODE.KEY_RIGHT then
+        -- Move cursor right, skipping separators
+        if self.cursorColumn < #self.columnWidths - 1 then
+            self.cursorColumn = self.cursorColumn + 1
+            -- Check if it's a separator and skip it
+            if self.cursorColumn % 7 == 0 then -- Assuming separator is every 7th column
+                self.cursorColumn = self.cursorColumn + 1
+            end
+        else
+            self.cursorColumn = 1 -- Wrap to first column
+        end
+        cursorMoved = true
+    end
+
+    self:ensureCursorVisible()
+    if rowChanged then self:updateText() end
+    if cursorMoved then self:updateCursorX() end
+end
+
 function MusicTracker:update() uiManager:update() end
+
+function MusicTracker:updateCursorX()
+    local x = self.x + 2 -- Start x position of the first column
+    for i = 1, self.cursorColumn - 1 do x = x + self.columnWidths[i] * 4 end
+    self.cursorX = x
+end
+
+function MusicTracker:ensureCursorVisible()
+    if self.cursorRow < self.topVisibleLine then
+        self.topVisibleLine = self.cursorRow
+    elseif self.cursorRow > self.topVisibleLine + self.visibleLines - 1 then
+        self.topVisibleLine = self.cursorRow - self.visibleLines + 1
+    end
+    -- Ensure topVisibleLine stays within valid bounds
+    self.topVisibleLine = math.max(1, math.min(self.topVisibleLine,
+                                               64 - self.visibleLines + 1))
+end
 
 function MusicTracker:drawPost() end
 
@@ -186,15 +314,7 @@ function MusicTracker:drawFakeBeat(sx, sy)
     local hn = flr((h - 1) * v)
 
     rectfill(sx, sy, w, h, 0)
-
     rectfill(sx + 1, sy + h - hn - 1, w - 2, hn, 2)
-    -- rectfill(sx + 1, sy + 1, w - 1, h * v, 2)
-    -- for y = 0, h - 1 do
-    --    local x
-    --    local yp = y + t() * 50
-    --    x = sin(yp / 10) * rnd(1) * 8 + sx
-    --    line(sx, sy + y, sx + x, sy + y, 2)
-    -- end
 end
 
 function MusicTracker:mousep(x, y, button) uiManager:mousepressed(x, y, button) end
