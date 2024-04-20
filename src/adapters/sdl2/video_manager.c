@@ -60,6 +60,8 @@ void video_update()
 #endif
 
     update_frame();
+    SDL_SetRenderDrawColor(renderer, memory.drawState.colorPalette.r[0], memory.drawState.colorPalette.g[0], memory.drawState.colorPalette.b[0], 255);
+
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
