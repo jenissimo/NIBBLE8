@@ -49,12 +49,11 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.logoWidth = 71
     self.logoHeight = 13
     self.input = ""
-    self.cursorBlink = 0
+    self.cursor = {x = 0, y = 0, visible = false, blink = 0, pos = 0}
     self.history = {}
     self.commandsHistory = {}
     self.commandsHistoryIndex = 1
     self.linesOnScreen = 120 / 6 - 1
-    self.cursorPos = 0
 
     self.editCallback = editCallback
     self.spriteEditCallback = spriteEditCallback
@@ -71,7 +70,7 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self:queueMessage("nibble8 v.0.0.1", 2, 0.1)
     self:queueMessage("", 2, 0.05)
     self:queueMessage("type \f2help\f3 for help", 3, 0.1)
-    self:queueMessage("", 2, 0.05)
+    self:queueMessage("", 2, 0.15)
 
     return self;
 end
@@ -153,9 +152,7 @@ function Terminal:printLs(path)
         files = split(ls(), "\n")
     end
     for i = 1, #files, 1 do
-        if #files[i] > 0 then
-            self:printLn(files[i], 2)
-        end
+        if #files[i] > 0 then self:printLn(files[i], 2) end
     end
 end
 
@@ -304,7 +301,7 @@ function Terminal:executeInput()
     self.commandsHistoryIndex = #self.commandsHistory + 1
 
     self.input = ""
-    self.cursorPos = 0
+    self.cursor.pos = 0
 end
 
 function Terminal:key(key_code, ctrl_pressed, shift_pressed)
@@ -316,27 +313,27 @@ function Terminal:key(key_code, ctrl_pressed, shift_pressed)
     local rightPart = ""
 
     if inputText ~= "" then
-        leftPart = sub(self.input, 1, self.cursorPos)
-        rightPart = sub(self.input, self.cursorPos + 1)
+        leftPart = sub(self.input, 1, self.cursor.pos)
+        rightPart = sub(self.input, self.cursor.pos + 1)
 
         self.input = leftPart .. inputText .. rightPart
-        self.cursorPos = self.cursorPos + 1
+        self.cursor.pos = self.cursor.pos + 1
     end
 
     if key_code == KEYCODE.KEY_BACKSPACE then
-        if self.cursorPos <= #self.input and self.cursorPos > 0 then
-            leftPart = sub(self.input, 1, self.cursorPos - 1)
-            rightPart = sub(self.input, self.cursorPos + 1)
+        if self.cursor.pos <= #self.input and self.cursor.pos > 0 then
+            leftPart = sub(self.input, 1, self.cursor.pos - 1)
+            rightPart = sub(self.input, self.cursor.pos + 1)
 
             self.input = leftPart .. rightPart
-            self.cursorPos = self.cursorPos - 1
+            self.cursor.pos = self.cursor.pos - 1
         end
     end
 
     if key_code == KEYCODE.KEY_DELETE then
-        if self.cursorPos < #self.input and self.cursorPos >= 0 then
-            leftPart = sub(self.input, 1, self.cursorPos)
-            rightPart = sub(self.input, self.cursorPos + 2)
+        if self.cursor.pos < #self.input and self.cursor.pos >= 0 then
+            leftPart = sub(self.input, 1, self.cursor.pos)
+            rightPart = sub(self.input, self.cursor.pos + 2)
 
             self.input = leftPart .. rightPart
         end
@@ -349,7 +346,7 @@ function Terminal:key(key_code, ctrl_pressed, shift_pressed)
         if self.commandsHistoryIndex > 1 then
             self.commandsHistoryIndex = self.commandsHistoryIndex - 1
             self.input = self.commandsHistory[self.commandsHistoryIndex]
-            self.cursorPos = #self.input
+            self.cursor.pos = #self.input
         end
     end
 
@@ -358,20 +355,20 @@ function Terminal:key(key_code, ctrl_pressed, shift_pressed)
         if self.commandsHistoryIndex < #self.commandsHistory then
             self.commandsHistoryIndex = self.commandsHistoryIndex + 1
             self.input = self.commandsHistory[self.commandsHistoryIndex]
-            self.cursorPos = #self.input
+            self.cursor.pos = #self.input
         else
             self.commandsHistoryIndex = #self.commandsHistory + 1
             self.input = ""
-            self.cursorPos = 0
+            self.cursor.pos = 0
         end
     end
 
     if key_code == KEYCODE.KEY_LEFT then
-        self.cursorPos = math.max(self.cursorPos - 1, 0)
+        self.cursor.pos = math.max(self.cursor.pos - 1, 0)
     end
 
     if key_code == KEYCODE.KEY_RIGHT then
-        self.cursorPos = math.min(self.cursorPos + 1, #self.input)
+        self.cursor.pos = math.min(self.cursor.pos + 1, #self.input)
     end
 end
 
@@ -392,6 +389,8 @@ function Terminal:update()
             table.remove(self.messageQueue, 1)
             self.queueTimer = 0
         end
+    else
+        self.cursor.blink = self.cursor.blink + 1
     end
 end
 
@@ -400,15 +399,17 @@ function Terminal:draw()
     self:printHistory()
     if #self.messageQueue > 0 then return end
 
-    local cursorX = (self.cursorPos + 2) * 4 + 1 -- Calculating cursor's X position
-    local cursorY = self:getCursorY() * 6
+    self.cursor.x = (self.cursor.pos + 2) * 4 + 1
+    self.cursor.y = self:getCursorY() * 6
 
-    if t() * 10 % 20 > 10 then
+    if self.cursor.blink%20 == 0 then self.cursor.visible = not self.cursor.visible end
+
+    if self.cursor.visible then
         -- Draw cursor if it's time to blink it on
-        print(chr(16), cursorX, cursorY, 1)
+        print(chr(16), self.cursor.x, self.cursor.y, 1)
     end
     -- Draw the current input line
-    print("> " .. self.input, 1, cursorY, 3)
+    print("> " .. self.input, 1, self.cursor.y, 3)
 end
 
 return Terminal
