@@ -51,6 +51,7 @@
 #define NIBBLE_SFX_COUNT            64
 #define NIBBLE_SFX_MAX_NOTES        32
 #define NIBBLE_SFX_SIZE             4352 // 64 music frames (0-63), each frame uses 4 bytes represents 4 channels
+#define NIBBLE_SFX_CHANNELS         4
 
 #define NIBBLE_DRAW_STATE_SIZE      64
 #define NIBBLE_HARDWARE_STATE_SIZE  64
@@ -67,6 +68,7 @@
 #define NIBBLE_KEY_BUFFER        4
 #define NIBBLE_SAMPLERATE        44100
 #define NIBBLE_SAMPLE_CHANNELS   2
+#define NIBBLE_SAMPLES           4096
 #define NIBBLE_FRAMERATE         30
 
 #define FONT_SIZE_COMPRESSED 128 * 128 / 8

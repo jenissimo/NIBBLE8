@@ -15,8 +15,6 @@
 #include "debug/debug.h"
 #include "utils/pocketmod.h"
 
-extern pocketmod_context *modContext;
-
 typedef struct ColorPalette
 {
     bool flip : 1; // Flip flag
@@ -65,10 +63,24 @@ typedef struct DrawState
     int16_t line_y;
 } DrawState;
 
+typedef struct {
+    uint8_t note_index;
+    uint8_t sample_index;
+    uint8_t volume;
+    bool active : 1;
+    bool need_reset : 1;
+    float position; // Current position in the sample
+    float increment; // Increment per frame, based on the note and sample rate
+} TriggeredNote;
+
 typedef struct SoundState
 {
-    bool soundEnabled : 1;
-    uint8_t musicFrame;
+    bool music_active : 1;
+    uint8_t music_start_pattern;
+    uint8_t music_end_pattern;
+    TriggeredNote triggered_note;
+    int8_t sfx_patterns[NIBBLE_SFX_CHANNELS];
+    pocketmod_context context;
 } SoundState;
 
 typedef struct MemoryLayout

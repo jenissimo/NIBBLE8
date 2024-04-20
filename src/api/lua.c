@@ -1592,6 +1592,7 @@ void nibble_lua_close_app()
         app = NULL;
         // reset draw state
         nibble_reset_video();
+        nibble_audio_reset();
     }
     currentVM = lua;
 }

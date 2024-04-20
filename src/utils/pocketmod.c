@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 /* Min/max helper functions */
-static int _pocketmod_min(int x, int y) { return x < y ? x : y; }
-static int _pocketmod_max(int x, int y) { return x > y ? x : y; }
+int _pocketmod_min(int x, int y) { return x < y ? x : y; }
+int _pocketmod_max(int x, int y) { return x > y ? x : y; }
 
 /* Clamp a volume value to the 0..64 range */
 static int _pocketmod_clamp_volume(int x)

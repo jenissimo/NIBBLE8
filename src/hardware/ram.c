@@ -1,6 +1,5 @@
 #include "ram.h"
 
-pocketmod_context *modContext = NULL;
 uint8_t *userLuaCode = NULL;
 uint8_t *clipboard;
 bool rebootRequested = false;
@@ -10,8 +9,15 @@ Memory memory;
 
 void nibble_ram_init()
 {
-    memory.soundState.soundEnabled = false;
-    memory.soundState.musicFrame = 254;
+    // poke(0x7bfb, 0x00)
+    // poke(0x7bfc, 0x01)
+    // poke(0x7bfd, 0x40)
+    // poke(0x7bfe, 0x01)
+    //unsigned char sample;       /* Sample number (0..31)                   */
+    //unsigned char volume;       /* Base volume without tremolo (0..64)     */
+    //unsigned char balance;      /* Stereo balance (0..255)                 */
+    //unsigned short period;      /* Note period (113..856)                  */
+
     DEBUG_LOG("Memory offset: %lu", sizeof(memory.spriteSheetData)+sizeof(memory.mapData)+sizeof(memory.spriteFlagsData)+sizeof(memory.drawState));
 }
 

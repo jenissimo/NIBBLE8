@@ -9,6 +9,9 @@ extern "C" {
 #endif
 
 typedef struct pocketmod_context pocketmod_context;
+
+int _pocketmod_min(int x, int y);
+int _pocketmod_max(int x, int y);
 int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate);
 int pocketmod_render(pocketmod_context *c, void *buffer, int size);
 int pocketmod_loop_count(pocketmod_context *c);
