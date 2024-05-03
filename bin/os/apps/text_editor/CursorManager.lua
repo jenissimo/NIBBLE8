@@ -13,10 +13,15 @@ function CursorManager:setCursor(textEditor, x, y)
         textEditor.cursor.y = y
     end
 
-    if textEditor.cursor.y == 0 then
+    if y < 0 then
+        y = 0
+    elseif y == 0 then
         textEditor.offsetY = 0
-    elseif textEditor.cursor.y == textEditor.rows_on_screen - 1 then
+    elseif y >= textEditor.rows_on_screen - 1 then
         textEditor.offsetY = -3
+        textEditor.cursor.y = textEditor.rows_on_screen - 1
+        textEditor.scroll.y = textEditor.scroll.y +
+                                  (y - (textEditor.rows_on_screen - 1))
     end
 
     self:showCursor(textEditor)
@@ -256,8 +261,8 @@ end
 
 function CursorManager:drawCursor(textEditor)
     rectfill(textEditor.cursor.x * 4 + textEditor.x,
-    textEditor.cursor.y * 6 + textEditor.y + textEditor.offsetY, 3, 5,
-    1)
+             textEditor.cursor.y * 6 + textEditor.y + textEditor.offsetY, 3, 5,
+             1)
 
     local cursorX = textEditor.cursor.x + textEditor.scroll.x
     local cursorY = textEditor.cursor.y + textEditor.scroll.y

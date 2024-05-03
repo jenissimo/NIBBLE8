@@ -39,6 +39,26 @@ function TextEditor:init(text)
     self:parseTabs()
 end
 
+function TextEditor:convertLineNumber(lineIndex)
+    local lines = split(self.text, "\n")
+    local tabIndex = 0
+    local tabLine = 0
+    local lineText = ""
+
+    for index, line in ipairs(lines) do
+        if index == lineIndex + 1 then
+            break
+        end
+
+        if line:match("^--#tab") then
+            tabIndex = tabIndex + 1
+            tabLine = index
+        end
+    end
+
+    return lineIndex - tabLine, tabIndex, lines[lineIndex]
+end
+
 -- Tabs
 function TextEditor:parseTabs()
     local lines = split(self.text, "\n")
