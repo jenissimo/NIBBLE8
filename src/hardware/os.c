@@ -7,10 +7,12 @@ FreeClipboardTextFunc freeClipboardText;
 void nibble_api_reboot()
 {
     DEBUG_LOG("Rebooting Nibble8");
+    nibble_ram_init();
+    nibble_ram_clear();
+    nibble_audio_init(NIBBLE_SAMPLERATE);
+    nibble_audio_reset();
     nibble_lua_destroy();
     nibble_lua_init();
-    nibble_ram_clear();
-    nibble_ram_init();
     nibble_reset_video();
 }
 
@@ -26,6 +28,12 @@ char *nibble_api_ls(char *path)
     }
     else
     {
+        // Check if the path exists
+        if (access(path, F_OK) != 0)
+        {
+            printf("Error: Path does not exist\n");
+            return NULL;
+        }
         dir = opendir(path);
     }
 
