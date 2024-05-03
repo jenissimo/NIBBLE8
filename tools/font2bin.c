@@ -4,9 +4,9 @@
 #else
 #include <stdint.h>
 #endif
-#include "src/nibble8.h"
+#include "nibble8.h"
 #include <png.h>
-#include "src/utils/png.h"
+#include "utils/png.h"
 
 #define FONT_SIZE 128 * 128
 
