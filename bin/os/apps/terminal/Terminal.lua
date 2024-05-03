@@ -1,6 +1,8 @@
 local Terminal = {}
 Terminal.__index = Terminal
 
+local ModControl = require("os/apps/sfx/ModControl")
+
 function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
                       saveCartCallback, importCodeCallback)
     local self = setmetatable({}, Terminal)
@@ -66,22 +68,37 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
 
     cls()
     -- trace("Terminal started")
-    self:queueImage(self.logo, self.logoWidth, self.logoHeight, 0.1)
-    self:queueMessage("nibble8 v.0.0.1", 2, 0.1)
-    self:queueMessage("", 2, 0.05)
-    self:queueMessage("type \f2help\f3 for help", 3, 0.1)
-    self:queueMessage("", 2, 0.15)
+    -- 24, 26, 28, 29
+    local sample = 1
+    local volume = 64
+    --local notes = {11, 20, 15, 22}
+    local notes = {28, 30, 31, 33}
+    self:queueImage(self.logo, self.logoWidth, self.logoHeight, 0.025,
+                    {note = notes[1], sample = sample, volume = volume})
+    self:queueMessage("nibble8 v.0.0.1", 2, 0.07,
+                      {note = notes[2], sample = sample, volume = volume})
+    self:queueMessage("", 2, 0.03)
+    self:queueMessage("type \f2help\f3 for help", 3, 0.05,
+                      {note = notes[3], sample = sample, volume = volume})
+    self:queueMessage("", 2, 0.07,
+                      {note = notes[4], sample = sample, volume = volume})
 
     return self;
 end
 
-function Terminal:queueImage(image, width, height, delay)
-    table.insert(self.messageQueue,
-                 {image = image, width = width, height = height, delay = delay})
+function Terminal:queueImage(image, width, height, delay, sound)
+    table.insert(self.messageQueue, {
+        image = image,
+        width = width,
+        height = height,
+        delay = delay,
+        sound = sound
+    })
 end
 
-function Terminal:queueMessage(text, color, delay)
-    table.insert(self.messageQueue, {text = text, color = color, delay = delay})
+function Terminal:queueMessage(text, color, delay, sound)
+    table.insert(self.messageQueue,
+                 {text = text, color = color, delay = delay, sound = sound})
 end
 
 function Terminal:printImage(image, width, height)
@@ -386,6 +403,12 @@ function Terminal:update()
             elseif msg.text then
                 self:printLn(msg.text, msg.color)
             end
+
+            if msg.sound then
+                ModControl:playNote(msg.sound.note, msg.sound.sample,
+                                    msg.sound.volume)
+            end
+
             table.remove(self.messageQueue, 1)
             self.queueTimer = 0
         end
@@ -402,7 +425,9 @@ function Terminal:draw()
     self.cursor.x = (self.cursor.pos + 2) * 4 + 1
     self.cursor.y = self:getCursorY() * 6
 
-    if self.cursor.blink%20 == 0 then self.cursor.visible = not self.cursor.visible end
+    if self.cursor.blink % 20 == 0 then
+        self.cursor.visible = not self.cursor.visible
+    end
 
     if self.cursor.visible then
         -- Draw cursor if it's time to blink it on
