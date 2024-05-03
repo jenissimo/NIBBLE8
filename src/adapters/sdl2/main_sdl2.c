@@ -116,8 +116,8 @@ int main(int argc, char *argv[])
 
     nibble_ram_init();
     nibble_init_video();
-    nibble_lua_init();
     nibble_sdl_init();
+    nibble_lua_init();
     next_time = SDL_GetTicks() + NIBBLE_FPS;
 
     DEBUG_LOG("NIBBLE8 started\n");
