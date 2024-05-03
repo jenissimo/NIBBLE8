@@ -1,10 +1,11 @@
 local MusicTracker = {}
 MusicTracker.__index = MusicTracker
 
+local ModControl = require("os/apps/sfx/ModControl")
 local UIManager = require("ui/UIManager")
 local FancyStepper = require("os/apps/sfx/FancyStepper")
 local ListSelector = require("os/apps/sfx/ListSelector")
-local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
+--local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
 local UIUtils = require("ui/UIUtils")
 local NUM_CHANNELS = 4
 local NOTES = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"}
@@ -37,6 +38,7 @@ function MusicTracker.new(x, y)
     self.topVisibleLine = 1
     self.numColumns = 6 * NUM_CHANNELS
     self.cursorX = self.x + 2
+    self.currentInstrument = 1
 
     self.columnWidths = {}
     for i = 1, NUM_CHANNELS do
@@ -45,6 +47,8 @@ function MusicTracker.new(x, y)
         end
     end
     self.numColumns = #self.columnWidths
+
+    ModControl:init()
 
     uiManager = UIManager.new()
     -- First row
@@ -60,15 +64,13 @@ function MusicTracker.new(x, y)
     -- Second row
     volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 40, "volume", function(
         value) trace("length: " .. str(value)) end)
+    volumeSelector.value = 0x40
 
-    local instruments = {
-        "0 sine", "1 square", "2 saw", "3 triangle", "4 noise", "5 pulse",
-        "6 kick", "7 snare", "8 hat", "9 cymbal", "10 tom", "11 clap",
-        "12 voice", "13 bass", "14 lead", "15 pad"
-    }
+    local instruments = ModControl:getSamples()
     instrumentSelector = ListSelector.new(x + 48, y + 12, "instrument",
                                           instruments, 15, function(value)
-        trace("instrument: " .. str(value))
+        --trace("instrument: " .. str(value))
+        self.currentInstrument = value
     end)
 
     uiManager:addElement(posSelector)
@@ -202,6 +204,8 @@ end
 function MusicTracker:key(key_code, ctrl_pressed, shift_pressed)
     local rowChanged = false
     local cursorMoved = false
+
+    ModControl:handleKeyInput(self, key_code)
 
     if (key_code == KEYCODE.KEY_UP) and (not ctrl_pressed) then
         self.cursorRow = max(1, self.cursorRow - 1)
