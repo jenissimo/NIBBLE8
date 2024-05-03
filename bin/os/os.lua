@@ -1,4 +1,4 @@
-local Intro  = require("os/Intro")
+local Intro = require("os/Intro")
 local TextEditor = require("os/apps/text_editor/TextEditor")
 local Terminal = require("os/apps/terminal/Terminal")
 local MapEditor = require("os/apps/map_editor/MapEditor")
@@ -24,7 +24,8 @@ local mouse_coords = {x = 0, y = 0}
 function _init()
     cls()
     textEditor = TextEditor.new("", 1, 8, 159, 106)
-    terminal = Terminal.new(editFile, editSprite, loadCart, saveCart, importCode)
+    terminal =
+        Terminal.new(editFile, editSprite, loadCart, saveCart, importCode)
     synth = Synth.new(0, 8)
     musicTracker = MusicTracker.new(0, 8)
     mapEditor = MapEditor.new(0, 8)
@@ -33,31 +34,34 @@ function _init()
     lastWindow = textEditor
     spriteEditor.init()
 
-    tabs = {{
-        width = 9,
-        iconfn = draw_brackets_icon,
-        window = textEditor
-    }, {
-        width = 7,
-        iconfn = draw_alien_icon,
-        window = spriteEditor
-    }, {
-        width = 7,
-        iconfn = draw_map_icon,
-        window = mapEditor
-    },--}
-    {
-        width = 7,
-        iconfn = draw_note_icon,
-        window = musicTracker
-    }}
+    tabs = {
+        {width = 9, iconfn = draw_brackets_icon, window = textEditor},
+        {width = 7, iconfn = draw_alien_icon, window = spriteEditor},
+        {width = 7, iconfn = draw_map_icon, window = mapEditor}, -- }
+        {width = 7, iconfn = draw_note_icon, window = musicTracker}
+    }
     Intro:init(1.3, 30)
 end
 
+function _error(error_message)
+    local lineNumber, errorText = error_message:match(
+                                      "%[string .-%]:(%d+): (.+)")
+    local localLine, tabIndex, lineText =
+        textEditor:convertLineNumber(tonumber(lineNumber))
+    terminal:printLn(">", 3)
+    terminal:printLn(
+        "syntax error line: " .. localLine .. " (tab " .. tabIndex .. ")", 1)
+    terminal:printLn(lineText, 3)
+    terminal:printLn(errorText, 2)
+
+    currentWindow = terminal
+
+    textEditor:switchToTab(tonumber(tabIndex + 1))
+    textEditor:setCursor(0, tonumber(localLine) - 1)
+end
+
 function _update()
-    if Intro.active then
-        return
-    end
+    if Intro.active then return end
 
     currentWindow:update()
 end
@@ -68,21 +72,13 @@ function _draw()
         return
     end
 
-    if currentWindow.draw then
-        currentWindow:draw()
-    end
+    if currentWindow.draw then currentWindow:draw() end
 
-    if currentWindow ~= terminal then
-        drawPanel()
-    end
-    
-    if currentWindow.drawPost then
-        currentWindow:drawPost()
-    end
+    if currentWindow ~= terminal then drawPanel() end
 
-    if currentWindow ~= terminal then
-        drawCursor()
-    end
+    if currentWindow.drawPost then currentWindow:drawPost() end
+
+    if currentWindow ~= terminal then drawCursor() end
 end
 
 function _key(key_code, ctrl_pressed, shift_pressed)
@@ -144,15 +140,11 @@ function _mousep(x, y, button)
 end
 
 function _mouser(x, y, button)
-    if currentWindow.mouser then
-        currentWindow:mouser(x, y, button)
-    end
+    if currentWindow.mouser then currentWindow:mouser(x, y, button) end
 end
 
 function _mousem(x, y, button)
-    if currentWindow.mousem then
-        currentWindow:mousem(x, y)
-    end
+    if currentWindow.mousem then currentWindow:mousem(x, y) end
     mouse_coords = {x = x, y = y}
 end
 
@@ -164,9 +156,7 @@ function draw_note_icon(x, y, col)
     rectfill(x + 3, y + 3, 2, 2, col)
 end
 
-function draw_brackets_icon(x, y, col)
-    print("{}", x, y, col)
-end
+function draw_brackets_icon(x, y, col) print("{}", x, y, col) end
 
 function draw_alien_icon(x, y, col)
     line(x, y + 1, x, y + 4, col)
@@ -198,18 +188,15 @@ end
 
 function drawCursor()
     local cursor_spr = {
-        {0, 0, 4, 4 ,4 ,4},
-        {0, 3, 0, 4 ,4 ,4},
-        {0, 3, 3, 0 ,4 ,4},
-        {0, 3, 3, 3, 0 ,4},
-        {0, 3, 3, 3, 3, 0},
-        {0, 3, 0, 0, 0, 4},
-        {0, 0, 4, 4, 4, 4},
+        {0, 0, 4, 4, 4, 4}, {0, 3, 0, 4, 4, 4}, {0, 3, 3, 0, 4, 4},
+        {0, 3, 3, 3, 0, 4}, {0, 3, 3, 3, 3, 0}, {0, 3, 0, 0, 0, 4},
+        {0, 0, 4, 4, 4, 4}
     }
     for i = 1, #cursor_spr do
         for j = 1, #cursor_spr[i] do
             if cursor_spr[i][j] < 4 then
-                pset(mouse_coords.x + j - 1, mouse_coords.y + i - 2, cursor_spr[i][j])
+                pset(mouse_coords.x + j - 1, mouse_coords.y + i - 2,
+                     cursor_spr[i][j])
             end
         end
     end
@@ -260,9 +247,7 @@ function saveCart(path)
         trace("writing cart: " .. (path or currentCartPath))
         save_cart((path or currentCartPath), textEditor:getText())
 
-        if path ~= nil then
-            currentCartPath = path
-        end
+        if path ~= nil then currentCartPath = path end
     else
         trace("cart path is nil")
     end
@@ -271,16 +256,10 @@ end
 function runCart(path)
     trace("running cart")
     local errorMsg = nil
-    
-    if path then
-        errorMsg = loadCart(path)
-    end
 
-    if errorMsg == nil then
-        run_code(textEditor:getText())
-    end
+    if path then errorMsg = loadCart(path) end
+
+    if errorMsg == nil then run_code(textEditor:getText()) end
 end
 
-function importCode(code)
-    textEditor:init(code)
-end
+function importCode(code) textEditor:init(code) end
