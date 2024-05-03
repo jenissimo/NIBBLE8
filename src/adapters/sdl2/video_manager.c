@@ -5,6 +5,7 @@ SDL_Surface *screen = NULL;
 SDL_Renderer *renderer;
 SDL_Texture *texture;
 SDL_Rect viewport;
+SDL_Surface *iconSurface;
 
 const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 Uint32 fpsLastTime = 0;
@@ -30,6 +31,9 @@ int video_init()
         DEBUG_LOG("SDL Window Creation failed: %s", SDL_GetError());
         return 1;
     }
+
+    iconSurface = IMG_Load("icon.png");
+    SDL_SetWindowIcon(window, iconSurface);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
@@ -79,6 +83,7 @@ void video_update()
 
 void video_quit()
 {
+    SDL_FreeSurface(iconSurface);
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

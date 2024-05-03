@@ -2,6 +2,7 @@
 #define VIDEO_MANAGER_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "hardware/audio.h"
 #include "hardware/video.h"
 #include "hardware/palette_manager.h"
