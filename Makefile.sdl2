@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
-LIBS_LIST = sdl2 libpng
+LIBS_LIST = sdl2 sdl2_image libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 SRCDIR = src
