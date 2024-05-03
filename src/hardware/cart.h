@@ -12,6 +12,7 @@
 #include "utils/png.h"
 #include "utils/base64.h"
 #include "utils/error_handling.h"
+#include "hardware/os.h"
 #include "hardware/ram.h"
 #include "nibble8.h"
 

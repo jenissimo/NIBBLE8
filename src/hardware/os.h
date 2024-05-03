@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <libgen.h>
 #include <unistd.h>
 #include "api/lua.h"
 #include "utils/miniz.h"
@@ -22,9 +23,12 @@ typedef void (*FreeClipboardTextFunc)(void*);
 extern GetClipboardTextFunc getClipboardText;
 extern SetClipboardTextFunc setClipboardText;
 extern FreeClipboardTextFunc freeClipboardText;
+extern char *execPath;
 
 // Other methods
 void nibble_api_reboot();
+void nibble_change_to_sandbox_directory(const char *exec_path);
+int nibble_is_within_sandbox(const char *path);
 char *nibble_api_ls(char *path);
 char *nibble_api_read_file(char *path);
 int nibble_api_change_dir(char *path);

@@ -63,6 +63,11 @@ ErrorCode nibble_api_load_cart(const char *path, char **adjustedPath)
 
 ErrorCode loadCart(const char *path)
 {
+    if (!nibble_is_within_sandbox(path))
+    {
+        return ERROR_CART_NOT_FOUND;
+    }
+
     mz_zip_archive zip_archive;
     memset(&zip_archive, 0, sizeof(zip_archive));
     uint8_t *zipBuffer = NULL;

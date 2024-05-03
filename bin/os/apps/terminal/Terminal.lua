@@ -71,7 +71,7 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     -- 24, 26, 28, 29
     local sample = 1
     local volume = 64
-    --local notes = {11, 20, 15, 22}
+    -- local notes = {11, 20, 15, 22}
     local notes = {28, 30, 31, 33}
     self:queueImage(self.logo, self.logoWidth, self.logoHeight, 0.025,
                     {note = notes[1], sample = sample, volume = volume})
@@ -131,10 +131,40 @@ function Terminal:getCursorY()
 end
 
 function Terminal:printLn(line, color)
-    local item = {text = line, color = color}
-    table.insert(self.history, item)
-    if #self.history > self.linesOnScreen - 1 then
-        table.remove(self.history, 1)
+    local maxLineLength = 40
+    local maxLinesOnScreen = self.linesOnScreen - 1
+    local chunks = {}
+
+    if line == nil then return end
+
+    -- Split the line into individual lines based on newline characters
+    local lines = {}
+    for substr in line:gmatch("[^\n]+") do table.insert(lines, substr) end
+
+    -- Process each line separately
+    for _, singleLine in ipairs(lines) do
+        -- Check if the line length exceeds the maximum allowed length
+        if #singleLine > maxLineLength then
+            -- Split the line into chunks of maxLineLength characters
+            for i = 1, #singleLine, maxLineLength do
+                local chunk = string.sub(singleLine, i, i + maxLineLength - 1)
+                table.insert(chunks, chunk)
+            end
+        else
+            -- If the line is short enough, add it as a single chunk
+            table.insert(chunks, singleLine)
+        end
+    end
+
+    -- Insert each chunk into the history table with the specified color
+    for _, chunk in ipairs(chunks) do
+        local item = {text = chunk, color = color}
+        table.insert(self.history, item)
+
+        -- Remove the oldest line if the history exceeds the maximum lines on screen
+        if #self.history > maxLinesOnScreen then
+            table.remove(self.history, 1)
+        end
     end
 end
 
@@ -168,8 +198,33 @@ function Terminal:printLs(path)
     else
         files = split(ls(), "\n")
     end
-    for i = 1, #files, 1 do
-        if #files[i] > 0 then self:printLn(files[i], 2) end
+
+    local column_width = 18
+    local max_filename_length = column_width - 1 -- Subtract 1 for the tilde (~) if needed
+
+    local columns = 2
+    local files_per_column = math.ceil(#files / columns)
+
+    for i = 1, files_per_column do
+        local line = "" -- Initialize the line as an empty string
+
+        for j = 0, columns - 1 do
+            local index = i + j * files_per_column
+            if index <= #files and files[index] ~= "" then -- Ensure index is valid and not an empty line
+                local filename = files[index]:sub(1, max_filename_length)
+                if #files[index] > max_filename_length then
+                    filename = filename .. "~"
+                end
+                line = line .. filename -- Append filename to line
+                -- Add padding to make columns align
+                if #filename < column_width then
+                    line = line .. string.rep(" ", column_width - #filename)
+                end
+            end
+        end
+        if #line > 0 then
+            self:printLn(line, 2) -- Print the complete line
+        end
     end
 end
 
@@ -178,7 +233,7 @@ function Terminal:loadCart(path)
     if errorMsg ~= nil then
         self:printLn(errorMsg, 2)
     else
-        local cartname
+        local cartname = path
         for i = #path, 1, -1 do
             if sub(path, i, i) == "/" then
                 cartname = sub(path, i + 1)

@@ -114,6 +114,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (argc > 0)
+    {
+        nibble_change_to_sandbox_directory(argv[0]);
+    }
+
     nibble_ram_init();
     nibble_init_video();
     nibble_sdl_init();

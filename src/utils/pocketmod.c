@@ -823,7 +823,7 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
         return 0;
     }
 
-    printf("Size: %d\n", size);
+    //printf("Size: %d\n", size);
 
     /* Zero out the whole context and identify the MOD type */
     _pocketmod_zero(c, sizeof(pocketmod_context));
@@ -897,7 +897,7 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
         unsigned int length = 2 * ((byte[22] << 8) | byte[23]);
         memcpy(c->samples[i].name, byte, 22); // Copy 22 bytes of the sample name
         c->samples[i].name[22] = '\0';        // Null-terminate the string
-        printf("Sample %d: %s\n", i, c->samples[i].name);
+        //printf("Sample %d: %s\n", i, c->samples[i].name);
 
         if (i >= POCKETMOD_MAX_SAMPLES && length > 2)
         {

@@ -3,12 +3,19 @@
 
 #include "nibble8.h"
 #include "palette_manager.h"
+#include "debug/debug.h"
+#include "ram.h"
+#include "os.h"
 #ifdef DOS
 #include <allegro.h>
 #else
 #include <stdint.h>
 #endif
 #include <stdbool.h>
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <setjmp.h>
 
 extern uint32_t *frame;
 extern uint8_t *nibble_font;

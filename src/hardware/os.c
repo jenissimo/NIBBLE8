@@ -4,6 +4,64 @@ GetClipboardTextFunc getClipboardText;
 SetClipboardTextFunc setClipboardText;
 FreeClipboardTextFunc freeClipboardText;
 
+char *execPath;
+char nibble_sandbox_path[1024];
+
+void nibble_change_to_sandbox_directory(const char *exec_path)
+{
+    char real_path[1024];
+    if (realpath(exec_path, real_path) == NULL)
+    {
+        perror("Failed to resolve real path of the executable");
+        exit(1);
+    }
+
+    // Get the directory containing the executable
+    execPath = dirname(real_path);
+
+    // Construct the path to the sandbox directory
+    snprintf(nibble_sandbox_path, sizeof(nibble_sandbox_path), "%s/%s", execPath, NIBBLE_SANDBOX_PATH);
+
+    // Change to the sandbox directory
+    if (chdir(nibble_sandbox_path) != 0)
+    {
+        perror("Failed to change directory to sandbox");
+        exit(1);
+    }
+    else
+    {
+        printf("Changed directory to %s\n", nibble_sandbox_path);
+    }
+}
+
+int nibble_is_within_sandbox(const char *path)
+{
+    char resolved_path[PATH_MAX];
+    char sandbox_abs_path[PATH_MAX];
+
+    // Ensure the sandbox path is resolved
+    if (realpath(nibble_sandbox_path, sandbox_abs_path) == NULL)
+    {
+        perror("Failed to resolve sandbox path");
+        return 0; // Failure, can't verify the sandbox path
+    }
+
+    // Attempt to resolve the input path to an absolute path
+    if (realpath(path, resolved_path) == NULL)
+    {
+        perror("Failed to resolve input path");
+        return 0;
+    }
+
+    // Check if the resolved path starts with the resolved sandbox path
+    if (strncmp(sandbox_abs_path, resolved_path, strlen(sandbox_abs_path)) == 0)
+    {
+        return 1; // The path is within the sandbox
+    }
+
+    return 0; // The path is not within the sandbox
+}
+
 void nibble_api_reboot()
 {
     DEBUG_LOG("Rebooting Nibble8");
@@ -21,10 +79,20 @@ char *nibble_api_ls(char *path)
     DIR *dir;
     int buf_size = 1024;
     char *buf = malloc(buf_size);
+    if (!buf)
+    {
+        perror("Failed to allocate memory");
+        return NULL;
+    }
 
     if (path == NULL)
     {
         dir = opendir(".");
+    }
+    else if (!nibble_is_within_sandbox(path))
+    {
+        free(buf);
+        return NULL;
     }
     else
     {
@@ -32,20 +100,42 @@ char *nibble_api_ls(char *path)
         if (access(path, F_OK) != 0)
         {
             printf("Error: Path does not exist\n");
+            free(buf);
             return NULL;
         }
         dir = opendir(path);
+    }
+
+    if (!dir)
+    {
+        perror("Failed to open directory");
+        free(buf);
+        return NULL;
     }
 
     buf[0] = '\0';
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL)
     {
+        // Skip hidden files and directories
+        if (entry->d_name[0] == '.')
+        {
+            continue;
+        }
+
         int entry_len = strlen(entry->d_name);
         if (entry_len + 2 > buf_size - strlen(buf))
         {
             buf_size *= 2;
-            buf = realloc(buf, buf_size);
+            char *new_buf = realloc(buf, buf_size);
+            if (!new_buf)
+            {
+                perror("Failed to reallocate memory");
+                free(buf);
+                closedir(dir);
+                return NULL;
+            }
+            buf = new_buf;
         }
 
         strcat(buf, entry->d_name);
@@ -59,6 +149,10 @@ char *nibble_api_ls(char *path)
 
 int nibble_api_change_dir(char *path)
 {
+    if (!nibble_is_within_sandbox(path))
+    {
+        return 1;
+    }
     return chdir(path);
 }
 

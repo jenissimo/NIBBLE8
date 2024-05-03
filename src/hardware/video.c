@@ -1,11 +1,4 @@
 #include "video.h"
-#include "palette_manager.h"
-#include "debug/debug.h"
-#include "ram.h"
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <setjmp.h>
 
 uint32_t *frame;
 uint8_t *nibble_font;
@@ -38,17 +31,20 @@ void nibble_reset_video()
 
 void nibble_load_font()
 {
+    char fontPath[1024];
+    snprintf(fontPath, sizeof(fontPath), "%s/font.bin", execPath);
     nibble_font = malloc(FONT_SIZE_COMPRESSED * sizeof(uint8_t));
-    FILE *f = fopen("font.bin", "rb");
+    FILE *f = fopen(fontPath, "rb");
     fread(nibble_font, 1, FONT_SIZE_COMPRESSED, f);
     fclose(f);
 }
 
 void nibble_load_palettes()
 {
-    const char *ini_file = "palettes.ini";
-
-    manager = palette_manager_create(ini_file);
+    char palettePath[1024];
+    snprintf(palettePath, sizeof(palettePath), "%s/palettes.ini", execPath);
+    DEBUG_LOG("%s",palettePath);
+    manager = palette_manager_create(palettePath);
     if (!manager)
     {
         DEBUG_LOG("Error: Unable to create palette manager.\n");

@@ -18,7 +18,7 @@ void nibble_lua_init()
 
     nibble_lua_init_api();
     nibble_lua_load_file("os/os.lua");
-    luaL_dostring(lua, "_init()");
+    nibble_lua_call("_init");
 
     if (cartPath)
     {
@@ -63,7 +63,6 @@ void nibble_lua_init_api()
     nibble_lua_register_function("poke", l_poke);
     nibble_lua_register_function("peek2", l_peek2);
     nibble_lua_register_function("poke2", l_poke2);
-
 
     // Graphics
     nibble_lua_register_function("print", l_print);
@@ -135,7 +134,17 @@ void nibble_lua_init_api()
     nibble_lua_register_function("exit", l_exit);
 
     // Load Custom Libs
-    luaL_dostring(currentVM, "package.path = package.path .. \";lib/?.lua\" .. \";os/?.lua\"");
+
+    lua_getglobal(currentVM, "package");
+
+    // Set package.path
+    lua_pushstring(currentVM, "path");
+    lua_gettable(currentVM, -2); // get original package.path
+    const char *original_path = lua_tostring(currentVM, -1);
+    lua_pushfstring(currentVM, "%s;%s/?.lua;%s/lib/?.lua;%s/os/?.lua", original_path, execPath, execPath, execPath);
+    lua_setfield(currentVM, -3, "path");
+    lua_pop(currentVM, 2); // Pop the package table and the path string
+
     luaL_dostring(currentVM, "KEYCODE = require(\"keys_constants\")");
     luaL_dostring(currentVM, "UTILS = require(\"utils\")");
 }
@@ -969,8 +978,8 @@ static int l_run_code(lua_State *L)
     {
         const char *code = lua_tostring(L, 1);
         nibble_api_run_code(code);
-        //DEBUG_LOG("run(%s) = true \n", code);
-        // lua_pushnumber(L, result);
+        // DEBUG_LOG("run(%s) = true \n", code);
+        //  lua_pushnumber(L, result);
         lua_pushboolean(L, true);
         return 1;
     }
@@ -1404,13 +1413,13 @@ static int l_load_cart(lua_State *L)
         {
             // Assuming get_error_text is implemented and returns a const char*
             lua_pushnil(L);
-            lua_pushstring(L, get_error_text(result, filename)); // Push error text
+            lua_pushstring(L, get_error_text(result, filename));
             lua_pushnil(L);
         }
         else
         {
-            lua_pushstring(L, userLuaCode);                              // Push user code
-            lua_pushnil(L);                                              // Assuming second pushnil is intended for a specific purpose
+            lua_pushstring(L, userLuaCode); // Push user code
+            lua_pushnil(L);
             lua_pushstring(L, adjustedFilename ? adjustedFilename : ""); // Push adjusted filename or empty string
         }
 
@@ -1465,32 +1474,62 @@ static int l_exit(lua_State *L)
     return 0;
 }
 
+// Function to format the error message
+void nible_lua_handle_user_error(const char *error_message)
+{
+    if (lua == NULL)
+    {
+        return;
+    }
+
+    lua_getglobal(lua, "_error");
+
+    if (!lua_isfunction(lua, -1))
+    {
+        DEBUG_LOG("_error not a function");
+        lua_pop(lua, 1);
+        return;
+    }
+
+    // DEBUG_LOG(error_message);
+
+    char msg_copy[1024];
+    strncpy(msg_copy, error_message, 1023);
+    msg_copy[1023] = '\0';
+
+    // Push the error message as an argument to the _error function
+    lua_pushstring(lua, msg_copy);
+
+    // Call the _error function with one argument (the error message)
+    if (lua_pcall(lua, 1, 0, 0) != 0)
+    {
+        DEBUG_LOG("error running function `_error': %s", lua_tostring(lua, -1));
+        lua_pop(lua, 1);
+        return;
+    }
+
+    nibble_lua_close_app();
+}
+
 int nibble_lua_traceback(lua_State *L)
 {
-    DEBUG_LOG("Entered nibble_lua_traceback");
-
-    // Check if the error is a string
-    if (lua_isstring(L, 1))
+    const char *error_message = lua_tostring(L, 1); // Retrieve the error message passed to the function
+    if (!error_message)
     {
-        DEBUG_LOG("Error message: %s", lua_tostring(L, 1));
-    }
-    else
-    {
-        // Try to get more information about the error object
-        if (lua_isnoneornil(L, 1))
-        {
-            DEBUG_LOG("Error is nil or none");
-        }
-        else
-        {
-            DEBUG_LOG("Error is of type: %s", luaL_typename(L, 1));
-        }
+        error_message = "Unknown error"; // Fallback error message if none provided
     }
 
-    // Generate a stack trace and append it to the error message
-    luaL_traceback(L, L, lua_tostring(L, 1) ? lua_tostring(L, 1) : "unknown error", 1);
-    DEBUG_LOG("Traceback: %s", lua_tostring(L, -1));
-    return 1;
+    luaL_traceback(L, L, error_message, 1); // Push the traceback to the stack on top of the error message
+
+    return 1; // Return the traceback message on the stack for potential further handling
+}
+
+// Function to push a traceback function onto the stack for error handling
+static int nibble_lua_push_traceback(lua_State *L)
+{
+    lua_pushcfunction(L, nibble_lua_traceback);
+    int errfunc = lua_gettop(L); // Get the index of the error function
+    return errfunc;              // Return the stack index of the traceback function
 }
 
 int nibble_lua_execute_code(const char *code)
@@ -1499,8 +1538,9 @@ int nibble_lua_execute_code(const char *code)
 
     if (load_status != 0)
     {
-        DEBUG_LOG("Error loading Lua script: %s\n", lua_tostring(currentVM, -1));
+        const char *error_message = lua_tostring(currentVM, -1);
         lua_pop(currentVM, 1); // Remove the error message from the stack
+        nible_lua_handle_user_error(error_message);
         return 2;
     }
 
@@ -1512,8 +1552,9 @@ int nibble_lua_execute_code(const char *code)
     int call_status = lua_pcall(currentVM, 0, LUA_MULTRET, -2);
     if (call_status != 0)
     {
-        DEBUG_LOG("Error executing Lua script:\n%s\n", lua_tostring(currentVM, -1));
-        lua_pop(currentVM, 1); // Remove the error message (with traceback) from the stack
+        const char *error_message = lua_tostring(currentVM, -1);
+        lua_pop(currentVM, 1); // Remove the error message from the stack
+        nible_lua_handle_user_error(error_message);
         return 3;
     }
 
@@ -1522,7 +1563,11 @@ int nibble_lua_execute_code(const char *code)
 
 int nibble_lua_load_file(const char *filename)
 {
-    int load_status = luaL_loadfile(currentVM, filename); // load Lua script
+    char adjustedPath[1024];
+    int load_status;
+
+    snprintf(adjustedPath, sizeof(adjustedPath), "%s/%s", execPath, filename);
+    load_status = luaL_loadfile(currentVM, adjustedPath); // load Lua script
 
     if (load_status != 0)
     {
@@ -1563,7 +1608,7 @@ void nibble_lua_run_file(const char *filename)
 
     nibble_lua_load_file(filename);
 
-    luaL_dostring(currentVM, "_init()");
+    nibble_lua_call("_init");
 }
 
 void nibble_lua_run_code(const char *code)
@@ -1578,9 +1623,10 @@ void nibble_lua_run_code(const char *code)
 
     nibble_lua_init_api();
 
-    nibble_lua_execute_code(code);
-
-    luaL_dostring(currentVM, "_init()");
+    if (nibble_lua_execute_code(code) == 0)
+    {
+        nibble_lua_call("_init");
+    }
 }
 
 void nibble_lua_close_app()
@@ -1625,23 +1671,34 @@ inline void nibble_lua_call(const char *name)
         return;
     }
 
-    lua_getglobal(currentVM, name);
+    int errfunc = nibble_lua_push_traceback(currentVM); // Push traceback function and get its index
 
+    lua_getglobal(currentVM, name);
     if (!lua_isfunction(currentVM, -1))
     {
         DEBUG_LOG("%s not a function", name);
-        lua_pop(currentVM, 1);
+        lua_pop(currentVM, 2); // Pop non-function and traceback
         return;
     }
 
-    if (lua_pcall(currentVM, 0, 0, 0) != 0)
+    if (lua_pcall(currentVM, 0, 0, errfunc) != 0)
     {
-        DEBUG_LOG("error running function `%s': %s", name, lua_tostring(currentVM, -1));
-        lua_pop(currentVM, 1);
-        return;
+        const char *error_message = lua_tostring(currentVM, -1);
+        lua_pop(currentVM, 1);          // Remove the error message from the stack
+        lua_remove(currentVM, errfunc); // Remove the traceback function from the stack
+        if (currentVM == app)
+        {
+            nible_lua_handle_user_error(error_message);
+        }
+        else
+        {
+            DEBUG_LOG("Error running function `%s': %s", name, error_message);
+        }
     }
-    // double time = nibble_api_time();
-    // DEBUG_LOG("Calling %s at %f", name, time);
+    else
+    {
+        lua_remove(currentVM, errfunc); // Remove the traceback function from the stack
+    }
 }
 
 void nibble_lua_call_key(int key_code, bool ctrl_pressed, bool shift_pressed)

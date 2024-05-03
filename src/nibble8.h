@@ -73,4 +73,6 @@
 
 #define FONT_SIZE_COMPRESSED 128 * 128 / 8
 
+#define NIBBLE_SANDBOX_PATH "drive_c"
+
 #endif

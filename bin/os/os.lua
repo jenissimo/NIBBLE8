@@ -44,15 +44,56 @@ function _init()
 end
 
 function _error(error_message)
-    local lineNumber, errorText = error_message:match(
-                                      "%[string .-%]:(%d+): (.+)")
+    local errorType = "runtime error"
+    local errorFirstLine
+    local firstLineEndIndex = error_message:find("\n")
+    local errorText
+    local lineNumber = error_message:match("%[string .-%]:(%d+): (.+)")
+    local traceback = error_message:match("stack traceback:\n(.+)")
     local localLine, tabIndex, lineText =
         textEditor:convertLineNumber(tonumber(lineNumber))
+
+    if error_message:find("syntax error") then errorType = "syntax error" end
+
+    -- for runtime error get just firt line for parsing
+    if firstLineEndIndex then
+        errorFirstLine = error_message:sub(1, firstLineEndIndex - 1)
+    else
+        errorFirstLine = error_message
+    end
+
+    -- get error message
+    errorText = errorFirstLine:match("^%[.+:%d+:%s*(.+)")
+
+    -- print regular error
+    -- space
     terminal:printLn(">", 3)
+    -- general error header
     terminal:printLn(
-        "syntax error line: " .. localLine .. " (tab " .. tabIndex .. ")", 1)
+        errorType .. " line " .. localLine .. " (tab " .. tabIndex .. ")", 1)
+    -- line with error
     terminal:printLn(lineText, 3)
+    -- error text
     terminal:printLn(errorText, 2)
+
+    -- if we have stacktrace print it too
+    if traceback then
+        terminal:printLn("stack trace:", 1)
+        for line in traceback:gmatch("[^\n]+") do
+            local lineNumber, functionName = line:match(
+                                                 "^%s*%[string .-%]:(%d+): in function '(.+)'")
+
+            if lineNumber and functionName then
+                -- Convert the line number to local line number and tab index
+                local localLine, tabIndex, _ =
+                    textEditor:convertLineNumber(tonumber(lineNumber))
+                local text = "in " .. functionName .. " line " .. localLine ..
+                                 " (tab " .. tabIndex .. ")"
+                trace(text)
+                terminal:printLn(text, 1)
+            end
+        end
+    end
 
     currentWindow = terminal
 
@@ -218,7 +259,7 @@ end
 function loadCart(path)
     local result, errorMsg, adjustedPath = load_cart(path)
 
-    if errorMsg ~= nil then
+    if errorMsg then
         trace(errorMsg)
         return errorMsg
     else
