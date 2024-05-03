@@ -68,7 +68,7 @@
 #define NIBBLE_KEY_BUFFER        4
 #define NIBBLE_SAMPLERATE        44100
 #define NIBBLE_SAMPLE_CHANNELS   2
-#define NIBBLE_SAMPLES           4096
+#define NIBBLE_SAMPLES           2048
 #define NIBBLE_FRAMERATE         30
 
 #define FONT_SIZE_COMPRESSED 128 * 128 / 8
