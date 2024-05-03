@@ -26,6 +26,7 @@ int pocketmod_loop_count(pocketmod_context *c);
 
 typedef struct {
     signed char *data;          /* Sample data buffer                      */
+    unsigned char name[23];     /* Sample name */
     unsigned int length;        /* Data length (in bytes)                  */
 } _pocketmod_sample;
 

@@ -1,5 +1,6 @@
 #include "pocketmod.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Min/max helper functions */
 int _pocketmod_min(int x, int y) { return x < y ? x : y; }
@@ -786,7 +787,6 @@ static int _pocketmod_ident(pocketmod_context *c, unsigned char *data, int size)
         }
     }
 
-    printf("Song title: ");
     /* Check that sample names only contain ASCII bytes (or null) */
     for (i = 0; i < 15; i++)
     {
@@ -797,13 +797,8 @@ static int _pocketmod_ident(pocketmod_context *c, unsigned char *data, int size)
             {
                 return 0;
             }
-            else
-            {
-                printf("%c", chr);
-            }
         }
     }
-    printf("\n");
 
     /* It looks like we have an older 15-instrument MOD */
     c->length = data[470];
@@ -893,6 +888,22 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
     if (header_bytes + pattern_bytes > size)
     {
         return 0;
+    }
+
+    /* Extract sample names and sample lengths */
+    byte = (unsigned char *)data + 20;
+    for (i = 0; i < c->num_samples; i++)
+    {
+        unsigned int length = 2 * ((byte[22] << 8) | byte[23]);
+        memcpy(c->samples[i].name, byte, 22); // Copy 22 bytes of the sample name
+        c->samples[i].name[22] = '\0';        // Null-terminate the string
+        printf("Sample %d: %s\n", i, c->samples[i].name);
+
+        if (i >= POCKETMOD_MAX_SAMPLES && length > 2)
+        {
+            return 0; // Can't fit this sample
+        }
+        byte += 30; // Move to the next sample entry
     }
 
     /* Load sample payload data, truncating ones that extend outside the file */
