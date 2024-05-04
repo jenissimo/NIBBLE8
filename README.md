@@ -57,7 +57,8 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
 4. Navigate to the NIBBLE8 directory.
 5. Run make with the DOS configuration Makefile:
    ```bash
-   make -f config/Makefile.dos```
+   make -f config/Makefile.dos
+   ```
 ## License
 
 NIBBLE8 is licensed under the [MIT License](https://github.com/jenissimo/NIBBLE8/blob/main/LICENSE).
