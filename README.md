@@ -33,10 +33,9 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
        pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-libpng mingw-w64-x86_64-pkg-config mingw-w64-x86_64-toolchain mingw-w64-x86_64-make
        ```
 2. Navigate to the NIBBLE8 directory.
-3. Build using mingw32-make:
+3. Build using make (mingw32-make for MSYS2):
    ```bash
-   mingw32-make VERSION=sdl2
-4. After building, copy the necessary DLL files to the build folder.
+   make VERSION=sdl2
 
 ### Building NIBBLE8 DOS Version:
 
@@ -51,14 +50,13 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
 #### Build Steps:
 1. Set up DJGPP cross-compilation environment by following the instructions at [build-djgpp](https://github.com/andrewwutw/build-djgpp).
 2. Unpack the additional libraries to the DJGPP folder.
-3. Source the DJGPP environment setup script:
+3. Source the DJGPP environment setup script (replace /usr/local/djgpp with the actual path to your DJGPP installation if different):
    ```bash
    source /usr/local/djgpp/setenv
-(Replace /usr/local/djgpp with the actual path to your DJGPP installation if different)
+   ```
 4. Navigate to the NIBBLE8 directory.
 5. Run make with the DOS configuration Makefile:
-   ```make -f config/Makefile.dos
-
+   ```make -f config/Makefile.dos```
 ## License
 
 NIBBLE8 is licensed under the [MIT License](https://github.com/jenissimo/NIBBLE8/blob/main/LICENSE).
