@@ -44,19 +44,8 @@
 
 # Mac files
 *.DS_Store
+.DS_Store
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-bin/nibble8
-bin/nibble8.exe
-bin/font2bin
-bin/font2bin.exe
-.DS_Store
-.DS_Store
-.DS_Store
+# Build folders
+bin/
+obj/
