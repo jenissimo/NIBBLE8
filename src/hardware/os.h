@@ -6,10 +6,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#ifndef DOS
 #include <libgen.h>
+#endif
 #include <unistd.h>
 #include "api/lua.h"
-#include "utils/miniz.h"
 #include "utils/png.h"
 #include "utils/error_handling.h"
 #include "hardware/ram.h"
@@ -37,5 +38,6 @@ const uint8_t *nibble_api_get_clipboard_text();
 int nibble_api_set_clipboard_text(const uint8_t *text);
 const char *nibble_api_get_code();
 void nibble_api_run_code(uint8_t *code);
+int nibble_load_rom(void);
 
 #endif

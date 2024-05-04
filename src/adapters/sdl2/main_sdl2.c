@@ -116,7 +116,17 @@ int main(int argc, char *argv[])
 
     if (argc > 0)
     {
+        #ifdef __EMSCRIPTEN__
+        nibble_change_to_sandbox_directory(".");
+        #else
         nibble_change_to_sandbox_directory(argv[0]);
+        #endif
+    }
+
+    if (nibble_load_rom() > 0)
+    {
+        DEBUG_LOG("ROM Loading Error");
+        return 1;
     }
 
     nibble_ram_init();
@@ -124,8 +134,6 @@ int main(int argc, char *argv[])
     nibble_sdl_init();
     nibble_lua_init();
     next_time = SDL_GetTicks() + NIBBLE_FPS;
-
-    DEBUG_LOG("NIBBLE8 started\n");
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, -1, 1);
 #else

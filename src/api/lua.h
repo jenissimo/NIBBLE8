@@ -34,6 +34,8 @@ void nibble_lua_run_file(const char *filename);
 void nibble_lua_run_code(const char *code);
 void nibble_lua_close_app(void);
 void nibble_lua_register_function(const char* name, lua_CFunction func);
+int nibble_find_lua_file_in_zip(const char *base_name, char **file_name, mz_zip_archive *zip_archive);
+int nibble_rom_lua_loader(lua_State *L);
 
 static int l_peek(lua_State *L);
 static int l_poke(lua_State *L);

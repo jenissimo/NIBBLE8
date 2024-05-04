@@ -34,7 +34,7 @@ int nibble_sdl_init()
 
     SDL_ShowCursor(SDL_DISABLE);
 
-    DEBUG_LOG("SDL Initialized");
+    //DEBUG_LOG("SDL Initialized");
     return 0;
 }
 

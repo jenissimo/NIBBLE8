@@ -17,14 +17,14 @@ void nibble_lua_init()
     currentVM = lua;
 
     nibble_lua_init_api();
-    nibble_lua_load_file("os/os.lua");
+    // load os
+    luaL_dostring(currentVM, "require(\"os/os\")");
     nibble_lua_call("_init");
 
     if (cartPath)
     {
         nibble_api_load_cart(cartPath, NULL);
         nibble_api_run_code(userLuaCode);
-        // free(cartPath);
     }
 
     if (cartBase64)
@@ -32,7 +32,6 @@ void nibble_lua_init()
         DEBUG_LOG("Loading cart from base64");
         loadCartFromBase64(cartBase64);
         nibble_api_run_code(userLuaCode);
-        // free(cartBase64);
     }
 }
 
@@ -133,11 +132,15 @@ void nibble_lua_init_api()
 
     nibble_lua_register_function("exit", l_exit);
 
-    // Load Custom Libs
-
+    // Load os files from ZIP archive
     lua_getglobal(currentVM, "package");
+    lua_getfield(currentVM, -1, "searchers"); // Use 'loaders' in Lua 5.1
+    lua_pushcfunction(currentVM, nibble_rom_lua_loader);
+    lua_rawseti(currentVM, -2, 2); // Set it as the second searcher
+    lua_pop(currentVM, 2);         // Pop 'package' and 'searchers' tables from the stack
 
-    // Set package.path
+    // Ability to load OS from folder if it exists
+    lua_getglobal(currentVM, "package");
     lua_pushstring(currentVM, "path");
     lua_gettable(currentVM, -2); // get original package.path
     const char *original_path = lua_tostring(currentVM, -1);
@@ -1773,6 +1776,98 @@ void nibble_lua_call_mouse_release(int x, int y, int button)
     lua_pushinteger(currentVM, button);
     lua_pcall(currentVM, 3, 0, 0);
     // DEBUG_LOG("mouse_release(%d, %d, %d)\n", x, y, button);
+}
+
+// Helper function to convert Lua module path to relative file path in ZIP
+static char *nibble_module_path_to_zip_path(const char *module_path)
+{
+    size_t len = strlen(module_path);
+    char *path = malloc(len + 5); // +5 for ".lua" and '\0'
+    if (!path)
+        return NULL;
+
+    // Replace dots with slashes to convert Lua module notation to file path
+    for (size_t i = 0; i < len; i++)
+    {
+        path[i] = (module_path[i] == '.') ? '/' : module_path[i];
+    }
+    strcpy(path + len, ".lua"); // Append ".lua" extension
+    return path;
+}
+
+int nibble_find_lua_file_in_zip(const char *base_name, char **file_name, mz_zip_archive *zip_archive)
+{
+    const char *directories[] = {"", "lib/", "os/"}; // Directories to search
+    char full_path[1024];                            // Buffer for full path
+    int fileIndex = 0;
+
+    for (int i = 0; i < sizeof(directories) / sizeof(directories[0]); i++)
+    {
+        // Construct the full path with correct directory separator
+        snprintf(full_path, sizeof(full_path), "%s%s", directories[i], base_name);
+
+        fileIndex = mz_zip_reader_locate_file(zip_archive, full_path, NULL, 0);
+
+        // Attempt to locate the file
+        if (fileIndex > -1)
+        {
+            *file_name = strdup(full_path);
+            return fileIndex; // File found
+        }
+    }
+
+    return -1; // File not found
+}
+
+int nibble_rom_lua_loader(lua_State *L)
+{
+    const char *module_name = luaL_checkstring(L, 1);
+    char *file_name = nibble_module_path_to_zip_path(module_name); // Convert Lua module name to file path
+    char *script_buffer = NULL;
+    int fileIndex = -1;
+    mz_zip_archive_file_stat file_stat;
+
+    fileIndex = nibble_find_lua_file_in_zip(file_name, &file_name, rom);
+    // Use the helper function to find the file in the zip archive
+    if (fileIndex == -1)
+    {
+        DEBUG_LOG("File %s not found in ROM", file_name);
+        free(file_name);
+        return luaL_error(L, "Failed to locate script.lua in ZIP archive");
+    }
+
+    // Get file information
+    if (!mz_zip_reader_file_stat(rom, (mz_uint) fileIndex, &file_stat))
+    {
+        DEBUG_LOG("Failed to get file info for %s", file_name);
+        free(file_name);
+        return luaL_error(L, "Failed to get file info");
+    }
+
+    // Allocate memory for the script buffer
+    script_buffer = (char *)malloc(file_stat.m_uncomp_size);
+    if (!script_buffer)
+    {
+        DEBUG_LOG("Memory allocation failed for script buffer");
+        free(file_name);
+        return luaL_error(L, "Memory allocation failed for script buffer");
+    }
+
+    // Load the Lua script from the ZIP archive
+    load_text_from_zip(rom, file_name, &script_buffer);
+
+    // Load the Lua script into the Lua state
+    if (luaL_loadbuffer(L, script_buffer, file_stat.m_uncomp_size, file_name) != LUA_OK)
+    {
+        DEBUG_LOG("Failed to load script %s", file_name);
+        free(script_buffer);
+        free(file_name);
+        return luaL_error(L, "Failed to load script");
+    }
+
+    free(script_buffer);
+    free(file_name);
+    return 1; // Number of results
 }
 
 void nibble_lua_destroy()

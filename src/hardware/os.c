@@ -30,12 +30,16 @@ void nibble_change_to_sandbox_directory(const char *exec_path)
     }
     else
     {
-        printf("Changed directory to %s\n", nibble_sandbox_path);
+        // DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
     }
 }
 
 int nibble_is_within_sandbox(const char *path)
 {
+#ifdef __EMSCRIPTEN__
+    return 1;
+#endif
+
     char resolved_path[PATH_MAX];
     char sandbox_abs_path[PATH_MAX];
 
@@ -64,7 +68,7 @@ int nibble_is_within_sandbox(const char *path)
 
 void nibble_api_reboot()
 {
-    DEBUG_LOG("Rebooting Nibble8");
+    //DEBUG_LOG("Rebooting Nibble8");
     nibble_ram_init();
     nibble_ram_clear();
     nibble_audio_init(NIBBLE_SAMPLERATE);
@@ -231,4 +235,64 @@ void nibble_api_run_code(uint8_t *code)
         userLuaCode = code;
         nibble_lua_run_code(userLuaCode);
     }
+}
+
+int nibble_load_rom()
+{
+    char romPath[1024];
+    snprintf(romPath, sizeof(romPath), "%s/rom.zip", execPath);
+
+    // Allocate memory for the ROM archive
+    rom = (mz_zip_archive *)malloc(sizeof(mz_zip_archive));
+    if (!rom)
+    {
+        DEBUG_LOG("Failed to allocate memory for ROM archive\n");
+        return 1; // Return error code
+    }
+
+    // Initialize the ROM archive
+    memset(rom, 0, sizeof(mz_zip_archive));
+
+    // Read the ROM archive into memory
+    FILE *file = fopen(romPath, "rb");
+    if (!file)
+    {
+        DEBUG_LOG("Failed to open ROM archive: %s", romPath);
+        free(rom);
+        return 1; // Return error code
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    romBuffer = (uint8_t *)malloc(fileSize);
+    if (!romBuffer)
+    {
+        DEBUG_LOG("Failed to allocate memory for ZIP buffer\n");
+        fclose(file);
+        free(rom);
+        return 1; // Return error code
+    }
+
+    if (fread(romBuffer, 1, fileSize, file) != fileSize)
+    {
+        DEBUG_LOG("Failed to read ROM archive: %s\n", romPath);
+        fclose(file);
+        free(romBuffer);
+        free(rom);
+        return 1; // Return error code
+    }
+    fclose(file);
+
+    // Initialize the ROM archive from the buffer
+    if (!mz_zip_reader_init_mem(rom, romBuffer, fileSize, 0))
+    {
+        DEBUG_LOG("Failed to initialize ROM archive from memory\n");
+        free(romBuffer);
+        free(rom);
+        return 1; // Return error code
+    }
+
+    return 0;        // Return success code
 }

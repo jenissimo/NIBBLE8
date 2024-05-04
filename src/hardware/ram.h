@@ -14,6 +14,7 @@
 #include "hardware/empty_mod_file.h"
 #include "debug/debug.h"
 #include "utils/pocketmod.h"
+#include "utils/miniz.h"
 
 typedef struct ColorPalette
 {
@@ -110,6 +111,8 @@ typedef union
 } Memory;
 
 extern Memory memory;
+extern mz_zip_archive *rom;
+extern uint8_t *romBuffer;
 extern uint8_t *userLuaCode;
 extern uint8_t *clipboard;
 extern bool rebootRequested;

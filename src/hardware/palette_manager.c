@@ -28,7 +28,7 @@ PaletteManager *palette_manager_create(const char *ini_file)
         return NULL;
     }
 
-    DEBUG_LOG("Reading palette file: %s\n", ini_file);
+    //DEBUG_LOG("Reading palette file: %s\n", ini_file);
 
     PaletteManager *manager = malloc(sizeof(PaletteManager));
     manager->palettes = malloc(num_palettes * sizeof(Palette));

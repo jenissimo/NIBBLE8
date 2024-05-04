@@ -31,26 +31,32 @@ void nibble_reset_video()
 
 void nibble_load_font()
 {
-    char fontPath[1024];
-    snprintf(fontPath, sizeof(fontPath), "%s/font.bin", execPath);
-    nibble_font = malloc(FONT_SIZE_COMPRESSED * sizeof(uint8_t));
-    FILE *f = fopen(fontPath, "rb");
-    fread(nibble_font, 1, FONT_SIZE_COMPRESSED, f);
-    fclose(f);
+    size_t buffer_size = 0;
+    bool result;
+    result = extract_file_to_buffer(rom, "font.bin", (void **)&nibble_font, &buffer_size);
+    if (!result)
+    {
+        DEBUG_LOG("Font loading failed!");
+        exit(1);
+    }
+    else if (buffer_size != FONT_SIZE_COMPRESSED * sizeof(uint8_t))
+    {
+        DEBUG_LOG("Font size wrong %zu bytes, expected %zu bytes!", buffer_size, FONT_SIZE_COMPRESSED * sizeof(uint8_t));
+        exit(1);
+    }
 }
 
 void nibble_load_palettes()
 {
     char palettePath[1024];
     snprintf(palettePath, sizeof(palettePath), "%s/palettes.ini", execPath);
-    DEBUG_LOG("%s",palettePath);
     manager = palette_manager_create(palettePath);
     if (!manager)
     {
         DEBUG_LOG("Error: Unable to create palette manager.\n");
     }
     manager->current_palette = 1;
-    DEBUG_LOG("%s (%d)", manager->palettes[manager->current_palette].name, manager->current_palette);
+    // DEBUG_LOG("%s (%d)", manager->palettes[manager->current_palette].name, manager->current_palette);
 }
 
 void print_char(int charIndex)
@@ -75,6 +81,7 @@ void print_char(int charIndex)
 
 void nibble_destroy_video()
 {
+    free(nibble_font);
     free(frame);
 }
 

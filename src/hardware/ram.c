@@ -5,6 +5,9 @@ uint8_t *clipboard;
 bool rebootRequested = false;
 bool shutdownRequested = false;
 
+mz_zip_archive *rom;
+uint8_t *romBuffer;
+
 Memory memory;
 
 void nibble_ram_init()
@@ -13,12 +16,12 @@ void nibble_ram_init()
     // poke(0x7bfc, 0x01)
     // poke(0x7bfd, 0x40)
     // poke(0x7bfe, 0x01)
-    //unsigned char sample;       /* Sample number (0..31)                   */
-    //unsigned char volume;       /* Base volume without tremolo (0..64)     */
-    //unsigned char balance;      /* Stereo balance (0..255)                 */
-    //unsigned short period;      /* Note period (113..856)                  */
+    // unsigned char sample;       /* Sample number (0..31)                   */
+    // unsigned char volume;       /* Base volume without tremolo (0..64)     */
+    // unsigned char balance;      /* Stereo balance (0..255)                 */
+    // unsigned short period;      /* Note period (113..856)                  */
 
-    DEBUG_LOG("Memory offset: %lu", sizeof(memory.spriteSheetData)+sizeof(memory.mapData)+sizeof(memory.spriteFlagsData)+sizeof(memory.drawState));
+    // DEBUG_LOG("Memory offset: %lu", sizeof(memory.spriteSheetData)+sizeof(memory.mapData)+sizeof(memory.spriteFlagsData)+sizeof(memory.drawState));
 }
 
 void nibble_ram_clear()
@@ -90,6 +93,13 @@ void nibble_ram_print_map()
 
 void nibble_ram_destroy()
 {
+    if (rom)
+    {
+        mz_zip_reader_end(rom);
+        free(rom);
+        free(romBuffer);
+        rom = NULL; // Set the pointer to NULL to avoid potential dangling pointers
+    }
     // free(state->memory);
     // free(memory);
 }

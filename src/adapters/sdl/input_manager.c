@@ -79,7 +79,7 @@ int input_update()
         if (e.type == SDL_MOUSEBUTTONDOWN)
         {
             Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
-            printf("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
+            //printf("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
             nibble_lua_call_mouse_press(mousePos.x, mousePos.y, e.button.button);
         }
 

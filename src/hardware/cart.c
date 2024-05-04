@@ -470,7 +470,7 @@ size_t load_file_from_zip(mz_zip_archive *zip_archive, const char *file_to_load,
     size_t buffer_size = 0;
     if (extract_file_to_buffer(zip_archive, file_to_load, buffer, &buffer_size))
     {
-        DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+        //DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
     }
     else
     {
@@ -499,7 +499,7 @@ void load_text_from_zip(mz_zip_archive *zip_archive, const char *file_to_load, c
         {
             *buffer = new_buffer;          // Update pointer if realloc was successful
             (*buffer)[buffer_size] = '\0'; // Null-terminate the buffer
-            DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+            //DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
         }
         else
         {

@@ -5,7 +5,9 @@ SDL_Surface *screen = NULL;
 SDL_Renderer *renderer;
 SDL_Texture *texture;
 SDL_Rect viewport;
+#ifndef __EMSCRIPTEN__
 SDL_Surface *iconSurface;
+#endif
 
 const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 Uint32 fpsLastTime = 0;
@@ -32,8 +34,10 @@ int video_init()
         return 1;
     }
 
+    #ifndef __EMSCRIPTEN__
     iconSurface = IMG_Load("icon.png");
     SDL_SetWindowIcon(window, iconSurface);
+    #endif
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
@@ -44,10 +48,9 @@ int video_init()
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, NIBBLE_WIDTH, NIBBLE_HEIGHT);
     SDL_RenderSetScale(renderer, windowWidth / NIBBLE_WIDTH, windowHeight / NIBBLE_HEIGHT);
 
-    DEBUG_LOG("SDL Initialized");
+    //DEBUG_LOG("SDL Initialized");
 
     screen = SDL_GetWindowSurface(window);
-    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     return 0;
 }
@@ -83,7 +86,9 @@ void video_update()
 
 void video_quit()
 {
+    #ifndef __EMSCRIPTEN__
     SDL_FreeSurface(iconSurface);
+    #endif
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

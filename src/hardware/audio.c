@@ -64,7 +64,7 @@ void nibble_audio_init(int freq)
     }
     else
     {
-        DEBUG_LOG("PocketMod initialized\n");
+        //DEBUG_LOG("PocketMod initialized");
     }
     nibble_audio_reset();
 }

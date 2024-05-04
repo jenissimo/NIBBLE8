@@ -66,6 +66,17 @@ int main(int argc, char *argv[])
 
     srand(time(NULL)); // Initialization, should only be called once.
 
+    if (argc > 0)
+    {
+        nibble_change_to_sandbox_directory(argv[0]);
+    }
+
+    if (nibble_load_rom() > 0)
+    {
+        DEBUG_LOG("ROM Loading Error");
+        return 1;
+    }
+
     nibble_ram_init();
     nibble_init_video();
     nibble_lua_init();
