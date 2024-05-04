@@ -1,12 +1,11 @@
+include config/Makefile.common
 CC = gcc
 CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function -mconsole
 LIBS_LIST = lua5.4 sdl libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm -lSDL_gfx
 
-SRCDIR = src
-TOOLSDIR = tools
-OBJDIR = obj
-BUILDDIR = bin
+OBJDIR = obj/sdl
+BUILDDIR = bin/sdl
 TARGET = nibble8
 
 # Excluding all adapters from the common sources
@@ -20,10 +19,10 @@ SOURCES := $(COMMON_SOURCES) $(SDL_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: CFLAGS += -O2
-all: $(BUILDDIR)/$(TARGET)
+all: rom $(BUILDDIR)/$(TARGET)
 
 debug: CFLAGS += -g
-debug: $(BUILDDIR)/$(TARGET)
+debug: rom $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)
@@ -35,7 +34,15 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJDIR)/* $(BUILDDIR)/$(TARGET)
+	rm -rf $(OBJDIR) $(BUILDDIR)
 
 font2bin: $(TOOLSDIR)/font2bin.c
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)
+
+rom: $(ROMFILES:%=$(ROMDIR)/%)
+	@mkdir -p $(BUILDDIR)
+	@cp $(ASSETSDIR)/icon.png $(BUILDDIR)
+	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)
+	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
+	-@rm $(BUILDDIR)/rom.zip
+	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)

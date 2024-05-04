@@ -52,7 +52,7 @@ end
 
 function ListSelector:decrease()
     --trace("decrease")
-    if self.selectedIndex > 0 then
+    if self.selectedIndex > 1 then
         self.selectedIndex = self.selectedIndex - 1
         self.changeCallback(self.selectedIndex)
     end

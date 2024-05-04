@@ -27,9 +27,12 @@ a:hover {
     color: #e9efec;
 }
 
-.logo a{
+.terminal-header a{
+    color: #211e20;
+}
+
+.terminal-nav a{
     font-size: 2em;
-    color: #e9efec;
 }
 
 /* Assuming that the .terminal-container and .terminal-header-container share the same max-width value */
@@ -107,8 +110,9 @@ a:hover {
 
 /* Header and footer shared styles */
 .terminal-header, .terminal-footer {
-    color: #e9efec;
-    background-color: #764462;
+    color: #211e20;
+    /* background-color: #764462;*/
+    background-color: #ff944f;
     border-bottom: 1px solid #555568;
     display: flex;
     justify-content: space-between;

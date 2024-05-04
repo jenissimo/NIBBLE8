@@ -1,0 +1,53 @@
+include config/Makefile.common
+CC = gcc
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
+LIBS_LIST = sdl2 sdl2_image libpng
+LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
+
+SRCDIR = src
+TOOLSDIR = tools
+OBJDIR = obj/sdl2
+BUILDDIR = bin/sdl2
+TARGET = nibble8
+ASSETSDIR= assets
+ROMDIR = assets/rom
+ROMFILES = os lib font.bin
+
+# Excluding all adapters from the common sources
+COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -type f -name *.c))
+
+# SDL2 specific sources
+SDL2_SOURCES := $(shell find $(SRCDIR)/adapters/sdl2 -type f -name *.c)
+
+# Combine common sources with the SDL2-specific sources
+SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
+OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
+all: CFLAGS += -O2
+all: rom $(BUILDDIR)/$(TARGET)
+
+debug: CFLAGS += -g -fsanitize=address
+debug: rom $(BUILDDIR)/$(TARGET)
+
+$(BUILDDIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean
+clean:
+	rm -rf $(OBJDIR) $(BUILDDIR)
+
+font2bin: $(TOOLSDIR)/font2bin.c
+	$(CC) $(CFLAGS) -o $(TOOLSDIR)/font2bin $^ $(LIBS)
+
+rom: $(ROMFILES:%=$(ROMDIR)/%)
+	@mkdir -p $(BUILDDIR)
+	@cp $(ASSETSDIR)/icon.png $(BUILDDIR)
+	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)
+	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
+	-@rm $(BUILDDIR)/rom.zip
+	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)

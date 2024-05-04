@@ -99,6 +99,9 @@
         "trigtables.h": "c",
         "pocketmod.h": "c",
         "empty_mod.h": "c",
-        "empty_mod_file.h": "c"
+        "empty_mod_file.h": "c",
+        "dirent.h": "c",
+        "unistd.h": "c",
+        "libgen.h": "c"
     }
 }

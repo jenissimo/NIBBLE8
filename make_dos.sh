@@ -1,2 +1,2 @@
 source /usr/local/djgpp/setenv
-make -f Makefile.dos
+make -f config/Makefile.dos

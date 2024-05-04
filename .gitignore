@@ -49,3 +49,6 @@
 # Build folders
 bin/
 obj/
+
+# VSCode folder
+.v

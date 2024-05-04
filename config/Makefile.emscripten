@@ -1,13 +1,11 @@
-CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
-LIBS_LIST = sdl2 sdl2_image libpng
-LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
+include config/Makefile.common
+CC = emcc
+CFLAGS = -w -I$(SRCDIR) -Wno-unused-function --embed-file bin/emscripten/embed@/ --shell-file assets/web/emtemplate.html
+LIBS = -s USE_SDL=2 -s USE_LIBPNG=1
 
-SRCDIR = src
-TOOLSDIR = tools
-OBJDIR = obj
-BUILDDIR = bin
-TARGET = nibble8
+OBJDIR = obj/emscripten
+BUILDDIR = bin/emscripten
+TARGET = index.html
 
 # Excluding all adapters from the common sources
 COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -type f -name *.c))
@@ -19,10 +17,12 @@ SDL2_SOURCES := $(shell find $(SRCDIR)/adapters/sdl2 -type f -name *.c)
 SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
+all: rom
 all: CFLAGS += -O2
 all: $(BUILDDIR)/$(TARGET)
 
-debug: CFLAGS += -g -fsanitize=address
+debug: rom
+debug: CFLAGS += -g
 debug: $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)
@@ -35,7 +35,14 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJDIR)/* $(BUILDDIR)/$(TARGET)
+	rm -rf $(OBJDIR) $(BUILDDIR)
 
 font2bin: $(TOOLSDIR)/font2bin.c
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)
+
+rom: $(ROMFILES:%=$(ROMDIR)/%)
+	@mkdir -p $(BUILDDIR)/embed
+	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)/embed
+	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)/embed
+	-@rm $(BUILDDIR)/embed/rom.zip
+	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/embed/rom.zip $(ROMFILES)

@@ -1,0 +1,5 @@
+SRCDIR = src
+TOOLSDIR = tools
+ROMDIR = assets/rom
+ASSETSDIR= assets
+ROMFILES = os lib font.bin

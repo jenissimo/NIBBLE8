@@ -94,7 +94,7 @@ function TextEditor:createTab(contentLines)
         selection = {x1 = nil, y1 = nil, x2 = nil, y2 = nil},
         offsetY = 0
     })
-    trace("Created tab: " .. #self.tabs)
+    --trace("Created tab: " .. #self.tabs)
 end
 
 function TextEditor:switchToTab(tabIndex, checkEmptyTab)

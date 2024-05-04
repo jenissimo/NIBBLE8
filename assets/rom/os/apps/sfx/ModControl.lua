@@ -29,8 +29,6 @@ function ModControl:init()
     self.keys[KEYCODE.KEY_Y] = 33
     self.keys[KEYCODE.KEY_7] = 34
     self.keys[KEYCODE.KEY_U] = 35
-
-    self:getSamples()
 end
 
 function ModControl:getSamples()
@@ -44,7 +42,7 @@ function ModControl:getSamples()
         for i = 0, 21 do
             name = name .. chr(peek(startAddress + sample * offset + i))
         end
-        trace(name)
+        --trace(name)
         samples[sample + 1] = name
     end
 
@@ -69,7 +67,7 @@ function ModControl:handleKeyInput(tracker, key_code)
 end
 
 function ModControl:playNote(note, sample, volume)
-    trace("Play note: " .. str(note) .. " sample: " .. sample)
+    --trace("Play note: " .. str(note) .. " sample: " .. sample)
     -- note
     poke(0x7bfc, note)
     -- sample
