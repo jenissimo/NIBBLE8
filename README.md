@@ -8,6 +8,57 @@ Boasting a potent 2-bit graphics engine, and utilizing the easy-to-learn Lua scr
 
 Immerse yourself in the irresistible charm of nostalgia while exploring the capabilities of contemporary game development with NIBBLE8. 
 
+### Building NIBBLE8 SDL2 Version:
+
+#### Dependencies:
+- SDL2
+- SDL2_image
+- libpng
+- pkg-config
+
+#### Build Steps:
+1. Install dependencies:
+   - For macOS (using Homebrew):
+     ```bash
+     brew install sdl2 sdl2_image libpng pkg-config
+     ```
+   - For Ubuntu/Debian:
+     ```bash
+     sudo apt-get install libsdl2-dev libsdl2-image-dev libpng-dev pkg-config
+     ```
+   - For Windows (using MSYS2):
+     - Install MSYS2 from [here](https://www.msys2.org/).
+     - Open MSYS2 terminal and install dependencies:
+       ```bash
+       pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-libpng mingw-w64-x86_64-pkg-config mingw-w64-x86_64-toolchain mingw-w64-x86_64-make
+       ```
+2. Navigate to the NIBBLE8 directory.
+3. Build using mingw32-make:
+   ```bash
+   mingw32-make VERSION=sdl2
+4. After building, copy the necessary DLL files to the build folder.
+
+### Building NIBBLE8 DOS Version:
+
+#### Dependencies:
+- DJGPP cross-compilation environment
+- Additional libraries:
+  - Lua 5.2: [lua522b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/lua522b.zip)
+  - PNG 1.6.40: [png1640b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/png1640b.zip)
+  - Zlib 1.3: [zlb13b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/zlb13b.zip)
+  - Allegro 4.2.2: [all422ar2.zip](https://www.delorie.com/pub/djgpp/current/v2tk/allegro/all422ar2.zip)
+
+#### Build Steps:
+1. Set up DJGPP cross-compilation environment by following the instructions at [build-djgpp](https://github.com/andrewwutw/build-djgpp).
+2. Unpack the additional libraries to the DJGPP folder.
+3. Source the DJGPP environment setup script:
+   ```bash
+   source /usr/local/djgpp/setenv
+(Replace /usr/local/djgpp with the actual path to your DJGPP installation if different)
+4. Navigate to the NIBBLE8 directory.
+5. Run make with the DOS configuration Makefile:
+   ```make -f config/Makefile.dos
+
 ## License
 
 NIBBLE8 is licensed under the [MIT License](https://github.com/jenissimo/NIBBLE8/blob/main/LICENSE).
