@@ -51,6 +51,7 @@ font2bin: $(TOOLSDIR)/font2bin.c
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@echo $(PATH)
 	@mkdir -p $(BUILDDIR)
+	@cp $(ASSETSDIR)/CWSDPMI.EXE $(BUILDDIR)
 	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
 	-@rm $(BUILDDIR)/rom.zip
