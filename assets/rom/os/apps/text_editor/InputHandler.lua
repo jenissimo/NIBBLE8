@@ -113,7 +113,7 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
 
     -- Check for backspace
     if (key_code == KEYCODE.KEY_BACKSPACE) then
-        trace("Backspace!")
+        --trace("Backspace!")
         if textEditor.selection.x1 == nil then
             textEditor:removeChar(-1, textEditor.cursor.x, textEditor.cursor.y)
         else
@@ -124,7 +124,7 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
 
     -- Check for delete
     if (key_code == KEYCODE.KEY_DELETE) then
-        trace("Delete!")
+        --trace("Delete!")
         if textEditor.selection.x1 == nil then
             textEditor:removeChar(1, textEditor.cursor.x, textEditor.cursor.y)
         else

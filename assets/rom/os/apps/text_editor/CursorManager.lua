@@ -168,6 +168,7 @@ function CursorManager:moveCursorToLineStart(textEditor)
         textEditor.scroll.x = 0
     end
 
+    textEditor.syntax_highlighting_dirty = true
     textEditor:checkSelectionUpdate()
 end
 
@@ -177,6 +178,7 @@ function CursorManager:homeCursor(textEditor)
     textEditor.scroll.x = 0
     self:setCursor(textEditor, 0, textEditor.cursor.y)
 
+    textEditor.syntax_highlighting_dirty = true
     textEditor:checkSelectionUpdate()
 end
 
@@ -198,6 +200,7 @@ function CursorManager:endCursor(textEditor)
         self:setCursor(textEditor, line_len, textEditor.cursor.y)
     end
 
+    textEditor.syntax_highlighting_dirty = true
     textEditor:checkSelectionUpdate()
 end
 
