@@ -1,11 +1,11 @@
 include config/Makefile.common
 CC = emcc
 CFLAGS = -w -I$(SRCDIR) -Wno-unused-function --embed-file bin/emscripten/embed@/ --shell-file assets/web/emtemplate.html
-LIBS = -s USE_SDL=2 -s USE_LIBPNG=1
+LIBS = -s USE_SDL=2 -s USE_LIBPNG=1 -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0 -sMAX_WEBGL_VERSION=2
 
 OBJDIR = obj/emscripten
 BUILDDIR = bin/emscripten
-TARGET = index.html
+TARGET = nibble8.html
 
 # Excluding all adapters from the common sources
 COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -type f -name *.c))
@@ -43,6 +43,7 @@ font2bin: $(TOOLSDIR)/font2bin.c
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@mkdir -p $(BUILDDIR)/embed
 	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)/embed
+	@cp -R $(ASSETSDIR)/web/* $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)/embed
 	-@rm $(BUILDDIR)/embed/rom.zip
 	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/embed/rom.zip $(ROMFILES)

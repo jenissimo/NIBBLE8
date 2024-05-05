@@ -17,14 +17,27 @@ body {
     color: #555568;
 }
 
+#canvas {
+    display: block;
+    width: 480px;
+    height: 360px;
+}
+
+.screenshot {
+    width: 320px;
+    height: 240px;
+    image-rendering: pixelated;
+}
+
 /* Link styles */
 a {
-    color: #edb4a1;
+    color: #ff924f;
     text-decoration: none;
+    transition: color 0.3s ease; /* Transition effect for color change */
 }
 
 a:hover {
-    color: #e9efec;
+    color: #ffe7c4;
 }
 
 .terminal-header a{
@@ -67,6 +80,14 @@ a:hover {
     height: 100%; /* They should take the full height of the header */
 }
 
+.login-signin {
+    font-size: 2em;
+}
+
+#discord-link {
+    margin-right: 0.7rem;
+}
+
 /* Adjust the .terminal-container if needed */
 .terminal-container {
     padding-top: 2rem; /* This is just an example, adjust as needed */
@@ -82,8 +103,27 @@ a:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
+#monitor {
+    width: 525px; /* Set width */
+    height: 470px; /* Set height */
+    background-image: url("display.png");
+    background-size: contain; /* Fit the background image within the div */
+    background-repeat: no-repeat; /* Prevent background image from repeating */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Add position relative to use absolute positioning for the canvas */
+}
+
+#canvas {
+    position: absolute; /* Position the canvas absolutely within the monitor div */
+    top: 45px; /* Align the canvas to the center vertically */
+    left: 25px; /* Align the canvas to the center horizontally */
+}
+
 /* Player styling */
 #player {
+    margin-top: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -139,15 +179,19 @@ a:hover {
     font-weight: 500;
 }
 
+.terminal-nav ul li a:hover {
+    color: #9f5322;
+}
+
 /* Content styles */
 .terminal-content h2 {
-    color: #a0a08b;
+    color: #9f5322;
     font-size: 1.5em;
 }
 
 .terminal-content p {
     margin-bottom: 2rem;
-    color: #e9efec;
+    color: #ffe7c4;
 }
 
 /* Responsive styling */

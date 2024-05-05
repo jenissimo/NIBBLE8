@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="happy_dog.gif" type="image/gif">
+    <title>NIBBLE8 Fantasy Gaming Console</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="terminal-header">
+        <div class="terminal-header-container">
+            <!-- Logo on the left -->
+            <div class="logo">
+                <img src="logo2.png" />
+            </div>
+            <nav class="terminal-nav">
+                <ul>
+                    <li><a href="https://github.com/jenissimo/NIBBLE8/blob/main/API_REFERENCE.md" target="_blank">LEARN</a></li>
+                    <li><a href="https://nibble8.com/try.html" target="_blank">TRY</a></li>
+                    <li><a href="https://itch.io/" target="_blank">GET</a></li>
+                </ul>
+            </nav>
+            <!-- Sign-in on the right -->
+            <div class="login-signin">
+                <a id="discord-link" href="https://discord.gg/KJRE8AEa" target="_blank"><i class="fab fa-discord"></i></a>
+                <a href="https://github.com/jenissimo/NIBBLE8" target="_blank"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </header>
+    <div class="terminal-container">
+        <main class="terminal-content">
+            <section id="player">
+                <div id="monitor">
+                    <canvas id="canvas"></canvas>
+                </div>
+            </section>
+            <section id="about">
+                <h2>About</h2>
+                <p>Have you ever imagined what it would be like if the Game Boy were a full-fledged computer? Were you mesmerized by the nostalgic glow of amber CRT monitors? Or maybe you're longing to dive into some retro-programming on your vintage IBM ThinkPad under MS-DOS?</p>
+                <p>Look no further, because I've got you covered.</p>
+                <p>NIBBLE8 is a <a href="https://en.wikipedia.org/wiki/Fantasy_video_game_console" target="_blank">fantasy video game console</a> that comes bundled with an array of game creation tools for editing code, sprites, maps, and music. It's designed to ignite the joy of retro programming, though it does come with some technical limitations: enjoy a whopping 160x120 pixels display, a 4-color palette, a 240x240 pixels sprite sheet, and 4-channel sound, among other features.</p>
+                <p>Not only can you create your own games, but you can also share them with others.</p>
+            </section>
+            <section id="screenshots">
+                <h2>Screenshots</h2>
+                <p><img class="screenshot" src="screenshots/terminal.png" alt="Terminal"/>
+                <img class="screenshot" src="screenshots/code_editor.png" alt="Code Editor"/>
+                <img class="screenshot" src="screenshots/sprite_editor.png" alt="Sprite Editor"/>
+                <img class="screenshot" src="screenshots/map_editor.png" alt="Map Editor"/>
+                <img class="screenshot" src="screenshots/tracker.png" alt="Sound Tracker"/>
+                <img class="screenshot" src="screenshots/game.png" alt="Game"/></p>
+        </main>
+    </div>
+    <footer class="terminal-footer">
+        <p>2024 NIBBLE8</p>
+    </footer>
+    <script async src=nibble8.js></script>
+    <script>
+        var Module = {
+            arguments: [
+                '--cart', 'demos/synthwave.n8',
+                '--width', '480',
+                '--height', '360',
+                '--player', '1',
+            ],
+            canvas: function () {
+                var canvas = document.getElementById('canvas');
+                canvas.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                return canvas;
+            }()
+        }
+    </script>
+</body>
+
+</html>
