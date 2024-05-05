@@ -108,7 +108,7 @@ void audio_quit()
     SDL_ClearQueuedAudio(device);                      // Clear all queued audio data
     SDL_QueueAudio(device, &silence, sizeof(silence)); // Queue a single sample of silence
     SDL_PauseAudioDevice(device, 0);                   // Resume playback to flush the buffer
-    SDL_Delay(100);                                    // Short delay to let the silence play out
+    SDL_Delay(200);                                    // Short delay to let the silence play out
 
     SDL_CloseAudio();
 }
