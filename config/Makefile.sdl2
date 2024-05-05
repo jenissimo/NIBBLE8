@@ -4,14 +4,9 @@ CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -
 LIBS_LIST = sdl2 sdl2_image libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
-SRCDIR = src
-TOOLSDIR = tools
 OBJDIR = obj/sdl2
 BUILDDIR = bin/sdl2
 TARGET = nibble8
-ASSETSDIR= assets
-ROMDIR = assets/rom
-ROMFILES = os lib font.bin
 
 # Excluding all adapters from the common sources
 COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -type f -name *.c))

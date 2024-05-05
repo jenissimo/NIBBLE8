@@ -1,8 +1,8 @@
 include config/Makefile.common
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -Wno-unused-function -mconsole
-LIBS_LIST = lua5.4 sdl libpng
-LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm -lSDL_gfx
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
+LIBS_LIST = SDL_gfx libpng
+LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
 OBJDIR = obj/sdl
 BUILDDIR = bin/sdl
@@ -14,14 +14,14 @@ COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -typ
 # SDL specific sources
 SDL_SOURCES := $(shell find $(SRCDIR)/adapters/sdl -type f -name *.c)
 
-# Combine common sources with the SDL-specific sources
-SOURCES := $(COMMON_SOURCES) $(SDL_SOURCES)
+# Combine common sources with the SDL2-specific sources
+SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: CFLAGS += -O2
 all: rom $(BUILDDIR)/$(TARGET)
 
-debug: CFLAGS += -g
+debug: CFLAGS += -g -fsanitize=address
 debug: rom $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)
@@ -37,7 +37,7 @@ clean:
 	rm -rf $(OBJDIR) $(BUILDDIR)
 
 font2bin: $(TOOLSDIR)/font2bin.c
-	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)
+	$(CC) $(CFLAGS) -o $(TOOLSDIR)/font2bin $^ $(LIBS)
 
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@mkdir -p $(BUILDDIR)
