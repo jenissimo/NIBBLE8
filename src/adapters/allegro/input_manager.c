@@ -109,10 +109,12 @@ int input_update()
 
     updateButtonState();
 
+    /*
     if (key[KEY_F12])
     {
         return 0; // Indicate that the application should quit
     }
+    */
 
     return 1;
 }

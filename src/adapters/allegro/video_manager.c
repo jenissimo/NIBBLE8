@@ -12,7 +12,6 @@ const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 uint32_t fpsLastTime = 0;
 int frameCount = 0;
 int fpsCurrent = 0;
-int currentPaletteIndex = 0;
 
 int video_init()
 {
@@ -32,7 +31,6 @@ int video_init()
         return -1;
     }
 
-    currentPaletteIndex = manager->current_palette;
     // Setup the palette
     video_setup_palette();
 
@@ -41,16 +39,24 @@ int video_init()
 
 void video_setup_palette()
 {
-    const Palette *palette = currentPalette(manager); // Ensure this function exists and is accessible
     PALETTE allegPalette;
 
     // Convert and set colors
     for (int i = 0; i < 4; i++)
     {
-        allegPalette[i].r = palette->color[i][0] / 4;
-        allegPalette[i].g = palette->color[i][1] / 4;
-        allegPalette[i].b = palette->color[i][2] / 4;
-        DEBUG_LOG("Color %d: %d, %d, %d", i, palette->color[i][0], palette->color[i][1], palette->color[i][2]);
+        if (memory.drawState.colorPalette.flip)
+        {
+            allegPalette[i].r = memory.drawState.colorPalette.r[3 - i] / 4;
+            allegPalette[i].g = memory.drawState.colorPalette.g[3 - i] / 4;
+            allegPalette[i].b = memory.drawState.colorPalette.b[3 - i] / 4;
+        }
+        else
+        {
+            allegPalette[i].r = memory.drawState.colorPalette.r[i] / 4;
+            allegPalette[i].g = memory.drawState.colorPalette.g[i] / 4;
+            allegPalette[i].b = memory.drawState.colorPalette.b[i] / 4;
+        }
+        //DEBUG_LOG("Color %d: %d, %d, %d", i, palette->color[i][0], palette->color[i][1], palette->color[i][2]);
     }
 
     // Fill the rest of the palette with black or any default color
@@ -65,6 +71,7 @@ void video_setup_palette()
 
 inline void video_update()
 {
+    video_setup_palette();
     // Display FPS on the back buffer if enabled
 #if NIBBLE_DISPLAY_FPS
     frameCount++;
@@ -81,12 +88,6 @@ inline void video_update()
     // Perform drawing operations on native_buffer
     video_update_frame_allgero(); // Assuming this function draws the current frame
 
-    if (currentPaletteIndex != manager->current_palette)
-    {
-        video_setup_palette();
-        currentPaletteIndex = manager->current_palette;
-    }
-
     // Update the display (not needed for every version of Allegro, but here for completeness)
     // vsync();
 
@@ -102,7 +103,6 @@ inline void video_update()
 void video_update_frame_allgero()
 {
     int pixelIndex = 0;
-    // const Palette *palette = currentPalette(manager); // Ensure this function exists and is accessible
     uint8_t value;
     uint8_t col;
     int x, y;
