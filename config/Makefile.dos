@@ -26,7 +26,7 @@ COMMON_SOURCES += $(wildcard $(SRCDIR)/utils/*.c)
 SOURCES := $(COMMON_SOURCES)
 OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-all: CFLAGS += -O3 -ffast-math -march=pentium-mmx -ffunction-sections -fdata-sections -funroll-all-loops
+all: CFLAGS += -O3 -march=pentium-mmx -ffunction-sections -fdata-sections -funroll-all-loops -ffloat-store
 all: LDFLAGS += -flto
 all: rom $(BUILDDIR)/$(TARGET)
 

@@ -73,7 +73,9 @@ local KEYWORDS = {
     ["cursor"] = true,
     ["color"] = true,
     ["add"] = true,
-    ["str"] = true
+    ["str"] = true,
+    ["sfx"] = true,
+    ["music"] = true
 }
 local TERMINATORS = {
     ["\n"] = true,

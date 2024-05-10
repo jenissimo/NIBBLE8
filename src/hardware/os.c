@@ -71,7 +71,7 @@ void nibble_api_reboot()
     //DEBUG_LOG("Rebooting Nibble8");
     nibble_ram_init();
     nibble_ram_clear();
-    nibble_audio_init(NIBBLE_SAMPLERATE);
+    nibble_audio_init(NIBBLE_SAMPLERATE, NULL, 0);
     nibble_audio_reset();
     nibble_lua_destroy();
     nibble_lua_init();
@@ -103,7 +103,7 @@ char *nibble_api_ls(char *path)
         // Check if the path exists
         if (access(path, F_OK) != 0)
         {
-            printf("Error: Path does not exist\n");
+            DEBUG_LOG("Error: Path does not exist");
             free(buf);
             return NULL;
         }
@@ -147,7 +147,7 @@ char *nibble_api_ls(char *path)
     }
 
     closedir(dir);
-    printf("LS: %s", buf);
+    DEBUG_LOG("LS: %s", buf);
     return buf;
 }
 

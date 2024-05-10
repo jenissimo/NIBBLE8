@@ -44,19 +44,21 @@ function FancyStepper:draw()
 end
 
 function FancyStepper:increase()
-    --trace("increase")
     if self.value < self.maxValue then
         self.value = self.value + 1
-        self.changeCallback(self.value)
+    else
+        self.value = self.minValue  -- Wrap around to the minimum value
     end
+    self.changeCallback(self.value)
 end
 
 function FancyStepper:decrease()
-    --trace("decrease")
     if self.value > self.minValue then
         self.value = self.value - 1
-        self.changeCallback(self.value)
+    else
+        self.value = self.maxValue  -- Wrap around to the maximum value
     end
+    self.changeCallback(self.value)
 end
 
 function FancyStepper:mousepressed(x, y, button)

@@ -18,8 +18,6 @@ end
 
 function Label:draw()
     print(self.text, self.x, self.y, self.color)
-    --love.graphics.setColor(1, 1, 1, 1)
-    --love.graphics.printf(self.text, self.x, self.y + self.height / 2 - 10, self.width, "center")
 end
 
 return Label

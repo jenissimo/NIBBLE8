@@ -67,8 +67,6 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     self.queueTimer = 0
 
     cls()
-    -- trace("Terminal started")
-    -- 24, 26, 28, 29
     local sample = 1
     local volume = 64
     -- local notes = {11, 20, 15, 22}
@@ -82,7 +80,8 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
                       {note = notes[3], sample = sample, volume = volume})
     self:queueMessage("", 2, 0.07,
                       {note = notes[4], sample = sample, volume = volume})
-
+                      self:queueMessage("", 2, 0.07,
+                      {note = -1, sample = sample, volume = volume})
     return self;
 end
 
@@ -460,8 +459,12 @@ function Terminal:update()
             end
 
             if msg.sound then
-                ModControl:playNote(msg.sound.note, msg.sound.sample,
+                if msg.sound.note == -1 then
+                    ModControl:stopNote()
+                else
+                    ModControl:playNote(msg.sound.note, msg.sound.sample,
                                     msg.sound.volume)
+                end
             end
 
             table.remove(self.messageQueue, 1)

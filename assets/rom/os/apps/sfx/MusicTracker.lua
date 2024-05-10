@@ -5,10 +5,9 @@ local ModControl = require("os/apps/sfx/ModControl")
 local UIManager = require("ui/UIManager")
 local FancyStepper = require("os/apps/sfx/FancyStepper")
 local ListSelector = require("os/apps/sfx/ListSelector")
---local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
+-- local KeyboardUtils = require("os/apps/synth/KeyboardUtils")
 local UIUtils = require("ui/UIUtils")
 local NUM_CHANNELS = 4
-local NOTES = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"}
 -- Define the width of each column in the pattern editor
 local columnWidths = {
     3, -- Note
@@ -38,7 +37,9 @@ function MusicTracker.new(x, y)
     self.topVisibleLine = 1
     self.numColumns = 6 * NUM_CHANNELS
     self.cursorX = self.x + 2
-    self.currentInstrument = 1
+    self.playing = false
+    self.editMode = false
+    -- self.currentInstrument = 1
 
     self.columnWidths = {}
     for i = 1, NUM_CHANNELS do
@@ -52,24 +53,23 @@ function MusicTracker.new(x, y)
 
     uiManager = UIManager.new()
     -- First row
-    posSelector = FancyStepper.new(x + 2, y + 1, 0, 63, "pos",
-                                   self.positionChanged)
-    patternSelector = FancyStepper.new(x + 36, y + 1, 0, 63, "pattern",
-                                       self.patternChanged)
-    bpmSelector = FancyStepper.new(x + 86, y + 1, 0, 255, "bpm", bpmChanged)
-    bpmSelector.value = 125
-    -- lengthSelector = FancyStepper.new(x + 124, y + 1, 0, 63, "len", function(
-    -- value) trace("length: " .. str(value)) end)
+    patternSelector = FancyStepper.new(x + 2, y + 1, 0, 99, "pattern",
+                                       function(value)
+        trace("pattern: " .. str(value))
+        self:invalidateTrack()
+    end)
+    bpmSelector = FancyStepper.new(x + 52, y + 1, 0, 255, "bpm", function(value)
+        trace("BPM: " .. str(value))
+    end)
 
     -- Second row
-    volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 40, "volume", function(
-        value) trace("length: " .. str(value)) end)
-    volumeSelector.value = 0x40
+    volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 64, "volume", function(
+        value) self.volume = volumeSelector.value end)
 
     local instruments = ModControl:getSamples()
     instrumentSelector = ListSelector.new(x + 48, y + 12, "instrument",
                                           instruments, 15, function(value)
-        --trace("instrument: " .. str(value))
+        -- trace("instrument: " .. str(value))
         self.currentInstrument = value
     end)
 
@@ -80,24 +80,28 @@ function MusicTracker.new(x, y)
     uiManager:addElement(volumeSelector)
     uiManager:addElement(instrumentSelector)
 
-    self.channels = {}
-    self.track = {}
     self.lines = ""
-
-    for i = 1, 64 do
-        for j = 1, NUM_CHANNELS do
-            -- note index, octave, instrument, command, param
-            table.insert(self.track, {2, 2, 4, 10, 1})
-        end
-    end
-    self:updateText()
+    self.track = {}
+    self:init()
 
     return self
 end
 
-function MusicTracker.positionChanged(value) trace("pos: " .. str(value)) end
-function MusicTracker.patternChanged(value) trace("pattern: " .. str(value)) end
-function MusicTracker.bpmChanged(value) trace("bpm: " .. str(value)) end
+function MusicTracker:init()
+    patternSelector.value = patternSelector.minValue
+    instrumentSelector.selectedIndex = 1
+    bpmSelector.value = 125
+    volumeSelector.value = 0x40
+    self.currentInstrument = 1
+    self.volume = volumeSelector.value
+
+    self:invalidateTrack()
+end
+
+function MusicTracker:invalidateTrack()
+    self.track = ModControl:getPattern(patternSelector.value)
+    self:updateText()
+end
 
 function MusicTracker:updateText()
     self.lines = ""
@@ -122,12 +126,24 @@ function MusicTracker:getLineText(i, highlight)
     for j = 1, NUM_CHANNELS do
         local index = (i - 1) * NUM_CHANNELS + j
         local note = self.track[index]
-        local noteName = NOTES[note[1]]
-        local octave = string.format("%d", note[2])
-        local instrument = string.format("%02d", note[3])
+        local noteName
+        local octave
+        local instrument = string.format("%02x", note[3])
         local command = string.format("%x", note[4])
-        local param = string.format("%02d", note[5])
+        local param = string.format("%02x", note[5])
         local noteText = ""
+
+        if note[1] > 0 and note[3] > 0 then
+            noteName = ModControl.NOTES[note[1]]
+        else
+            noteName = "--"
+        end
+
+        if note[2] > 0 and note[1] > 0 and note[3] > 0 then
+            octave = string.format("%d", note[2])
+        else
+            octave = "-"
+        end
 
         if highlight then
             noteText = noteText .. "\f3" .. noteName .. octave
@@ -165,10 +181,12 @@ function MusicTracker:drawPatternEditor()
 
     -- Draw the cursor
     local cursorY = baseY + ((self.cursorRow - self.topVisibleLine) * 6)
-    rectfill(self.x + 3, cursorY + 2, 153, 7, 1)
+    rectfill(self.x + 3, cursorY + 2, 153, 7, 2)
     -- draw second cursor
-    rectfill(self.cursorX + 13, cursorY + 2,
-             self.columnWidths[self.cursorColumn] * 4 + 1, 7, 2)
+    if self.editMode and not self.playing then
+        rectfill(self.cursorX + 13, cursorY + 2,
+                 self.columnWidths[self.cursorColumn] * 4 + 1, 7, 3)
+    end
 
     -- Draw the cursor text
     palt(1, true)
@@ -202,25 +220,112 @@ function MusicTracker:drawPatternEditor()
 end
 
 function MusicTracker:key(key_code, ctrl_pressed, shift_pressed)
+    local channel = flr(self.cursorColumn / 7)
+    local line = self.cursorRow
+    local pattern = patternSelector.value
+    local sample = self.currentInstrument
+
+    if not self.playing then
+        self:checkCursorKeys(key_code)
+
+        if self.editMode then
+            self:editInput(key_code)
+        else
+            ModControl:handleKeyInput(self, key_code, pattern, line, channel,
+                                      sample)
+        end
+    end
+
+    -- trace(key_code)
+
+    if key_code == KEYCODE.KEY_SPACE then
+        if self.playing then
+            self.playing = false
+            music(-1)
+        else
+            self.editMode = not self.editMode
+        end
+    elseif key_code == KEYCODE.KEY_RETURN then
+        self.playing = not self.playing
+        if self.playing then
+            trace("Play!")
+            music(patternSelector.value, 1)
+        else
+            trace("Stop!")
+            music(-1)
+        end
+    end
+end
+
+function MusicTracker:editInput(key_code)
+    local channel,columnType,noteData
+    local lineIndex = self.cursorRow - 1
+    local pattern = patternSelector.value
+    local sample = self.currentInstrument
+
+    channel = flr((self.cursorColumn) / 7)
+    columnType = (self.cursorColumn) % 7
+    noteData = self.track[lineIndex * NUM_CHANNELS + channel + 1]
+    
+    -- Convert SDL2 key_code to character if it's a hex character (0-9, A-F)
+    local char = UTILS.handle_text_input(key_code, false, false)
+    if columnType == 1 then -- Note column
+        ModControl:handleKeyInput(self, key_code, pattern, lineIndex, channel,
+                                  sample)
+    elseif char and noteData then
+        local value = tonumber(char, 16)
+        if value then
+            if columnType == 2 or columnType == 3 then -- Instrument columns
+                -- Assuming instruments are stored in noteData[3] in two nibbles
+                local newInstrument
+
+                if columnType == 2 then
+                    newInstrument = (value * 16) + (noteData[3] % 16)
+                else
+                    newInstrument = (noteData[3] - noteData[3] % 16) + value
+                end
+
+                if newInstrument > 32 then newInstrument = 32 end
+
+                ModControl:setSample(pattern, lineIndex, channel, newInstrument)
+                self:invalidateTrack()
+                self:moveCursorV(1)
+            elseif columnType == 4 then -- Command column
+                ModControl:setCommandAndParams(pattern, lineIndex, channel, value, noteData[5])
+                self:invalidateTrack()
+                self:moveCursorV(1)
+            elseif columnType == 5 or columnType == 6 then -- Param columns
+                -- Assuming params are stored in noteData[5] as two hex digits
+                local newParams
+
+                if columnType == 5 then
+                    newParams = (value * 16) + (noteData[5] % 16)
+                else
+                    newParams = (noteData[5] - noteData[5] % 16) + value
+                end
+
+                ModControl:setCommandAndParams(pattern, lineIndex, channel, noteData[4], newParams)
+                self:invalidateTrack()
+                self:moveCursorV(1)
+            end
+        end
+    end
+end
+
+function MusicTracker:checkCursorKeys(key_code)
     local rowChanged = false
     local cursorMoved = false
 
-    ModControl:handleKeyInput(self, key_code)
-
     if (key_code == KEYCODE.KEY_UP) and (not ctrl_pressed) then
-        self.cursorRow = max(1, self.cursorRow - 1)
-        rowChanged = true
+        self:moveCursorV(-1)
     elseif (key_code == KEYCODE.KEY_DOWN) and (not ctrl_pressed) then
-        self.cursorRow = min(64, self.cursorRow + 1)
-        rowChanged = true
+        self:moveCursorV(1)
     elseif key_code == KEYCODE.KEY_PGUP or
         (key_code == KEYCODE.KEY_UP and ctrl_pressed) then
-        self.cursorRow = max(1, self.cursorRow - self.visibleLines)
-        rowChanged = true
+        self:moveCursorV(-self.visibleLines)
     elseif key_code == KEYCODE.KEY_PGDOWN or
         (key_code == KEYCODE.KEY_DOWN and ctrl_pressed) then
-        self.cursorRow = min(64, self.cursorRow + self.visibleLines)
-        rowChanged = true
+        self:moveCursorV(self.visibleLines)
     elseif key_code == KEYCODE.KEY_LEFT then
         -- Move cursor left, skipping separators
         if self.cursorColumn > 1 then
@@ -229,6 +334,7 @@ function MusicTracker:key(key_code, ctrl_pressed, shift_pressed)
             if self.cursorColumn % 7 == 0 then -- Assuming separator is every 7th column
                 self.cursorColumn = self.cursorColumn - 1
             end
+            trace(self.cursorColumn)
         else
             self.cursorColumn = #self.columnWidths -- Wrap to last column, avoiding separators
             if self.cursorColumn % 7 == 0 then
@@ -244,18 +350,68 @@ function MusicTracker:key(key_code, ctrl_pressed, shift_pressed)
             if self.cursorColumn % 7 == 0 then -- Assuming separator is every 7th column
                 self.cursorColumn = self.cursorColumn + 1
             end
+            trace(self.cursorColumn)
         else
             self.cursorColumn = 1 -- Wrap to first column
         end
         cursorMoved = true
     end
 
-    self:ensureCursorVisible()
-    if rowChanged then self:updateText() end
     if cursorMoved then self:updateCursorX() end
 end
 
-function MusicTracker:update() uiManager:update() end
+function MusicTracker:moveCursorV(offset)
+    local rowChanged = false
+    local cursorMoved = false
+
+    -- Calculate the new cursor row
+    local newCursorRow = self.cursorRow + offset
+
+    -- Check if the new cursor row exceeds the limits
+    if newCursorRow < 1 then
+        -- Wraparound to the bottom if the new cursor row is less than 1
+        self.cursorRow = 64
+        rowChanged = true
+    elseif newCursorRow > 64 then
+        -- Wraparound to the top if the new cursor row is greater than 64
+        self.cursorRow = 1
+        rowChanged = true
+    else
+        -- Update the cursor row if within the limits
+        self.cursorRow = newCursorRow
+        rowChanged = true
+    end
+
+    -- Ensure the cursor remains within the visible lines
+    self:ensureCursorVisible()
+
+    if rowChanged then self:updateText() end
+end
+
+function MusicTracker:keyup(key_code, ctrl_pressed, shift_pressed)
+    ModControl:checkKeyUp(self, key_code)
+end
+
+function MusicTracker:update()
+    self.playing = ModControl:isPlaying()
+    if self.playing then
+        local newRow = ModControl:getCurrentLine() + 1
+        -- local pattern = ModControl:getCurrentPattern()
+        -- if pattern ~= patternSelector.value then
+        --    patternSelector.value = pattern
+        --    self.lines = ModControl:getPattern(pattern)
+        --    self:updateText()
+        -- end
+        if newRow ~= self.cursorRow and newRow <= 64 then
+            self.cursorRow = newRow
+            self:updateText()
+            self:ensureCursorVisible()
+        end
+    end
+
+    uiManager:update()
+    ModControl:checkKeyUp()
+end
 
 function MusicTracker:updateCursorX()
     local x = self.x + 2 -- Start x position of the first column
@@ -274,7 +430,16 @@ function MusicTracker:ensureCursorVisible()
                                                64 - self.visibleLines + 1))
 end
 
-function MusicTracker:drawPost() end
+function MusicTracker:drawPost()
+    local msg = nil
+    if self.playing then
+        msg = "playing"
+    elseif self.editMode then
+        msg = "edit mode"
+    end
+
+    if msg then print(msg, 160 - #msg * 4, 1, 0) end
+end
 
 function MusicTracker:draw()
     cls(1)

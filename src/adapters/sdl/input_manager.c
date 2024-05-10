@@ -148,6 +148,7 @@ void nibble_clear_keys()
         if (i == nibble_get_custom_key(SDLK_LSHIFT) || i == nibble_get_custom_key(SDLK_RSHIFT))
             continue;
         nibble_keymap[i] = 0;
+        nibble_keymap_p[i] = 0;
     }
 }
 
@@ -156,7 +157,7 @@ void nibble_sdl_save_lua_keys_constants()
     FILE *f = fopen("lib/keys_constants.lua", "w");
     if (f == NULL)
     {
-        printf("Error opening file!\n");
+        DEBUG_LOG("Error opening file!");
         exit(1);
     }
 

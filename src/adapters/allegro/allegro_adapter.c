@@ -12,7 +12,7 @@ void nibble_allegro_init()
         DEBUG_LOG("Allegro Initialization failed.");
         return 1;
     }
-    
+
     install_keyboard();
     install_mouse();
     install_timer();
@@ -39,14 +39,15 @@ inline void nibble_allegro_update()
         return; // Quit signal received
     }
 
+    // nibble_lua_call("_update");
     lua_getglobal(currentVM, "_update");
     lua_pcall(currentVM, 0, 0, 0);
 
+    audio_update();
+
+    // nibble_lua_call("_update");
     lua_getglobal(currentVM, "_draw");
     lua_pcall(currentVM, 0, 0, 0);
-    
-    //nibble_lua_call("_update");
-    //nibble_lua_call("_draw");
 
     if (frame_dirty)
     {

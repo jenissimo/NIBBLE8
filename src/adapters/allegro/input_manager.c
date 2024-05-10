@@ -133,7 +133,7 @@ void input_check_hotkey(int key)
         nextPalette(manager);
         break;
     case KEY_F4:
-        nibble_allegro_save_lua_keys_constants();
+        //nibble_allegro_save_lua_keys_constants();
         break;
     default:
         break;
@@ -185,6 +185,7 @@ void nibble_clear_keys()
         // if (i == nibble_get_custom_key(KEY_LSHIFT) || i == nibble_get_custom_key(KEY_RSHIFT))
         //    continue;
         nibble_keymap[i] = 0;
+        nibble_keymap_p[i] = 0;
     }
 }
 

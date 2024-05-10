@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
 
     nibble_ram_init();
     nibble_init_video();
-    nibble_lua_init();
     nibble_allegro_init();
+    nibble_lua_init();
     check_params(argc, argv);
 
     // Lock the timer handler function
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
             int old_ticks = ticks;
             ticks--;
             if (old_ticks <= ticks)
-            { 
+            {
                 break;
             }
         }

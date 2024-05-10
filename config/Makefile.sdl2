@@ -1,6 +1,6 @@
 include config/Makefile.common
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR)  -Wno-unused-function -pg -ffunction-sections
 LIBS_LIST = sdl2 sdl2_image libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 

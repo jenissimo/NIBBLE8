@@ -95,10 +95,17 @@ function _error(error_message)
         end
     end
 
-    currentWindow = terminal
+    changeWindow(terminal)
 
     textEditor:switchToTab(tonumber(tabIndex + 1))
     textEditor:setCursor(0, tonumber(localLine) - 1)
+end
+
+function changeWindow(window)
+    currentWindow = window
+    if window.init then
+        window:init()
+    end
 end
 
 function _update()
@@ -135,23 +142,23 @@ function _key(key_code, ctrl_pressed, shift_pressed)
         hot_key_pressed = true
     elseif key_code == KEYCODE.KEY_F1 then
         hot_key_pressed = true
-        currentWindow = textEditor
+        changeWindow(textEditor)
     elseif key_code == KEYCODE.KEY_F2 then
         hot_key_pressed = true
-        currentWindow = spriteEditor
+        changeWindow(spriteEditor)
     elseif key_code == KEYCODE.KEY_F3 then
         hot_key_pressed = true
-        currentWindow = mapEditor
+        changeWindow(mapEditor)
     elseif key_code == KEYCODE.KEY_F4 then
         hot_key_pressed = true
-        currentWindow = musicTracker
+        changeWindow(musicTracker)
     elseif key_code == KEYCODE.KEY_ESCAPE then
         hot_key_pressed = true
         if (currentWindow == terminal) then
-            currentWindow = lastWindow
+            changeWindow(lastWindow)
         else
             lastWindow = currentWindow
-            currentWindow = terminal
+            changeWindow(terminal)
         end
     end
 

@@ -93,6 +93,10 @@ void nibble_lua_init_api()
     nibble_lua_register_function("mget", l_mget);
     nibble_lua_register_function("mset", l_mset);
 
+    // Sound Functions
+    nibble_lua_register_function("sfx", l_sfx);
+    nibble_lua_register_function("music", l_music);
+
     // Utils
     nibble_lua_register_function("rnd", l_rnd);
     nibble_lua_register_function("chr", l_chr);
@@ -262,7 +266,7 @@ static int l_peek(lua_State *L)
 
     if (top >= 1)
     {
-        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint32_t addr = (uint32_t)lua_tonumber(L, 1);
         uint8_t result = nibble_api_peek(addr);
         // DEBUG_LOG("peek(%d) = %d\n", addr, result);
         lua_pushinteger(L, result);
@@ -278,7 +282,7 @@ static int l_poke(lua_State *L)
 
     if (top >= 2)
     {
-        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint32_t addr = (uint32_t)lua_tonumber(L, 1);
         uint8_t value = (uint8_t)lua_tonumber(L, 2);
         // DEBUG_LOG("poke(%d, %d)\n", addr, value);
         nibble_api_poke(addr, value);
@@ -294,7 +298,7 @@ static int l_peek2(lua_State *L)
 
     if (top >= 1)
     {
-        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint32_t addr = (uint32_t)lua_tonumber(L, 1);
         uint16_t result = nibble_api_peek2(addr);
         // DEBUG_LOG("peek2(%d) = %d\n", addr, result);
         lua_pushinteger(L, result);
@@ -310,7 +314,7 @@ static int l_poke2(lua_State *L)
 
     if (top >= 2)
     {
-        uint16_t addr = (uint16_t)lua_tonumber(L, 1);
+        uint32_t addr = (uint16_t)lua_tonumber(L, 1);
         uint16_t value = (uint16_t)lua_tonumber(L, 2);
         // DEBUG_LOG("poke2(%d, %d)\n", addr, value);
         nibble_api_poke2(addr, value);
@@ -642,6 +646,48 @@ static int l_cls(lua_State *L)
     nibble_api_cls(color);
 
     return 0;
+}
+
+static int l_sfx(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        int n = lua_tointeger(L, 1);
+        int offset = 0;
+        int length = NIBBLE_PATTERN_LENGTH;
+
+        if (top >= 2)
+        {
+            offset = lua_tointeger(L, 2);
+        }
+
+        if (top >= 3)
+        {
+            length = lua_tointeger(L, 3);
+        }
+
+        nibble_api_sfx(n, offset, length);
+    }
+}
+
+static int l_music(lua_State *L)
+{
+    int top = lua_gettop(L);
+
+    if (top >= 1)
+    {
+        int8_t n = lua_tointeger(L, 1);
+        uint8_t length = n > 0 ? (NIBBLE_PATTERNS_COUNT - n) : 0;
+        DEBUG_LOG("l_music(%d,%d)", n, length);
+        if (top >= 2)
+        {
+            length = lua_tointeger(L, 2);
+        }
+
+        nibble_api_music(n, length);
+    }
 }
 
 static int l_rnd(lua_State *L)
@@ -1837,7 +1883,7 @@ int nibble_rom_lua_loader(lua_State *L)
     }
 
     // Get file information
-    if (!mz_zip_reader_file_stat(rom, (mz_uint) fileIndex, &file_stat))
+    if (!mz_zip_reader_file_stat(rom, (mz_uint)fileIndex, &file_stat))
     {
         DEBUG_LOG("Failed to get file info for %s", file_name);
         free(file_name);

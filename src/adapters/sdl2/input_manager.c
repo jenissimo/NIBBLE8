@@ -25,6 +25,8 @@ int input_update()
         if (e.type == SDL_KEYDOWN)
         {
             nibble_keymap[nibble_get_custom_key(e.key.keysym.sym)] = 1;
+            nibble_keymap_p[nibble_get_custom_key(e.key.keysym.sym)] = 1;
+
             nibble_lua_call_key(nibble_get_custom_key(e.key.keysym.sym), ctrl_pressed, shift_pressed);
             // DEBUG_LOG("Key Down: %d\n", nibble_get_custom_key(e.key.keysym.sym));
             // DEBUG_LOG("Key Scancode: %d\n", e.key.keysym.scancode);
@@ -93,7 +95,7 @@ int input_update()
         if (e.type == SDL_MOUSEBUTTONDOWN)
         {
             SDL_Point mousePos = convertMouseCoordinates(e.motion.x, e.motion.y);
-            //DEBUG_LOG("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
+            // DEBUG_LOG("Mouse Down at: %d, %d\n", mousePos.x, mousePos.y);
             nibble_lua_call_mouse_press(mousePos.x, mousePos.y, e.button.button);
         }
 
@@ -163,6 +165,7 @@ void nibble_clear_keys()
         if (i == nibble_get_custom_key(SDLK_LSHIFT) || i == nibble_get_custom_key(SDLK_RSHIFT))
             continue;
         nibble_keymap[i] = 0;
+        nibble_keymap_p[i] = 0;
     }
 }
 

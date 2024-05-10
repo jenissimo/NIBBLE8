@@ -27,6 +27,9 @@ void loadLuaCodeFromCart(mz_zip_archive *zip_archive);
 void loadMapDataFromCart(mz_zip_archive *zip_archive);
 void loadSpriteFlagsFromCart(mz_zip_archive *zip_archive);
 void loadSpriteSheetFromCart(mz_zip_archive *zip_archive);
+void loadModFromCart(mz_zip_archive *zip_archive);
+
+int writeModFile(mz_zip_archive *zip_archive);
 
 void processMapData(const uint8_t *buffer, size_t bufferSize);
 

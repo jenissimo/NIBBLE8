@@ -106,6 +106,10 @@ static int l_map(lua_State *L);
 static int l_mget(lua_State *L);
 static int l_mset(lua_State *L);
 
+// Music functions
+static int l_sfx(lua_State *L);
+static int l_music(lua_State *L);
+
 static int l_exit(lua_State *L);
 
 void nibble_lua_call(const char* name);

@@ -4,6 +4,13 @@
 #ifndef POCKETMOD_H_INCLUDED
 #define POCKETMOD_H_INCLUDED
 
+#include <math.h>
+#ifdef DOS
+#include <allegro.h>
+#else
+#include <stdint.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,9 +19,14 @@ typedef struct pocketmod_context pocketmod_context;
 
 int _pocketmod_min(int x, int y);
 int _pocketmod_max(int x, int y);
+void _pocketmod_next_line(pocketmod_context *c);
+void _pocketmod_zero(void *data, int size);
 int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate);
 int pocketmod_render(pocketmod_context *c, void *buffer, int size);
+int pocketmod_render_u8(pocketmod_context *c, void *buffer, int buffer_size);
 int pocketmod_loop_count(pocketmod_context *c);
+int16_t _pocketmod_clamp_int(int value, int min_val, int max_val);
+void _pocketmod_next_tick(pocketmod_context *c);
 
 #ifndef POCKETMOD_MAX_CHANNELS
 #define POCKETMOD_MAX_CHANNELS 32
@@ -25,35 +37,35 @@ int pocketmod_loop_count(pocketmod_context *c);
 #endif
 
 typedef struct {
-    signed char *data;          /* Sample data buffer                      */
-    unsigned char name[23];     /* Sample name */
-    unsigned int length;        /* Data length (in bytes)                  */
+    uint8_t name[23];      /* Sample name                             */
+    int8_t *data;          /* Sample data buffer                      */
+    uint32_t length;       /* Data length (in bytes)                  */
 } _pocketmod_sample;
 
 typedef struct {
-    unsigned char dirty;        /* Pitch/volume dirty flags                */
-    unsigned char sample;       /* Sample number (0..31)                   */
-    unsigned char volume;       /* Base volume without tremolo (0..64)     */
-    unsigned char balance;      /* Stereo balance (0..255)                 */
-    unsigned short period;      /* Note period (113..856)                  */
-    unsigned short delayed;     /* Delayed note period (113..856)          */
-    unsigned short target;      /* Target period (for tone portamento)     */
-    unsigned char finetune;     /* Note finetune (0..15)                   */
-    unsigned char loop_count;   /* E6x loop counter                        */
-    unsigned char loop_line;    /* E6x target line                         */
-    unsigned char lfo_step;     /* Vibrato/tremolo LFO step counter        */
-    unsigned char lfo_type[2];  /* LFO type for vibrato/tremolo            */
-    unsigned char effect;       /* Current effect (0x0..0xf or 0xe0..0xef) */
-    unsigned char param;        /* Raw effect parameter value              */
-    unsigned char param3;       /* Parameter memory for 3xx                */
-    unsigned char param4;       /* Parameter memory for 4xy                */
-    unsigned char param7;       /* Parameter memory for 7xy                */
-    unsigned char param9;       /* Parameter memory for 9xx                */
-    unsigned char paramE1;      /* Parameter memory for E1x                */
-    unsigned char paramE2;      /* Parameter memory for E2x                */
-    unsigned char paramEA;      /* Parameter memory for EAx                */
-    unsigned char paramEB;      /* Parameter memory for EBx                */
-    unsigned char real_volume;  /* Volume (with tremolo adjustment)        */
+    uint8_t dirty;        /* Pitch/volume dirty flags                */
+    uint8_t sample;       /* Sample number (0..31)                   */
+    uint8_t volume;       /* Base volume without tremolo (0..64)     */
+    uint8_t balance;      /* Stereo balance (0..255)                 */
+    uint16_t period;      /* Note period (113..856)                  */
+    uint16_t delayed;     /* Delayed note period (113..856)          */
+    uint16_t target;      /* Target period (for tone portamento)     */
+    uint8_t finetune;     /* Note finetune (0..15)                   */
+    uint8_t loop_count;   /* E6x loop counter                        */
+    uint8_t loop_line;    /* E6x target line                         */
+    uint8_t lfo_step;     /* Vibrato/tremolo LFO step counter        */
+    uint8_t lfo_type[2];  /* LFO type for vibrato/tremolo            */
+    uint8_t effect;       /* Current effect (0x0..0xf or 0xe0..0xef) */
+    uint8_t param;        /* Raw effect parameter value              */
+    uint8_t param3;       /* Parameter memory for 3xx                */
+    uint8_t param4;       /* Parameter memory for 4xy                */
+    uint8_t param7;       /* Parameter memory for 7xy                */
+    uint8_t param9;       /* Parameter memory for 9xx                */
+    uint8_t paramE1;      /* Parameter memory for E1x                */
+    uint8_t paramE2;      /* Parameter memory for E2x                */
+    uint8_t paramEA;      /* Parameter memory for EAx                */
+    uint8_t paramEB;      /* Parameter memory for EBx                */
+    uint8_t real_volume;  /* Volume (with tremolo adjustment)        */
     float position;             /* Position in sample data buffer          */
     float increment;            /* Position increment per output sample    */
 } _pocketmod_chan;
@@ -62,33 +74,34 @@ struct pocketmod_context
 {
     /* Read-only song data */
     _pocketmod_sample samples[POCKETMOD_MAX_SAMPLES];
-    unsigned char *source;      /* Pointer to source MOD data              */
-    unsigned char *order;       /* Pattern order table                     */
-    unsigned char *patterns;    /* Start of pattern data                   */
-    unsigned char length;       /* Patterns in the order (1..128)          */
-    unsigned char reset;        /* Pattern to loop back to (0..127)        */
-    unsigned char num_patterns; /* Patterns in the file (1..128)           */
-    unsigned char num_samples;  /* Sample count (15 or 31)                 */
-    unsigned char num_channels; /* Channel count (1..32)                   */
+    uint32_t source_size; /* Size of MOD data                        */
+    uint8_t *source;      /* Pointer to source MOD data              */
+    uint8_t *order;       /* Pattern order table                     */
+    uint8_t *patterns;    /* Start of pattern data                   */
+    uint8_t length;       /* Patterns in the order (1..128)          */
+    uint8_t reset;        /* Pattern to loop back to (0..127)        */
+    uint8_t num_patterns; /* Patterns in the file (1..128)           */
+    uint8_t num_samples;  /* Sample count (15 or 31)                 */
+    uint8_t num_channels; /* Channel count (1..32)                   */
 
     /* Timing variables */
-    int samples_per_second;     /* Sample rate (set by user)               */
-    int ticks_per_line;         /* A.K.A. song speed (initially 6)         */
+    int32_t samples_per_second;     /* Sample rate (set by user)               */
+    int32_t ticks_per_line;         /* A.K.A. song speed (initially 6)         */
     float samples_per_tick;     /* Depends on sample rate and BPM          */
 
     /* Loop detection state */
-    unsigned char visited[16];  /* Bit mask of previously visited patterns */
+    uint8_t visited[16];  /* Bit mask of previously visited patterns */
     int loop_count;             /* How many times the song has looped      */
 
     /* Render state */
     _pocketmod_chan channels[POCKETMOD_MAX_CHANNELS];
-    unsigned char pattern_delay;/* EEx pattern delay counter               */
-    unsigned int lfo_rng;       /* RNG used for the random LFO waveform    */
+    uint8_t pattern_delay;/* EEx pattern delay counter               */
+    uint32_t lfo_rng;       /* RNG used for the random LFO waveform    */
 
     /* Position in song (from least to most granular) */
-    signed char pattern;        /* Current pattern in order                */
-    signed char line;           /* Current line in pattern                 */
-    short tick;                 /* Current tick in line                    */
+    int8_t pattern;        /* Current pattern in order                */
+    int8_t line;           /* Current line in pattern                 */
+    int16_t tick;                 /* Current tick in line                    */
     float sample;               /* Current sample in tick                  */
 };
 
@@ -112,6 +125,7 @@ struct pocketmod_context
 
 /* The size of one sample in bytes */
 #define POCKETMOD_SAMPLE_SIZE sizeof(float[2])
+#define POCKETMOD_SAMPLE_SIZE_U8 sizeof(uint8_t[2])
 
 /* Finetune adjustment table. Three octaves for each finetune setting. */
 static const signed char _pocketmod_finetune[16][36] = {

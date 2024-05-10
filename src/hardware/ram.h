@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "nibble8.h"
 #include "hardware/empty_mod_file.h"
 #include "debug/debug.h"
@@ -65,6 +66,16 @@ typedef struct DrawState
 } DrawState;
 
 typedef struct {
+    uint8_t name[23];
+} Sample;
+
+typedef struct {
+    int8_t sfxId;
+    uint8_t offset;
+    uint8_t length;
+} SfxChannel;
+
+typedef struct {
     uint8_t note_index;
     uint8_t sample_index;
     uint8_t volume;
@@ -77,11 +88,15 @@ typedef struct {
 typedef struct SoundState
 {
     bool music_active : 1;
+    bool need_update_patterns : 1;
     uint8_t music_start_pattern;
-    uint8_t music_end_pattern;
+    uint8_t music_length;
     TriggeredNote triggered_note;
-    int8_t sfx_patterns[NIBBLE_SFX_CHANNELS];
-    pocketmod_context context;
+    uint8_t current_pattern;
+    uint8_t current_line;
+    SfxChannel sfx_channels[NIBBLE_SFX_CHANNELS];
+    Sample samples[POCKETMOD_MAX_SAMPLES];
+    uint8_t patterns[NIBBLE_PATTERNS_COUNT * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE];
 } SoundState;
 
 typedef struct MemoryLayout
@@ -125,10 +140,10 @@ void nibble_ram_dump_part(char *name, void *start, int size);
 void nibble_ram_dump(void);
 void nibble_ram_destroy(void);
 void nibble_ram_print_map();
-uint8_t nibble_api_peek(uint16_t addr);
-uint16_t nibble_api_peek2(uint16_t addr);
-void nibble_api_poke(uint16_t addr, uint8_t value);
-void nibble_api_poke2(uint16_t addr, uint16_t value);
-void nibble_api_memcpy(uint16_t destaddr, uint16_t sourceaddr, uint16_t len);
+uint8_t nibble_api_peek(uint32_t addr);
+uint16_t nibble_api_peek2(uint32_t addr);
+void nibble_api_poke(uint32_t addr, uint8_t value);
+void nibble_api_poke2(uint32_t addr, uint16_t value);
+void nibble_api_memcpy(uint32_t destaddr, uint32_t sourceaddr, uint16_t len);
 
 #endif

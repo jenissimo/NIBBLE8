@@ -14,10 +14,27 @@ static int _pocketmod_clamp_volume(int x)
     return x;
 }
 
-/* Zero out a block of memory */
-static void _pocketmod_zero(void *data, int size)
+/* Clamp an integer value to the specified range */
+int16_t _pocketmod_clamp_int(int value, int min_val, int max_val)
 {
-    char *byte = data;
+    if (value < min_val)
+    {
+        return (int16_t)min_val;
+    }
+    else if (value > max_val)
+    {
+        return (int16_t)max_val;
+    }
+    else
+    {
+        return (int16_t)value;
+    }
+}
+
+/* Zero out a block of memory */
+void _pocketmod_zero(void *data, int size)
+{
+    uint8_t *byte = data;
     for (int i = 0; i < size; i++)
     {
         byte[i] = 0;
@@ -203,7 +220,7 @@ static void _pocketmod_volume_slide(_pocketmod_chan *ch, int param)
     ch->dirty |= POCKETMOD_VOLUME;
 }
 
-static void _pocketmod_next_line(pocketmod_context *c)
+void _pocketmod_next_line(pocketmod_context *c)
 {
     unsigned char(*data)[4];
     int i, pos, pattern_break = -1;
@@ -245,7 +262,7 @@ static void _pocketmod_next_line(pocketmod_context *c)
         {
             if (sample <= POCKETMOD_MAX_SAMPLES)
             {
-                unsigned char *sample_data = POCKETMOD_SAMPLE(c, sample);
+                uint8_t *sample_data = POCKETMOD_SAMPLE(c, sample);
                 ch->sample = sample;
                 ch->finetune = sample_data[2] & 0x0f;
                 ch->volume = _pocketmod_min(sample_data[3], 0x40);
@@ -445,7 +462,7 @@ static void _pocketmod_next_line(pocketmod_context *c)
     }
 }
 
-static void _pocketmod_next_tick(pocketmod_context *c)
+void _pocketmod_next_tick(pocketmod_context *c)
 {
     int i;
 
@@ -813,9 +830,9 @@ static int _pocketmod_ident(pocketmod_context *c, unsigned char *data, int size)
 
 int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
 {
-    int i, remaining, header_bytes, pattern_bytes;
-    unsigned char *byte = (unsigned char *)c;
-    signed char *sample_data;
+    int32_t i, remaining, header_bytes, pattern_bytes;
+    uint8_t *byte = (unsigned char *)c;
+    int8_t *sample_data;
 
     /* Check that arguments look more or less sane */
     if (!c || !data || rate <= 0 || size <= 0)
@@ -823,11 +840,13 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
         return 0;
     }
 
-    //printf("Size: %d\n", size);
+    printf("Size: %d\n", size);
 
     /* Zero out the whole context and identify the MOD type */
     _pocketmod_zero(c, sizeof(pocketmod_context));
-    c->source = (unsigned char *)data;
+    c->source = (uint8_t *)data;
+    c->source_size = size;
+    
     if (!_pocketmod_ident(c, c->source, size))
     {
         return 0;
@@ -842,10 +861,10 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
     /* Check that we have enough sample slots for this file */
     if (POCKETMOD_MAX_SAMPLES < 31)
     {
-        byte = (unsigned char *)data + 20;
+        byte = (uint8_t *)data + 20;
         for (i = 0; i < c->num_samples; i++)
         {
-            unsigned int length = 2 * ((byte[22] << 8) | byte[23]);
+            uint32_t length = 2 * ((byte[22] << 8) | byte[23]);
             if (i >= POCKETMOD_MAX_SAMPLES && length > 2)
             {
                 return 0; /* Can't fit this sample */
@@ -872,8 +891,11 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
     {
         c->num_patterns = _pocketmod_max(c->num_patterns, c->order[i]);
     }
+
+    printf("%d patterns\n", c->num_patterns);
+
     pattern_bytes = 256 * c->num_channels * ++c->num_patterns;
-    header_bytes = (int)((char *)c->patterns - (char *)data);
+    header_bytes = (int32_t)((int8_t *)c->patterns - (int8_t *)data);
 
     /* Check that each pattern in the order is within file bounds */
     for (i = 0; i < c->length; i++)
@@ -891,13 +913,12 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
     }
 
     /* Extract sample names and sample lengths */
-    byte = (unsigned char *)data + 20;
+    byte = (uint8_t *)data + 20;
     for (i = 0; i < c->num_samples; i++)
     {
-        unsigned int length = 2 * ((byte[22] << 8) | byte[23]);
+        uint32_t length = 2 * ((byte[22] << 8) | byte[23]);
         memcpy(c->samples[i].name, byte, 22); // Copy 22 bytes of the sample name
         c->samples[i].name[22] = '\0';        // Null-terminate the string
-        //printf("Sample %d: %s\n", i, c->samples[i].name);
 
         if (i >= POCKETMOD_MAX_SAMPLES && length > 2)
         {
@@ -908,11 +929,11 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
 
     /* Load sample payload data, truncating ones that extend outside the file */
     remaining = size - header_bytes - pattern_bytes;
-    sample_data = (signed char *)data + header_bytes + pattern_bytes;
+    sample_data = (int8_t *)data + header_bytes + pattern_bytes;
     for (i = 0; i < c->num_samples; i++)
     {
-        unsigned char *data = POCKETMOD_SAMPLE(c, i + 1);
-        unsigned int length = ((data[0] << 8) | data[1]) << 1;
+        uint8_t *data = POCKETMOD_SAMPLE(c, i + 1);
+        uint32_t length = ((data[0] << 8) | data[1]) << 1;
         _pocketmod_sample *sample = &c->samples[i];
         sample->data = sample_data;
         sample->length = _pocketmod_min(length > 2 ? length : 0, remaining);
@@ -997,6 +1018,144 @@ int pocketmod_render(pocketmod_context *c, void *buffer, int buffer_size)
         }
     }
     return samples_rendered * POCKETMOD_SAMPLE_SIZE;
+}
+
+static void _pocketmod_render_channel_u8(pocketmod_context *c,
+                                         _pocketmod_chan *chan,
+                                         uint8_t *output,
+                                         int samples_to_write)
+{
+    /* Gather some loop data */
+    _pocketmod_sample *sample = &c->samples[chan->sample - 1];
+    unsigned char *data = POCKETMOD_SAMPLE(c, chan->sample);
+    const int loop_start = ((data[4] << 8) | data[5]) << 1;
+    const int loop_length = ((data[6] << 8) | data[7]) << 1;
+    const int loop_end = loop_length > 2 ? loop_start + loop_length : sample->length;
+    const float sample_end = 1 + _pocketmod_min(loop_end, sample->length);
+
+    /* Calculate left/right levels */
+    const float volume = chan->real_volume / (float)(128 * 64);
+    const float level_l = volume * (1.0f - chan->balance / 255.0f);
+    const float level_r = volume * (chan->balance / 255.0f);
+
+    /* Write samples */
+    int i, num;
+    do
+    {
+        /* Calculate how many samples we can write in one go */
+        num = (sample_end - chan->position) / chan->increment;
+        num = _pocketmod_min(num, samples_to_write);
+
+        /* Resample and write 'num' samples */
+        for (i = 0; i < num; i++)
+        {
+            int x0 = (int)chan->position;
+
+#ifdef POCKETMOD_NO_INTERPOLATION
+            float s = sample->data[x0];
+#else
+            int x1 = x0 + 1;
+            if (x0 + 1 >= loop_end)
+                x1 = loop_start;
+
+            if (x0 < 0 || x0 >= sample->length || x1 < 0 || x1 >= sample->length)
+            {
+                // Handle out-of-bound index here, e.g., break or continue with adjusted values
+                continue;
+            }
+
+            float t = chan->position - x0;
+            float s = (1.0f - t) * sample->data[x0] + t * sample->data[x1];
+#endif
+            chan->position += chan->increment;
+
+            // Convert float sample to 8-bit unsigned integer
+            uint8_t sample_left = (int)((level_l * s) * 127.5f);
+            uint8_t sample_right = (int)((level_r * s) * 127.5f);
+
+            // Clamp values to the uint8_t range
+            sample_left = _pocketmod_clamp_int(sample_left, 0, 255);
+            sample_right = _pocketmod_clamp_int(sample_right, 0, 255);
+
+            *output++ += sample_left;
+            *output++ += sample_right;
+        }
+
+        /* Rewind the sample when reaching the loop point */
+        if (chan->position >= loop_end)
+        {
+            chan->position -= loop_length;
+        }
+        else if (chan->position >= sample->length)
+        {
+            // Cut the sample if the end is reached
+            chan->position = -1.0f;
+            break;
+        }
+
+        samples_to_write -= num;
+    } while (num > 0);
+}
+
+int pocketmod_render_u8(pocketmod_context *c, void *buffer, int buffer_size)
+{
+    int i, samples_rendered = 0;
+    int samples_remaining = buffer_size / POCKETMOD_SAMPLE_SIZE_U8;
+    if (c && buffer)
+    {
+        uint8_t(*output)[2] = (uint8_t(*)[2])buffer;
+        while (samples_remaining > 0)
+        {
+            /* Calculate the number of samples left in this tick */
+            int num = (int)(c->samples_per_tick - c->sample);
+            num = _pocketmod_min(num + !num, samples_remaining);
+
+            /* Check if enough buffer space is left before zeroing */
+            if (num * POCKETMOD_SAMPLE_SIZE_U8 > buffer_size)
+            {
+                // If not enough space, adjust num to fit the remaining buffer
+                num = buffer_size / POCKETMOD_SAMPLE_SIZE_U8;
+            }
+
+            // memset(output, 128, num * POCKETMOD_SAMPLE_SIZE); // Fill buffer with the mid-point value of 128 (silence)
+
+            for (i = 0; i < c->num_channels; i++)
+            {
+                _pocketmod_chan *chan = &c->channels[i];
+
+                if (chan->sample != 0 && chan->position >= 0.0f)
+                {
+                    _pocketmod_render_channel_u8(c, chan, output, num);
+                }
+            }
+
+            /* Reduce buffer_size by the amount of data processed */
+            buffer_size -= num * POCKETMOD_SAMPLE_SIZE_U8;
+            samples_remaining -= num;
+            samples_rendered += num;
+            output += num;
+
+            /* Advance song position by 'num' samples */
+            if ((c->sample += num) >= c->samples_per_tick)
+            {
+                c->sample -= c->samples_per_tick;
+                _pocketmod_next_tick(c);
+
+                /* Stop if a new pattern was reached */
+                if (c->line == 0 && c->tick == 0)
+                {
+                    /* Increment loop counter as needed */
+                    if (c->visited[c->pattern >> 3] & (1 << (c->pattern & 7)))
+                    {
+                        memset(c->visited, 0, sizeof(c->visited));
+                        c->loop_count++;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return samples_rendered * POCKETMOD_SAMPLE_SIZE_U8; // return the number of bytes processed
 }
 
 int pocketmod_loop_count(pocketmod_context *c)

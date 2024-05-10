@@ -122,6 +122,7 @@ ErrorCode loadCartFromZipBuffer(const uint8_t *buffer, size_t bufferSize)
     loadMapDataFromCart(&zip_archive);
     loadSpriteFlagsFromCart(&zip_archive);
     loadSpriteSheetFromCart(&zip_archive);
+    loadModFromCart(&zip_archive);
 
     mz_zip_reader_end(&zip_archive);
 
@@ -198,6 +199,37 @@ void loadSpriteSheetFromCart(mz_zip_archive *zip_archive)
     }
 }
 
+void loadModFromCart(mz_zip_archive *zip_archive)
+{
+    if (cart_has_file(zip_archive, "music.mod"))
+    {
+        uint8_t *modBuffer;
+        size_t modBufferSize = load_file_from_zip(zip_archive, "music.mod", (void **)&modBuffer);
+        DEBUG_LOG("Loaded mod file from cart");
+        nibble_audio_init(NIBBLE_SAMPLERATE, modBuffer, modBufferSize);
+    }
+    else
+    {
+        DEBUG_LOG("Loaded empty mod file");
+        nibble_audio_init(NIBBLE_SAMPLERATE, NULL, 0);
+    }
+}
+
+int writeModFile(mz_zip_archive *zip_archive)
+{
+    pocketmod_context *c = &masterContext;
+    
+    // Add the buffer to the ZIP archive
+    mz_bool result = mz_zip_writer_add_mem(zip_archive, "music.mod", c->source, c->source_size, MZ_DEFAULT_COMPRESSION);
+    if (!result)
+    {
+        DEBUG_LOG("Error adding MOD file to ZIP archive.");
+        return 0;
+    }
+
+    return 1;
+}
+
 int nibble_api_save_cart(char *path, char *luaCode)
 {
     remove(path);
@@ -259,6 +291,13 @@ int nibble_api_save_cart(char *path, char *luaCode)
     if (!mz_zip_writer_add_mem(&zip_archive, "map.bin", memory.mapData, NIBBLE_MAP_SIZE, MZ_DEFAULT_COMPRESSION))
     {
         DEBUG_LOG("Failed to add map.bin to cartridge.zip");
+        mz_zip_writer_end(&zip_archive);
+        return 1;
+    }
+
+    if (!writeModFile(&zip_archive))
+    {
+        DEBUG_LOG("Failed to add music.mod to cartridge.zip");
         mz_zip_writer_end(&zip_archive);
         return 1;
     }
@@ -470,7 +509,7 @@ size_t load_file_from_zip(mz_zip_archive *zip_archive, const char *file_to_load,
     size_t buffer_size = 0;
     if (extract_file_to_buffer(zip_archive, file_to_load, buffer, &buffer_size))
     {
-        //DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+        // DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
     }
     else
     {
@@ -499,7 +538,7 @@ void load_text_from_zip(mz_zip_archive *zip_archive, const char *file_to_load, c
         {
             *buffer = new_buffer;          // Update pointer if realloc was successful
             (*buffer)[buffer_size] = '\0'; // Null-terminate the buffer
-            //DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
+            // DEBUG_LOG("%s loaded into memory successfully %zu bytes", file_to_load, buffer_size);
         }
         else
         {

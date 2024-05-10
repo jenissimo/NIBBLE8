@@ -22,6 +22,8 @@ void nibble_ram_init()
     // unsigned short period;      /* Note period (113..856)                  */
 
     // DEBUG_LOG("Memory offset: %lu", sizeof(memory.spriteSheetData)+sizeof(memory.mapData)+sizeof(memory.spriteFlagsData)+sizeof(memory.drawState));
+    // DEBUG_LOG("Size of int8_t*: %zu bytes\n", sizeof(int8_t*));
+    //DEBUG_LOG("Alignment of int8_t*: %zu bytes\n", alignof(int8_t*));
 }
 
 void nibble_ram_clear()
@@ -36,7 +38,7 @@ void nibble_save_memory_layout()
     FILE *fp = fopen(filename, "w");
     if (fp == NULL)
     {
-        printf("Error opening the file %s", filename);
+        DEBUG_LOG("Error opening the file %s", filename);
         return;
     }
 
@@ -104,28 +106,28 @@ void nibble_ram_destroy()
     // free(memory);
 }
 
-uint8_t nibble_api_peek(uint16_t addr)
+uint8_t nibble_api_peek(uint32_t addr)
 {
     return memory.data[addr];
 }
 
-uint16_t nibble_api_peek2(uint16_t addr)
+uint16_t nibble_api_peek2(uint32_t addr)
 {
     return memory.data[addr] << 8 | memory.data[addr + 1];
 }
 
-void nibble_api_poke(uint16_t addr, uint8_t value)
+void nibble_api_poke(uint32_t addr, uint8_t value)
 {
     memory.data[addr] = value;
 }
 
-void nibble_api_poke2(uint16_t addr, uint16_t value)
+void nibble_api_poke2(uint32_t addr, uint16_t value)
 {
     memory.data[addr] = value >> 8;
     memory.data[addr + 1] = value & 0xFF;
 }
 
-void nibble_api_memcpy(uint16_t destaddr, uint16_t sourceaddr, uint16_t len)
+void nibble_api_memcpy(uint32_t destaddr, uint32_t sourceaddr, uint16_t len)
 {
     memcpy(memory.data + destaddr, memory.data + sourceaddr, len);
 }
