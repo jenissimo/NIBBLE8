@@ -1,6 +1,6 @@
 include config/Makefile.common
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg  -ffunction-sections
 LIBS_LIST = SDL_gfx libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
 
@@ -15,7 +15,7 @@ COMMON_SOURCES := $(filter-out $(SRCDIR)/adapters/%, $(shell find $(SRCDIR) -typ
 SDL_SOURCES := $(shell find $(SRCDIR)/adapters/sdl -type f -name *.c)
 
 # Combine common sources with the SDL2-specific sources
-SOURCES := $(COMMON_SOURCES) $(SDL2_SOURCES)
+SOURCES := $(COMMON_SOURCES) $(SDL_SOURCES)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: CFLAGS += -O2
@@ -42,7 +42,7 @@ font2bin: $(TOOLSDIR)/font2bin.c
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@mkdir -p $(BUILDDIR)
 	@cp $(ASSETSDIR)/icon.png $(BUILDDIR)
-	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)
+	@cp $(ASSETSDIR)/config.ini $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
 	-@rm $(BUILDDIR)/rom.zip
 	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)

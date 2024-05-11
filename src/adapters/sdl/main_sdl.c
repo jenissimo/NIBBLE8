@@ -9,6 +9,7 @@
 #include "hardware/utils.h"
 #include "api/lua.h"
 #include "sdl_adapter.h"
+#include "video_manager.h"
 #include "utils/base64.h"
 
 int run = 1;
@@ -25,13 +26,6 @@ int main(int argc, char *argv[])
 
     srand(time(NULL)); // Initialization, should only be called once.
 
-    nibble_ram_init();
-    init_video();
-    nibble_lua_init();
-    nibble_sdl_init();
-
-    next_time = SDL_GetTicks() + NIBBLE_FPS;
-
     // parse params
     for (int i = 0; i < argc; i++)
     {
@@ -42,18 +36,63 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[i], "--fullscreen") == 0)
         {
-            goFullScreen();
+            isFullscreen = true;
+        }
+        else if (strcmp(argv[i], "--width") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                windowWidth = atoi(argv[i + 1]);
+            }
+        }
+        else if (strcmp(argv[i], "--height") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                windowHeight = atoi(argv[i + 1]);
+            }
         }
         else if (strcmp(argv[i], "--cart") == 0)
         {
             if (i + 1 < argc)
             {
-                lua_getglobal(currentVM, "loadAndPlayCart");
-                lua_pushstring(currentVM, argv[i + 1]);
-                lua_pcall(currentVM, 1, 0, 0);
+                cartPath = argv[i + 1];
+            }
+        }
+        else if (strcmp(argv[i], "--cartb64") == 0)
+        {
+            DEBUG_LOG("Loading cart from base64\n");
+            if (i + 1 < argc)
+            {
+                cartBase64 = argv[i + 1];
+            }
+        }
+        else if (strcmp(argv[i], "--player") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                playerMode = (bool)atoi(argv[i + 1]);
             }
         }
     }
+
+    if (argc > 0)
+    {
+        nibble_change_to_sandbox_directory(argv[0]);
+    }
+
+    if (nibble_load_rom() > 0)
+    {
+        DEBUG_LOG("ROM Loading Error");
+        return 1;
+    }
+
+    nibble_ram_init();
+    nibble_init_video();
+    nibble_sdl_init();
+    nibble_lua_init();
+
+    next_time = SDL_GetTicks() + NIBBLE_FPS;
 
     while (run)
     {
@@ -92,9 +131,9 @@ int main(int argc, char *argv[])
     }
 
     nibble_lua_destroy();
-    destroy_video();
+    nibble_destroy_video();
+    nibble_ram_destroy();
     nibble_audio_destroy();
-    destroyRAM();
     debug_close();
     base64_cleanup();
     return nibble_sdl_quit();

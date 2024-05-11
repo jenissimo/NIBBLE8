@@ -21,6 +21,10 @@ function TextEditor.new(text, x, y, width, height)
 end
 
 function TextEditor:init(text)
+    if not text then
+        return
+    end
+
     self.text = text or ""
     self.cursor = {x = 0, y = 0, visible = true}
     -- self.lines = split(text or "", "\n")

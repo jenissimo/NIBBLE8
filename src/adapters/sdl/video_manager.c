@@ -5,6 +5,9 @@ const int FPS_DELAY = 1000; // Delay between FPS updates in milliseconds
 Uint32 fpsLastTime = 0;
 int frameCount = 0;
 int fpsCurrent = 0;
+bool isFullscreen = false;
+int windowWidth = 640;
+int windowHeight = 480;
 
 int video_init()
 {
@@ -14,7 +17,7 @@ int video_init()
         return 1;
     }
 
-    screen = SDL_SetVideoMode(NIBBLE_WIDTH * NIBBLE_WINDOW_SCALE, NIBBLE_HEIGHT * NIBBLE_WINDOW_SCALE, 32, SDL_SWSURFACE | SDL_DOUBLEBUF);
+    screen = SDL_SetVideoMode(windowWidth, windowHeight, 32, SDL_SWSURFACE | SDL_DOUBLEBUF);
     if (screen == NULL)
     {
         DEBUG_LOG("SDL SetVideoMode failed: %s", SDL_GetError());
@@ -31,7 +34,7 @@ void video_update()
     SDL_Surface *frameSurface = SDL_CreateRGBSurfaceFrom(frame, NIBBLE_WIDTH, NIBBLE_HEIGHT, 32, NIBBLE_WIDTH * sizeof(uint32_t), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
     // Use zoomSurface to scale the frameSurface to the screen size
-    SDL_Surface *scaledSurface = zoomSurface(frameSurface, NIBBLE_WINDOW_SCALE, NIBBLE_WINDOW_SCALE, SMOOTHING_OFF);
+    SDL_Surface *scaledSurface = zoomSurface(frameSurface, windowWidth / NIBBLE_WIDTH, windowHeight / NIBBLE_HEIGHT, SMOOTHING_OFF);
 
 #if NIBBLE_DISPLAY_FPS
     nibble_api_draw_fps(fpsCurrent); // You need to implement this function to draw directly on the surface
@@ -80,10 +83,10 @@ void video_toggle_fullscreen(bool fullscreen)
     // You often have to reset the video mode using SDL_SetVideoMode with or without SDL_FULLSCREEN flag.
     if (fullscreen)
     {
-        screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+        screen = SDL_SetVideoMode(windowWidth, windowHeight, 32, SDL_SWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
     }
     else
     {
-        screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE | SDL_DOUBLEBUF);
+        screen = SDL_SetVideoMode(windowWidth, windowHeight, 32, SDL_SWSURFACE | SDL_DOUBLEBUF);
     }
 }

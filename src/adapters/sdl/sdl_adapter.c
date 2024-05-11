@@ -3,7 +3,6 @@
 #include "video_manager.h"
 #include "input_manager.h"
 
-bool isFullscreen = false;
 uint32_t next_time;
 
 uint32_t time_left(void)

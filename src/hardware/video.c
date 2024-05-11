@@ -2,7 +2,6 @@
 
 uint32_t *frame;
 uint8_t *nibble_font;
-PaletteManager *manager;
 bool frame_dirty = false;
 bool transparencyCache[4];
 
@@ -48,15 +47,13 @@ void nibble_load_font()
 
 void nibble_load_palettes()
 {
-    char palettePath[1024];
-    snprintf(palettePath, sizeof(palettePath), "%s/palettes.ini", execPath);
-    manager = palette_manager_create(palettePath);
-    if (!manager)
+    char configPath[1024];
+    snprintf(configPath, sizeof(configPath), "%s/config.ini", execPath);
+    if (!nibble_config_load(configPath))
     {
-        DEBUG_LOG("Error: Unable to create palette manager.\n");
+        DEBUG_LOG("Config loading failed!");
+        exit(1);
     }
-    manager->current_palette = 1;
-    // DEBUG_LOG("%s (%d)", manager->palettes[manager->current_palette].name, manager->current_palette);
 }
 
 void print_char(int charIndex)
@@ -562,33 +559,33 @@ uint8_t nibble_api_sget(int16_t x, int16_t y)
 
 void nibble_api_map(int celx, int cely, int sx, int sy, int celw, int celh, uint8_t layer)
 {
-    for (int y = 0; y < celh; y++)
+    uint16_t mapStartIndex = cely * NIBBLE_MAP_WIDTH + celx;
+    uint16_t mapEndIndex = (cely + celh) * NIBBLE_MAP_WIDTH + (celx + celw);
+    uint16_t mapIndex;
+    int drawX, drawY;
+
+    for (mapIndex = mapStartIndex; mapIndex < mapEndIndex; mapIndex++)
     {
-        for (int x = 0; x < celw; x++)
+        int x = (mapIndex - mapStartIndex) % NIBBLE_MAP_WIDTH;
+        int y = (mapIndex - mapStartIndex) / NIBBLE_MAP_WIDTH;
+
+        uint16_t spriteIndex = memory.mapData[mapIndex];
+        uint8_t spriteFlags = memory.spriteFlagsData[spriteIndex];
+
+        if (layer > 0 && (spriteFlags & layer) != layer)
         {
-            // Calculate the map cell index
-            uint16_t mapIndex = (cely + y) * NIBBLE_MAP_WIDTH + (celx + x);
-
-            // Check bounds
-            if (mapIndex < 0 || mapIndex >= NIBBLE_MAP_COUNT)
-                continue;
-
-            // Retrieve the sprite index from the map data
-            uint16_t spriteIndex = memory.mapData[mapIndex];
-
-            // If a layer is specified, check sprite flags
-            if (layer > 0)
-            {
-                uint8_t spriteFlags = memory.spriteFlagsData[spriteIndex];
-                if ((spriteFlags & layer) != layer)
-                    continue;
-            }
-
-            // Draw the sprite
-            int drawX = sx + x * NIBBLE_TILE_SIZE;
-            int drawY = sy + y * NIBBLE_TILE_SIZE;
-            nibble_api_spr(spriteIndex, drawX, drawY, 0, 0);
+            continue; // Skip this sprite if not on the specified layer
         }
+
+        drawX = sx + x * NIBBLE_TILE_SIZE;
+        drawY = sy + y * NIBBLE_TILE_SIZE;
+
+        if ((drawX - memory.drawState.camera_x) >= NIBBLE_WIDTH || (drawY - memory.drawState.camera_y) >= NIBBLE_HEIGHT)
+        {
+            continue; // Skip drawing if out of screen bounds
+        }
+
+        nibble_api_spr(spriteIndex, drawX, drawY, 0, 0);
     }
 }
 
@@ -711,7 +708,7 @@ inline bool is_color_transparent(uint8_t color)
 
 void nibble_video_reset_colors()
 {
-    Palette palette = manager->palettes[manager->current_palette];
+    Palette palette = nibbleConfig.mainPalette;
 
     memory.drawState.colorPalette.flip = 0;
     for (int i = 0; i < 4; i++)
@@ -725,7 +722,6 @@ void nibble_video_reset_colors()
 void update_frame()
 {
     int pixelIndex = 0;
-    // const Palette *palette = currentPalette(manager);
     uint8_t value;
     uint8_t col;
     uint32_t argb[4] = {0};

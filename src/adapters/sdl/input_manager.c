@@ -46,14 +46,8 @@ int input_update()
             case SDLK_F4:
                 nibble_sdl_save_lua_keys_constants();
                 break;
-            case SDLK_F7:
-                prevPalette(manager);
-                break;
             case SDLK_F8:
                 nibble_ram_dump();
-                break;
-            case SDLK_F9:
-                nextPalette(manager);
                 break;
             // case SDLK_F10:
             //     printVRam();

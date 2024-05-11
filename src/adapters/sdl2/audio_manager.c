@@ -27,7 +27,6 @@ void audio_init()
     DEBUG_LOG("Audio format: freq=%d, format=%d, channels=%d, samples=%d", format.freq, format.format, format.channels, format.samples);
     nibble_audio_init(NIBBLE_SAMPLERATE, NULL, 0);
 
-    // memset(audioBuffer, 0, sizeof(audioBuffer));
     SDL_PauseAudioDevice(device, 0);
 }
 

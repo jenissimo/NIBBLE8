@@ -4,7 +4,6 @@
 #include <allegro.h>
 #include "hardware/audio.h"
 #include "hardware/video.h"
-#include "hardware/palette_manager.h"
 #include "hardware/input.h"
 #include "hardware/ram.h"
 #include "hardware/os.h"

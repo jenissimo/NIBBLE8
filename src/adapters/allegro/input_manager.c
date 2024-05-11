@@ -126,12 +126,6 @@ void input_check_hotkey(int key)
     case KEY_ESC:
         nibble_lua_close_app();
         break;
-    case KEY_F7:
-        prevPalette(manager);
-        break;
-    case KEY_F8:
-        nextPalette(manager);
-        break;
     case KEY_F4:
         //nibble_allegro_save_lua_keys_constants();
         break;

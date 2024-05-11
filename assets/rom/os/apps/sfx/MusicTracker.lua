@@ -33,7 +33,7 @@ function MusicTracker.new(x, y)
     self.y = y
     self.cursorRow = 1 -- Start at the first row
     self.cursorColumn = 1
-    self.visibleLines = 10
+    self.visibleLines = 15
     self.topVisibleLine = 1
     self.numColumns = 6 * NUM_CHANNELS
     self.cursorX = self.x + 2
@@ -58,16 +58,16 @@ function MusicTracker.new(x, y)
         trace("pattern: " .. str(value))
         self:invalidateTrack()
     end)
-    bpmSelector = FancyStepper.new(x + 52, y + 1, 0, 255, "bpm", function(value)
-        trace("BPM: " .. str(value))
-    end)
+    --bpmSelector = FancyStepper.new(x + 52, y + 1, 0, 255, "bpm", function(value)
+        --trace("BPM: " .. str(value))
+    --end)
 
     -- Second row
-    volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 64, "volume", function(
-        value) self.volume = volumeSelector.value end)
+    --volumeSelector = FancyStepper.new(x + 2, y + 12, 0, 64, "volume", function(
+        --value) self.volume = volumeSelector.value end)
 
     local instruments = ModControl:getSamples()
-    instrumentSelector = ListSelector.new(x + 48, y + 12, "instrument",
+    instrumentSelector = ListSelector.new(x + 50, y + 1, "instrument",
                                           instruments, 15, function(value)
         -- trace("instrument: " .. str(value))
         self.currentInstrument = value
@@ -75,9 +75,9 @@ function MusicTracker.new(x, y)
 
     uiManager:addElement(posSelector)
     uiManager:addElement(patternSelector)
-    uiManager:addElement(bpmSelector)
+    --uiManager:addElement(bpmSelector)
     -- uiManager:addElement(lengthSelector)
-    uiManager:addElement(volumeSelector)
+    --uiManager:addElement(volumeSelector)
     uiManager:addElement(instrumentSelector)
 
     self.lines = ""
@@ -90,10 +90,10 @@ end
 function MusicTracker:init()
     patternSelector.value = patternSelector.minValue
     instrumentSelector.selectedIndex = 1
-    bpmSelector.value = 125
-    volumeSelector.value = 0x40
+    --bpmSelector.value = 125
+    --volumeSelector.value = 0x40
     self.currentInstrument = 1
-    self.volume = volumeSelector.value
+    --self.volume = volumeSelector.value
 
     self:invalidateTrack()
 end
@@ -170,11 +170,13 @@ function MusicTracker:drawPanel()
 end
 
 function MusicTracker:drawPatternEditor()
-    local baseY = self.y + 48
+    local baseY = self.y + 20
+    --local height = 70
+    local height = 100
     palt(0, false)
 
     -- Draw the background
-    rectfill(self.x + 2, baseY - 7, 156, 70, 0)
+    rectfill(self.x + 2, baseY - 7, 156, height, 0)
 
     -- Draw the text
     print(self.lines, self.x + 4, baseY + 3, 1)
@@ -194,7 +196,7 @@ function MusicTracker:drawPatternEditor()
     palt(1, false)
 
     -- draw grid border with shadow
-    UIUtils.fancyRect(self.x + 1, baseY - 8, 156, 70, 2, 3)
+    UIUtils.fancyRect(self.x + 1, baseY - 8, 156, height, 2, 3)
     line(3, 119, 157, 119, 0) -- bottom shadow
     line(158, 118, 158, baseY - 6, 0) -- right shadow
 
@@ -445,11 +447,11 @@ function MusicTracker:draw()
     cls(1)
     self:drawPanel()
     self:drawPatternEditor()
-    self:drawFakeBeat(self.x + 2, self.y + 23)
-    self:drawFakeSpectrum(self.x + 14, self.y + 23, 1)
-    self:drawFakeSpectrum(self.x + 50, self.y + 23, 1)
-    self:drawFakeSpectrum(self.x + 86, self.y + 23, 1)
-    self:drawFakeSpectrum(self.x + 122, self.y + 23, 1)
+    --self:drawFakeBeat(self.x + 2, self.y + 23)
+    --self:drawFakeSpectrum(self.x + 14, self.y + 23, 1)
+    --self:drawFakeSpectrum(self.x + 50, self.y + 23, 1)
+    --self:drawFakeSpectrum(self.x + 86, self.y + 23, 1)
+    --self:drawFakeSpectrum(self.x + 122, self.y + 23, 1)
     uiManager:draw()
 end
 

@@ -679,7 +679,7 @@ static int l_music(lua_State *L)
     if (top >= 1)
     {
         int8_t n = lua_tointeger(L, 1);
-        uint8_t length = n > 0 ? (NIBBLE_PATTERNS_COUNT - n) : 0;
+        uint8_t length = n >= 0 ? (NIBBLE_PATTERNS_COUNT - n) : 0;
         DEBUG_LOG("l_music(%d,%d)", n, length);
         if (top >= 2)
         {

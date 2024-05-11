@@ -133,7 +133,9 @@ int main(int argc, char *argv[])
     nibble_init_video();
     nibble_sdl_init();
     nibble_lua_init();
+    
     next_time = SDL_GetTicks() + NIBBLE_FPS;
+    
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, -1, 1);
 #else

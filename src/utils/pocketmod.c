@@ -840,7 +840,7 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
         return 0;
     }
 
-    printf("Size: %d\n", size);
+    //printf("Size: %d\n", size);
 
     /* Zero out the whole context and identify the MOD type */
     _pocketmod_zero(c, sizeof(pocketmod_context));
@@ -892,7 +892,7 @@ int pocketmod_init(pocketmod_context *c, const void *data, int size, int rate)
         c->num_patterns = _pocketmod_max(c->num_patterns, c->order[i]);
     }
 
-    printf("%d patterns\n", c->num_patterns);
+    //printf("%d patterns\n", c->num_patterns);
 
     pattern_bytes = 256 * c->num_channels * ++c->num_patterns;
     header_bytes = (int32_t)((int8_t *)c->patterns - (int8_t *)data);
@@ -1034,7 +1034,7 @@ static void _pocketmod_render_channel_u8(pocketmod_context *c,
     const float sample_end = 1 + _pocketmod_min(loop_end, sample->length);
 
     /* Calculate left/right levels */
-    const float volume = chan->real_volume / (float)(128 * 64);
+    const float volume = chan->real_volume / (float)(128 * 64 * 2);
     const float level_l = volume * (1.0f - chan->balance / 255.0f);
     const float level_r = volume * (chan->balance / 255.0f);
 

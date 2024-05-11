@@ -43,7 +43,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	del /Q $(OBJDIR) $(BUILDDIR)\$(TARGET)
+	rm -rf $(OBJDIR) $(BUILDDIR)
 
 font2bin: $(TOOLSDIR)/font2bin.c
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)
@@ -52,7 +52,8 @@ rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@echo $(PATH)
 	@mkdir -p $(BUILDDIR)
 	@cp $(ASSETSDIR)/CWSDPMI.EXE $(BUILDDIR)
-	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)
+	@cp $(ASSETSDIR)/nibble8.bat $(BUILDDIR)
+	@cp $(ASSETSDIR)/config.ini $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
 	-@rm $(BUILDDIR)/rom.zip
 	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)

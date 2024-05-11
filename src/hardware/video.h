@@ -2,7 +2,7 @@
 #define nibble_video_h
 
 #include "nibble8.h"
-#include "palette_manager.h"
+#include "config_manager.h"
 #include "debug/debug.h"
 #include "ram.h"
 #include "os.h"
@@ -19,7 +19,6 @@
 
 extern uint32_t *frame;
 extern uint8_t *nibble_font;
-extern PaletteManager *manager;
 extern bool frame_dirty;
 static const uint8_t fullByteColors[4] = {0b00000000, 0b01010101, 0b10101010, 0b11111111};
 extern bool transparencyCache[4];

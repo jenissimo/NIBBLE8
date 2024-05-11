@@ -188,7 +188,7 @@ function ModControl:handleKeyInput(tracker, key_code, pattern, line, channel,
         local note = self.keys[key_code]
 
         self.keyPressed = key_code
-        self:playNote(note, tracker.currentInstrument, tracker.volume)
+        self:playNote(note, tracker.currentInstrument, 64)
 
         if tracker.editMode then
             local period = self:noteToPeriod(note)

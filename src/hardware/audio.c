@@ -275,7 +275,7 @@ void nibble_audio_play_note(pocketmod_context *context, TriggeredNote *note, uin
     const int loop_end = loop_length > 2 ? loop_start + loop_length : 0xffffff;
     const float sample_end = 1 + _pocketmod_min(loop_end, sample->length);
 
-    const float volume = note->volume / (float)(128 * 64);
+    const float volume = note->volume / (float)(128 * 64 * 2);
     const bool has_loop = loop_length > 2;
 
     int i, num;
@@ -529,6 +529,19 @@ int nibble_audio_note_to_period(int note)
         return 0;
     }
     return 0;
+}
+
+bool nibble_audio_has_notes()
+{
+    for (int i=0 ; i < masterContext.num_patterns * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE ; i++)
+    {
+        if (masterContext.patterns[i] > 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void nibble_audio_destroy()

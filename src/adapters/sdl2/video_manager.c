@@ -127,5 +127,5 @@ void video_update_aspect_ratio(int windowWidth, int windowHeight, int targetWidt
 
 void make_screenshot()
 {
-    write_indexed_png("screenshot.png", memory.screenData, NIBBLE_WIDTH, NIBBLE_HEIGHT, currentPalette(manager));
+    write_indexed_png("screenshot.png", memory.screenData, NIBBLE_WIDTH, NIBBLE_HEIGHT, &nibbleConfig.mainPalette);
 }

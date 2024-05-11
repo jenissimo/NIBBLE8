@@ -1,0 +1,3 @@
+@echo off
+CWSDPMI.EXE
+NIBBLE8.EXE

@@ -194,7 +194,7 @@ void loadSpriteSheetFromCart(mz_zip_archive *zip_archive)
     if (cart_has_file(zip_archive, "spritesheet.png"))
     {
         load_file_from_zip(zip_archive, "spritesheet.png", (void **)&png_data);
-        read_and_convert_png_from_buffer(memory.spriteSheetData, png_data, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
+        read_and_convert_png_from_buffer(memory.spriteSheetData, png_data, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &nibbleConfig.exportPalette);
         free(png_data);
     }
 }
@@ -268,7 +268,7 @@ int nibble_api_save_cart(char *path, char *luaCode)
     // free(app_lua_data);
 
     // Read spritesheet.png file
-    png_memory_write_state state = get_indexed_png(memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
+    png_memory_write_state state = get_indexed_png(memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &nibbleConfig.exportPalette);
 
     // Add spritesheet.png to the ZIP archive
     if (!state.data || !mz_zip_writer_add_mem(&zip_archive, "spritesheet.png", state.data, state.size, MZ_DEFAULT_COMPRESSION))
@@ -295,11 +295,15 @@ int nibble_api_save_cart(char *path, char *luaCode)
         return 1;
     }
 
-    if (!writeModFile(&zip_archive))
+    // If we dont have notes - we dont need to save mod file
+    if (nibble_audio_has_notes())
     {
-        DEBUG_LOG("Failed to add music.mod to cartridge.zip");
-        mz_zip_writer_end(&zip_archive);
-        return 1;
+        if (!writeModFile(&zip_archive))
+        {
+            DEBUG_LOG("Failed to add music.mod to cartridge.zip");
+            mz_zip_writer_end(&zip_archive);
+            return 1;
+        }
     }
 
     mz_zip_writer_finalize_archive(&zip_archive);
@@ -343,12 +347,12 @@ void nibble_api_import_png(char *path)
         return;
     }
 
-    read_and_convert_png_from_buffer(memory.spriteSheetData, buffer, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
+    read_and_convert_png_from_buffer(memory.spriteSheetData, buffer, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &nibbleConfig.exportPalette);
 }
 
 void nibble_api_export_png(char *path)
 {
-    write_indexed_png(path, memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &manager->palettes[0]);
+    write_indexed_png(path, memory.spriteSheetData, NIBBLE_SPRITE_SHEET_WIDTH, NIBBLE_SPRITE_SHEET_HEIGHT, &nibbleConfig.exportPalette);
 }
 
 void nibble_api_import_lua(char *path)

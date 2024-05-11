@@ -1,24 +1,18 @@
 #include "audio_manager.h"
 
-static int16_t audioBuffer[NUM_SAMPLES];
-
-void audio_callback(void *userdata, uint8_t *stream, int len)
+void audio_callback(void *userdata, Uint8 *buffer, int bytes)
 {
-    int16_t *audioStream = (int16_t *)stream;
-    int audioLength = len / sizeof(int16_t);
-
-    nibble_audio_update(audioBuffer, audioLength);
-    memcpy(audioStream, audioBuffer, len);
+    nibble_audio_update(buffer, bytes);
 }
 
 void audio_init()
 {
     SDL_AudioSpec desired_spec, obtained_spec;
 
-    desired_spec.freq = SAMPLE_RATE;
-    desired_spec.format = AUDIO_S16SYS;
-    desired_spec.channels = NUM_CHANNELS;
-    desired_spec.samples = NUM_SAMPLES;
+    desired_spec.freq = NIBBLE_SAMPLERATE;
+    desired_spec.format = AUDIO_U8;
+    desired_spec.channels = NIBBLE_SAMPLE_CHANNELS;
+    desired_spec.samples = NIBBLE_SAMPLES;
     desired_spec.callback = audio_callback;
     desired_spec.userdata = NULL;
 
@@ -29,13 +23,14 @@ void audio_init()
         exit(1); // Consider a more graceful exit
     }
 
-    memset(audioBuffer, 0, sizeof(audioBuffer));
-    SDL_Delay(50);
+    nibble_audio_init(NIBBLE_SAMPLERATE, NULL, 0);
     SDL_PauseAudio(0);
 }
 
 void audio_quit()
 {
     SDL_PauseAudio(1);
+    SDL_Delay(200);                                    // Short delay to let the silence play out
+
     SDL_CloseAudio();
 }

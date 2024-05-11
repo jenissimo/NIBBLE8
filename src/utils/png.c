@@ -13,7 +13,7 @@
 #include "debug/debug.h"
 #include "png.h"
 
-int find_closest_palette_index(const Palette *palette, uint8_t gray_value)
+int find_closest_palette_index(Palette *palette, uint8_t gray_value)
 {
    int min_distance = INT_MAX;
    int closest_index = -1;
@@ -40,7 +40,7 @@ void read_png_from_memory(png_structp png_ptr, png_bytep data, png_size_t length
    *png_mem_data += length;
 }
 
-void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targetWidth, int targetHeight, const Palette *palette)
+void read_and_convert_png_from_buffer(uint8_t *dest, uint8_t *png_data, int targetWidth, int targetHeight, Palette *palette)
 {
    int width, height;
    png_structp png_ptr;
@@ -175,7 +175,7 @@ void png_write_callback(png_structp png_ptr, png_bytep data, png_size_t length)
    state->size += length;
 }
 
-png_memory_write_state get_indexed_png(uint8_t *pixels, int width, int height, const Palette *palette)
+png_memory_write_state get_indexed_png(uint8_t *pixels, int width, int height, Palette *palette)
 {
    png_structp png_ptr;
    png_infop info_ptr;
@@ -243,7 +243,7 @@ png_memory_write_state get_indexed_png(uint8_t *pixels, int width, int height, c
    return state;
 }
 
-void write_indexed_png(const char *filename, uint8_t *pixels, int width, int height, const Palette *palette)
+void write_indexed_png(const char *filename, uint8_t *pixels, int width, int height, Palette *palette)
 {
    png_memory_write_state state = get_indexed_png(pixels, width, height, palette);
 

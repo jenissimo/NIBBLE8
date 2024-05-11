@@ -42,6 +42,7 @@ void nibble_audio_destroy();
 int nibble_audio_note_to_period(int note);
 bool nibble_audio_has_active_sfx();
 void nibble_audio_apply_limiter(uint8_t *mix_buffer, int bytes_to_limit);
+bool nibble_audio_has_notes();
 
 // API
 void nibble_api_sfx(uint8_t n, uint8_t offset, uint8_t length);
