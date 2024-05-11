@@ -42,7 +42,7 @@ font2bin: $(TOOLSDIR)/font2bin.c
 
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@mkdir -p $(BUILDDIR)/embed
-	@cp $(ASSETSDIR)/palettes.ini $(BUILDDIR)/embed
+	@cp $(ASSETSDIR)/config.ini $(BUILDDIR)/embed
 	@cp -R $(ASSETSDIR)/web/* $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)/embed
 	-@rm $(BUILDDIR)/embed/rom.zip
