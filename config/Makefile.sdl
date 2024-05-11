@@ -1,8 +1,12 @@
 include config/Makefile.common
 CC = gcc
-CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -pg  -ffunction-sections
+CFLAGS = -Wall $(foreach lib,$(LIBS_LIST),$(shell pkg-config --cflags $(lib))) -I$(SRCDIR) -Wno-unused-function -ffunction-sections
 LIBS_LIST = SDL_gfx libpng
 LIBS = $(foreach lib,$(LIBS_LIST),$(shell pkg-config --libs --static $(lib))) -lm
+
+ifneq ($(ARCH),)
+    CFLAGS += -arch $(ARCH)
+endif
 
 OBJDIR = obj/sdl
 BUILDDIR = bin/sdl
