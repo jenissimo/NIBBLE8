@@ -54,7 +54,7 @@ void check_params(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    printf("Welcome to NIBBLE8 for DOS!\n");
+    printf("Welcome to NIBBLE8 v.%d.%d.%d!\n", NIBBLE_MAJOR_VERSION, NIBBLE_MINOR_VERSION, NIBBLE_PATCH_VERSION);
 
     if (check_param("--debug", argc, argv) > -1)
     {

@@ -2,9 +2,8 @@ include config/Makefile.common
 DJGPP_PATH = /usr/local/djgpp/
 
 CC = gcc
-CFLAGS = -w
 # Adjust the include and lib paths as necessary for your Allegro installation
-CFLAGS += -D DOS -fgnu89-inline -I$(DJGPP_PATH)include -I$(SRCDIR)
+CFLAGS += -w -D DOS -fgnu89-inline -I$(DJGPP_PATH)include -I$(SRCDIR)
 LIBS =  -L$(DJGPP_PATH)lib -lalleg -lpng -lm -lz
 # If you have more Allegro libraries (like allegro_image, allegro_font, etc.), add them here
 

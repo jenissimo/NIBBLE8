@@ -1,6 +1,6 @@
 include config/Makefile.common
 CC = emcc
-CFLAGS = -w -I$(SRCDIR) -Wno-unused-function -ffloat-store --embed-file bin/emscripten/embed@/ --shell-file assets/web/emtemplate.html
+CFLAGS += -w -I$(SRCDIR) -Wno-unused-function -ffloat-store --embed-file bin/emscripten/embed@/ --shell-file assets/web/emtemplate.html
 LIBS = -s USE_SDL=2 -s USE_LIBPNG=1 -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0 -sMAX_WEBGL_VERSION=2
 
 OBJDIR = obj/emscripten

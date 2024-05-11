@@ -12,6 +12,18 @@
 
 #define NIBBLE_TITLE              "NIBBLE8"
 
+#ifndef NIBBLE_MAJOR_VERSION
+#define NIBBLE_MAJOR_VERSION 0
+#endif
+
+#ifndef NIBBLE_MINOR_VERSION
+#define NIBBLE_MINOR_VERSION 0
+#endif
+
+#ifndef NIBBLE_PATCH_VERSION
+#define NIBBLE_PATCH_VERSION 0
+#endif
+
 #define NIBBLE_WIDTH              160
 #define NIBBLE_HEIGHT             120
 #define NIBBLE_FONT_WIDTH         4

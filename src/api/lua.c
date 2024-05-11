@@ -152,6 +152,14 @@ void nibble_lua_init_api()
     lua_setfield(currentVM, -3, "path");
     lua_pop(currentVM, 2); // Pop the package table and the path string
 
+    // Expose version constants to Lua
+    lua_pushinteger(currentVM, NIBBLE_MAJOR_VERSION);
+    lua_setglobal(currentVM, "NIBBLE_MAJOR_VERSION");
+    lua_pushinteger(currentVM, NIBBLE_MINOR_VERSION);
+    lua_setglobal(currentVM, "NIBBLE_MINOR_VERSION");
+    lua_pushinteger(currentVM, NIBBLE_PATCH_VERSION);
+    lua_setglobal(currentVM, "NIBBLE_PATCH_VERSION");
+
     luaL_dostring(currentVM, "KEYCODE = require(\"keys_constants\")");
     luaL_dostring(currentVM, "UTILS = require(\"utils\")");
 }

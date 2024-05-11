@@ -59,7 +59,7 @@ void main_loop()
 
 int main(int argc, char *argv[])
 {
-    printf("Welcome to NIBBLE8!\n");
+    printf("Welcome to NIBBLE8 v.%d.%d.%d!\n", NIBBLE_MAJOR_VERSION, NIBBLE_MINOR_VERSION, NIBBLE_PATCH_VERSION);
     fflush(stdout);
 
     srand(time(NULL)); // Initialization, should only be called once.
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     nibble_lua_init();
     
     next_time = SDL_GetTicks() + NIBBLE_FPS;
-    
+
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, -1, 1);
 #else

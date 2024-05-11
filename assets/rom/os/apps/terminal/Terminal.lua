@@ -71,17 +71,19 @@ function Terminal.new(editCallback, spriteEditCallback, loadCartCallback,
     local volume = 64
     -- local notes = {11, 20, 15, 22}
     local notes = {28, 30, 31, 33}
+    local versionText = string.format("v.%d.%d.%d", NIBBLE_MAJOR_VERSION,
+                                      NIBBLE_MINOR_VERSION, NIBBLE_PATCH_VERSION)
+
     self:queueImage(self.logo, self.logoWidth, self.logoHeight, 0.025,
                     {note = notes[1], sample = sample, volume = volume})
-    self:queueMessage("nibble8 v.0.0.1", 2, 0.07,
+    self:queueMessage("nibble8 "..versionText, 2, 0.07,
                       {note = notes[2], sample = sample, volume = volume})
     self:queueMessage("", 2, 0.03)
     self:queueMessage("type \f2help\f3 for help", 3, 0.05,
                       {note = notes[3], sample = sample, volume = volume})
     self:queueMessage("", 2, 0.07,
                       {note = notes[4], sample = sample, volume = volume})
-                      self:queueMessage("", 2, 0.07,
-                      {note = -1, sample = sample, volume = volume})
+    self:queueMessage("", 2, 0.07, {note = -1, sample = sample, volume = volume})
     return self;
 end
 
@@ -463,7 +465,7 @@ function Terminal:update()
                     ModControl:stopNote()
                 else
                     ModControl:playNote(msg.sound.note, msg.sound.sample,
-                                    msg.sound.volume)
+                                        msg.sound.volume)
                 end
             end
 

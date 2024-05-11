@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     uint32_t last_time = 0;
     uint32_t targetFrameTimeMs = 1000 / NIBBLE_FPS;
 
-    printf("Welcome to NIBBLE8!\n");
+    printf("Welcome to NIBBLE8 v.%d.%d.%d!\n", NIBBLE_MAJOR_VERSION, NIBBLE_MINOR_VERSION, NIBBLE_PATCH_VERSION);
     fflush(stdout);
 
     srand(time(NULL)); // Initialization, should only be called once.
