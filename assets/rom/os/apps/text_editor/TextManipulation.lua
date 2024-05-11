@@ -138,9 +138,6 @@ function TextManipulation:removeSelectedText(textEditor)
     local line1
     local line2
 
-    trace("Selection: " .. startX .. "," .. startY .. " - " .. endX .. "," ..
-              endY)
-
     if endY - startY >= 1 then
         line = textEditor.lines[endY + 1]
         line1 = sub(line, 1, startX)
@@ -183,39 +180,28 @@ function TextManipulation:removeSelectedText(textEditor)
 end
 
 function TextManipulation:copy(textEditor)
-    trace("TextManipulation:copy")
-
     if textEditor.selection.x1 == nil then return end
     local startX, endX, startY, endY = self:normalizeSelection(textEditor)
 
-    trace("Selection: " .. startX .. "," .. startY .. " - " .. endX .. "," ..
-              endY)
+    --trace("Selection: " .. startX .. "," .. startY .. " - " .. endX .. "," .. endY)
 
     local text = {}
     if endY - startY >= 1 then
-        if startX == 0 and endX == 0 then
-            -- Special case: selection starts at the beginning of one line and ends at the beginning of the next
-            for i = startY, endY - 1 do
-                table.insert(text, textEditor.lines[i + 1])
-                table.insert(text, "\n")
-            end
-        else
-            -- Handle multi-line selection normally
-            table.insert(text, sub(textEditor.lines[startY + 1], startX))
+        -- Handle multi-line selection
+        if startX + 1 <= #textEditor.lines[startY + 1] then
+            table.insert(text, string.sub(textEditor.lines[startY + 1], startX))
             table.insert(text, "\n")
-            for i = startY + 1, endY do
-                local line = textEditor.lines[i + 1]
-                if i == endY then
-                    table.insert(text, sub(line, 1, endX))
-                else
-                    table.insert(text, line)
-                    table.insert(text, "\n")
-                end
-            end
+        end
+        for i = startY + 1, endY - 1 do -- Adjusted loop to end at endY - 1
+            table.insert(text, textEditor.lines[i + 1])
+            table.insert(text, "\n")
+        end
+        if endX > 1 then -- Handle partial line selection at end if any
+            table.insert(text, string.sub(textEditor.lines[endY + 1], 1, endX))
         end
     else
         -- Single-line selection
-        table.insert(text, sub(textEditor.lines[startY + 1], startX + 1, endX))
+        table.insert(text, string.sub(textEditor.lines[startY + 1], startX, endX))
     end
 
     local finalText = table.concat(text)

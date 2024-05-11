@@ -229,10 +229,10 @@ function SyntaxHighlighter:cacheLine(textEditor, lineIndex)
         if charIndex == 1 or previousColor ~= color or previousBgColor ~=
             bgColor then
             if color ~= previousColor then
-                drawText = drawText .. chr(12) .. str(color)
+                drawText = drawText .. "\f" .. str(color)
             end
             if bgColor ~= previousBgColor then
-                drawText = drawText .. chr(14) .. str(bgColor)
+                drawText = drawText .. "\b" .. str(bgColor)
             end
         end
 

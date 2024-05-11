@@ -48,6 +48,11 @@ int input_update()
     {
         int custom_key = allegroToSDLScancode[i]; // Map Allegro keycodes to your custom/Sdl keycodes
 
+        if ((i == KEY_LCONTROL) || (i == KEY_RCONTROL) || (i == KEY_LSHIFT) || (i == KEY_RSHIFT))
+        {
+            continue;
+        }
+
         // Key press logic
         if (key[i] && !old_key[i])
         {
@@ -127,7 +132,7 @@ void input_check_hotkey(int key)
         nibble_lua_close_app();
         break;
     case KEY_F4:
-        //nibble_allegro_save_lua_keys_constants();
+        // nibble_allegro_save_lua_keys_constants();
         break;
     default:
         break;

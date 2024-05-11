@@ -20,6 +20,11 @@ function DisplayManager:drawStatusBar(textEditor)
     local status = "line: " ..
                        str(flr(textEditor.cursor.y + textEditor.scroll.y + 1)) ..
                        "/" .. str(#textEditor.lines)
+    local s = textEditor.selection
+
+    if s.x1 ~= nil then
+        status = string.format("selection %d,%d:%d,%d", s.x1, s.y1, s.x2, s.y2)
+    end
 
     rectfill(0, 113, 160, 7, 2)
     print(status, 1, 114, 0)

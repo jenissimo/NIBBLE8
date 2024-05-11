@@ -1403,7 +1403,7 @@ static int l_get_clipboard_text(lua_State *L)
     char *result = nibble_api_get_clipboard_text();
     // DEBUG_LOG("get_clipboard_text() = %s\n", result);
     lua_pushstring(L, result);
-    freeClipboardText(result);
+    //freeClipboardText(result);
     return 1;
 }
 

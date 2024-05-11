@@ -385,7 +385,7 @@ int nibble_api_print(char *text, int16_t x, int16_t y, uint8_t fg_color, uint8_t
                 charIndex++; // Move past the parameter
                 continue;
             }
-            case 14:
+            case '\b':
             { // Set background color
                 charIndex++;
                 bg_color = nibble_print_parse_parameter(text[charIndex]);

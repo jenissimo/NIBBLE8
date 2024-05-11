@@ -25,21 +25,33 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
         elseif key_code == KEYCODE.KEY_UP then
             trace("CTRL+UP")
             textEditor.selecting = shift_pressed
+            if textEditor.selecting then
+                textEditor.selection.dirY = 1
+            end
             textEditor:pageUp()
             return
         elseif key_code == KEYCODE.KEY_DOWN then
             trace("CTRL+DOWN")
             textEditor.selecting = shift_pressed
+            if textEditor.selecting then
+                textEditor.selection.dirY = 1
+            end
             textEditor:pageDown()
             return
         elseif key_code == KEYCODE.KEY_LEFT then
             trace("CTRL+LEFT")
             textEditor.selecting = shift_pressed
+            if textEditor.selecting then
+                textEditor.selection.dirX = -1
+            end
             textEditor:moveCursorToLineStart()
             return
         elseif key_code == KEYCODE.KEY_RIGHT then
             trace("CTRL+RIGHT")
             textEditor.selecting = shift_pressed
+            if textEditor.selecting then
+                textEditor.selection.dirX = 1
+            end
             textEditor:endCursor()
             return
         end
@@ -48,11 +60,17 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
     if (key_code == KEYCODE.KEY_PAGEUP) then
         trace("PGUP")
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirY = -1
+        end
         textEditor:pageUp()
         return
     elseif (key_code == KEYCODE.KEY_PAGEDOWN) then
         trace("PGDN")
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirX = 1
+        end
         textEditor:pageDown()
         return
     end
@@ -68,36 +86,60 @@ function InputHandler.handleKeyInput(textEditor, key_code, ctrl_pressed,
     -- Check for Cursor Movement
     if (key_code == KEYCODE.KEY_LEFT) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirX = -1
+        end
         textEditor:moveCursor(-1, 0)
         return
     elseif (key_code == KEYCODE.KEY_RIGHT) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirX = 1
+        end
         textEditor:moveCursor(1, 0)
         return
     elseif (key_code == KEYCODE.KEY_UP) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirY = -1
+        end
         textEditor:moveCursor(0, -1)
         return
     elseif (key_code == KEYCODE.KEY_DOWN) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirY = 1
+        end
         textEditor:moveCursor(0, 1)
         return
     elseif (key_code == KEYCODE.KEY_PGUP) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirY = -1
+        end
         textEditor:moveCursor(0, -rows_on_screen)
         return
     elseif (key_code == KEYCODE.KEY_PGDOWN) then
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirY = 1
+        end
         textEditor:moveCursor(0, rows_on_screen)
         return
     elseif (key_code == KEYCODE.KEY_HOME) then
         trace("HOME")
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirX = -1
+        end
         textEditor:homeCursor()
         return
     elseif (key_code == KEYCODE.KEY_END) then
         trace("END")
         textEditor.selecting = shift_pressed
+        if textEditor.selecting then
+            textEditor.selection.dirX = 1
+        end
         textEditor:endCursor()
         return
     end

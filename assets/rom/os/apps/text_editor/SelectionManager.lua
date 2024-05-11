@@ -28,27 +28,15 @@ function SelectionManager:selectAll(textEditor)
     textEditor.selection.y1 = 0
     textEditor.selection.x2 = #textEditor.lines[#textEditor.lines]
     textEditor.selection.y2 = #textEditor.lines - 1
+    textEditor.selection.dirX = 0
+    textEditor.selection.dirY = 0
     textEditor.syntax_highlighting_dirty = true
 end
 
 function SelectionManager:selectText(textEditor)
-    local dirX = 0
-    local dirY = 0
-
-    if key(KEYCODE.KEY_LEFT) then
-        dirX = -1
-    elseif key(KEYCODE.KEY_RIGHT) then
-        dirX = 1
-    elseif key(KEYCODE.KEY_UP) then
-        dirY = -1
-    elseif key(KEYCODE.KEY_DOWN) then
-        dirY = 1
-    elseif key(KEYCODE.KEY_HOME) then
-        dirX = -1
-    elseif key(KEYCODE.KEY_END) then
-        dirX = 1        
-    end
-
+    local dirX = textEditor.selection.dirX
+    local dirY = textEditor.selection.diry
+    
     if dirX ~= 0 or dirY ~= 0 then
         if textEditor.selection.x1 == nil then
             self:startSelection(textEditor)
@@ -73,6 +61,8 @@ function SelectionManager:clearSelection(textEditor)
     textEditor.selection.y1 = nil
     textEditor.selection.x2 = nil
     textEditor.selection.y2 = nil
+    textEditor.selection.dirX = 0
+    textEditor.selection.dirY = 0
 end
 
 function SelectionManager:isSelected(textEditor, x, y)
