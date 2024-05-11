@@ -40,7 +40,10 @@ void debug_log(const char *file, int line, const char *format, ...)
 {
     // for DOS builds, we don't want to print to console
     #ifdef DOS
-    return;
+    if (!log_fp)
+    {
+        return;
+    }
     #endif
     va_list args;
     va_start(args, format);
