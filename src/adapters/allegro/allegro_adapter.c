@@ -3,7 +3,7 @@
 #include "video_manager.h"
 #include "input_manager.h"
 
-bool isFullscreen = false;
+char* clipboardText = NULL;
 
 void nibble_allegro_init()
 {
@@ -24,6 +24,10 @@ void nibble_allegro_init()
 
     audio_init();
     input_init();
+
+    getClipboardText = nibble_allegro_get_clipboard;
+    setClipboardText = nibble_allegro_set_clipboard;
+    freeClipboardText = nibble_allgero_free_clipboard;
 
     show_mouse(NULL);
     enable_hardware_cursor();
@@ -53,6 +57,32 @@ inline void nibble_allegro_update()
     {
         video_update();
     }
+}
+
+char *nibble_allegro_get_clipboard()
+{
+    // Return the clipboard text
+    return clipboardText;
+}
+
+// Default implementation of SetClipboardText
+int nibble_allegro_set_clipboard(const char *text)
+{
+    // Free previously allocated clipboard text, if any
+    free(clipboardText);
+    // Allocate memory for new clipboard text
+    clipboardText = strdup(text);
+    if (clipboardText == NULL)
+    {
+        return -1; // Memory allocation failed
+    }
+    return NULL; // Success
+}
+
+// Default implementation of FreeClipboardText
+void nibble_allgero_free_clipboard(void *ptr)
+{
+    free(ptr);
 }
 
 void nibble_allegro_quit()
