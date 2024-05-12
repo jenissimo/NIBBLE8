@@ -30,7 +30,7 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
      - Install MSYS2 from [here](https://www.msys2.org/).
      - Open MSYS2 terminal and install dependencies:
        ```bash
-       pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-libpng mingw-w64-x86_64-pkg-config mingw-w64-x86_64-toolchain mingw-w64-x86_64-make
+       pacman -S zip mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-libpng mingw-w64-x86_64-pkg-config mingw-w64-x86_64-toolchain mingw-w64-x86_64-make
        ```
 2. Navigate to the NIBBLE8 directory.
 3. Build using make (mingw32-make for MSYS2):
@@ -42,7 +42,6 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
 #### Dependencies:
 - DJGPP cross-compilation environment
 - Additional libraries:
-  - Lua 5.2: [lua522b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/lua522b.zip)
   - PNG 1.6.40: [png1640b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/png1640b.zip)
   - Zlib 1.3: [zlb13b.zip](https://www.delorie.com/pub/djgpp/current/v2tk/zlb13b.zip)
   - Allegro 4.2.2: [all422ar2.zip](https://www.delorie.com/pub/djgpp/current/v2tk/allegro/all422ar2.zip)

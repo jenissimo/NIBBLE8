@@ -8,6 +8,11 @@ ifneq ($(ARCH),)
     CFLAGS += -arch $(ARCH)
 endif
 
+ifeq ($(SYSTEM),Windows)
+	CFLAGS += -mconsole
+	LIBS += -lshlwapi
+endif
+
 OBJDIR = obj/sdl2
 BUILDDIR = bin/sdl2
 TARGET = nibble8
@@ -25,7 +30,11 @@ OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: CFLAGS += -O2
 all: rom $(BUILDDIR)/$(TARGET)
 
+ifeq ($(SYSTEM),Windows)
+debug: CFLAGS += -g
+else
 debug: CFLAGS += -g -fsanitize=address
+endif
 debug: rom $(BUILDDIR)/$(TARGET)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS)
@@ -38,7 +47,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJDIR) $(BUILDDIR)
+	@rm -rf $(OBJDIR) $(BUILDDIR)
 
 font2bin: $(TOOLSDIR)/font2bin.c
 	$(CC) $(CFLAGS) -o $(TOOLSDIR)/font2bin $^ $(LIBS)
@@ -48,5 +57,9 @@ rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@cp $(ASSETSDIR)/icon.png $(BUILDDIR)
 	@cp $(ASSETSDIR)/config.ini $(BUILDDIR)
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
-	-@rm $(BUILDDIR)/rom.zip
+	@rm -f $(BUILDDIR)/rom.zip
 	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)
+ifeq ($(SYSTEM),Windows)
+	@echo "Copying Windows specific libraries..."
+	@cp $(ASSETSDIR)/win_libs/* $(BUILDDIR)
+endif

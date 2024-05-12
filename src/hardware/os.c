@@ -4,35 +4,92 @@ GetClipboardTextFunc getClipboardText;
 SetClipboardTextFunc setClipboardText;
 FreeClipboardTextFunc freeClipboardText;
 
-char *execPath;
+char nibble_exec_path[1024];
 char nibble_sandbox_path[1024];
 
-void nibble_change_to_sandbox_directory(const char *exec_path)
-{
-    char real_path[1024];
-    if (realpath(exec_path, real_path) == NULL)
-    {
+#if defined(_WIN32)
+#include <windows.h>
+#include <Shlwapi.h>  // Include for PathCombine and other path functions
+char *realpath(const char *path, char *resolved_path) {
+    DWORD length = GetFullPathName(path, 0, NULL, NULL);
+    if (length == 0) return NULL;  // Call failed
+
+    char *buffer = resolved_path ? resolved_path : malloc(length);
+    if (buffer == NULL) return NULL;  // Allocation failed
+
+    if (GetFullPathName(path, length, buffer, NULL) == 0) {
+        if (!resolved_path) free(buffer);  // Free buffer if it was malloc'ed
+        return NULL;
+    }
+
+    return buffer;
+}
+
+void nibble_change_to_sandbox_directory(const char *path) {
+    DEBUG_LOG("Exec path: %s", path);
+
+    if (!GetFullPathName(path, MAX_PATH, nibble_exec_path, NULL)) {
         perror("Failed to resolve real path of the executable");
         exit(1);
     }
 
-    // Get the directory containing the executable
-    execPath = dirname(real_path);
+    DEBUG_LOG("Real path: %s", nibble_exec_path);
 
-    // Construct the path to the sandbox directory
-    snprintf(nibble_sandbox_path, sizeof(nibble_sandbox_path), "%s/%s", execPath, NIBBLE_SANDBOX_PATH);
-
-    // Change to the sandbox directory
-    if (chdir(nibble_sandbox_path) != 0)
-    {
-        perror("Failed to change directory to sandbox");
+    // Use PathRemoveFileSpec to remove the file specification and get only the directory
+    if (!PathRemoveFileSpec(nibble_exec_path)) {
+        perror("Failed to extract directory from path");
         exit(1);
     }
-    else
-    {
-        // DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
+
+    DEBUG_LOG("Directory path: %s", nibble_exec_path);
+
+    // Construct the path to the sandbox directory
+    if (!PathCombine(nibble_sandbox_path, nibble_exec_path, NIBBLE_SANDBOX_PATH)) {
+        perror("Failed to construct sandbox path");
+        exit(1);
+    }
+
+    DEBUG_LOG("Sandbox path: %s", nibble_sandbox_path);
+
+    // Change to the sandbox directory
+    if (_chdir(nibble_sandbox_path) != 0) {
+        perror("Failed to change directory to sandbox");
+        exit(1);
+    } else {
+        DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
     }
 }
+
+#else
+void nibble_change_to_sandbox_directory(const char *path) {
+    char real_path[1024];
+    DEBUG_LOG("Exec path: %s", path);
+
+    if (realpath(path, real_path) == NULL) {
+        perror("Failed to resolve real path of the executable");
+        exit(1);
+    }
+
+    DEBUG_LOG("Real path: %s", real_path);
+
+    // Use dirname to extract the directory from the real path
+    strncpy(nibble_exec_path, dirname(real_path), sizeof(nibble_exec_path));
+    nibble_exec_path[sizeof(nibble_exec_path) - 1] = '\0';  // Ensure null termination
+
+    DEBUG_LOG("Directory path: %s", nibble_exec_path);
+
+    // Construct the path to the sandbox directory
+    snprintf(nibble_sandbox_path, sizeof(nibble_sandbox_path), "%s/%s", nibble_exec_path, NIBBLE_SANDBOX_PATH);
+
+    // Change to the sandbox directory
+    if (chdir(nibble_sandbox_path) != 0) {
+        perror("Failed to change directory to sandbox");
+        exit(1);
+    } else {
+        DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
+    }
+}
+#endif
 
 int nibble_is_within_sandbox(const char *path)
 {
@@ -240,7 +297,8 @@ void nibble_api_run_code(uint8_t *code)
 int nibble_load_rom()
 {
     char romPath[1024];
-    snprintf(romPath, sizeof(romPath), "%s/rom.zip", execPath);
+    snprintf(romPath, sizeof(romPath), "%s/rom.zip", nibble_exec_path);
+    DEBUG_LOG("Loading rom from: %s", romPath);
 
     // Allocate memory for the ROM archive
     rom = (mz_zip_archive *)malloc(sizeof(mz_zip_archive));

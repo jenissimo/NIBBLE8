@@ -148,7 +148,7 @@ void nibble_lua_init_api()
     lua_pushstring(currentVM, "path");
     lua_gettable(currentVM, -2); // get original package.path
     const char *original_path = lua_tostring(currentVM, -1);
-    lua_pushfstring(currentVM, "%s;%s/?.lua;%s/lib/?.lua;%s/os/?.lua", original_path, execPath, execPath, execPath);
+    lua_pushfstring(currentVM, "%s;%s/?.lua;%s/lib/?.lua;%s/os/?.lua", original_path, nibble_exec_path, nibble_exec_path, nibble_exec_path);
     lua_setfield(currentVM, -3, "path");
     lua_pop(currentVM, 2); // Pop the package table and the path string
 
@@ -1623,7 +1623,7 @@ int nibble_lua_load_file(const char *filename)
     char adjustedPath[1024];
     int load_status;
 
-    snprintf(adjustedPath, sizeof(adjustedPath), "%s/%s", execPath, filename);
+    snprintf(adjustedPath, sizeof(adjustedPath), "%s/%s", nibble_exec_path, filename);
     load_status = luaL_loadfile(currentVM, adjustedPath); // load Lua script
 
     if (load_status != 0)

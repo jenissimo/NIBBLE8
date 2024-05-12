@@ -24,7 +24,7 @@ typedef void (*FreeClipboardTextFunc)(void*);
 extern GetClipboardTextFunc getClipboardText;
 extern SetClipboardTextFunc setClipboardText;
 extern FreeClipboardTextFunc freeClipboardText;
-extern char *execPath;
+extern char nibble_exec_path[1024];
 
 // Other methods
 void nibble_api_reboot();

@@ -2,6 +2,19 @@ MAJOR_VERSION := 0
 MINOR_VERSION := 1
 PATCH_VERSION := 0  
 
+# Automatically detect the platform
+ifeq ($(OS),Windows_NT)
+    SYSTEM := Windows
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        SYSTEM := Linux
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        SYSTEM := Darwin
+    endif
+endif
+
 SRCDIR = src
 TOOLSDIR = tools
 ROMDIR = assets/rom
