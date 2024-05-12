@@ -26,14 +26,10 @@ char *realpath(const char *path, char *resolved_path) {
 }
 
 void nibble_change_to_sandbox_directory(const char *path) {
-    DEBUG_LOG("Exec path: %s", path);
-
     if (!GetFullPathName(path, MAX_PATH, nibble_exec_path, NULL)) {
         perror("Failed to resolve real path of the executable");
         exit(1);
     }
-
-    DEBUG_LOG("Real path: %s", nibble_exec_path);
 
     // Use PathRemoveFileSpec to remove the file specification and get only the directory
     if (!PathRemoveFileSpec(nibble_exec_path)) {
@@ -41,15 +37,11 @@ void nibble_change_to_sandbox_directory(const char *path) {
         exit(1);
     }
 
-    DEBUG_LOG("Directory path: %s", nibble_exec_path);
-
     // Construct the path to the sandbox directory
     if (!PathCombine(nibble_sandbox_path, nibble_exec_path, NIBBLE_SANDBOX_PATH)) {
         perror("Failed to construct sandbox path");
         exit(1);
     }
-
-    DEBUG_LOG("Sandbox path: %s", nibble_sandbox_path);
 
     // Change to the sandbox directory
     if (_chdir(nibble_sandbox_path) != 0) {
@@ -63,20 +55,15 @@ void nibble_change_to_sandbox_directory(const char *path) {
 #else
 void nibble_change_to_sandbox_directory(const char *path) {
     char real_path[1024];
-    DEBUG_LOG("Exec path: %s", path);
 
     if (realpath(path, real_path) == NULL) {
         perror("Failed to resolve real path of the executable");
         exit(1);
     }
 
-    DEBUG_LOG("Real path: %s", real_path);
-
     // Use dirname to extract the directory from the real path
     strncpy(nibble_exec_path, dirname(real_path), sizeof(nibble_exec_path));
     nibble_exec_path[sizeof(nibble_exec_path) - 1] = '\0';  // Ensure null termination
-
-    DEBUG_LOG("Directory path: %s", nibble_exec_path);
 
     // Construct the path to the sandbox directory
     snprintf(nibble_sandbox_path, sizeof(nibble_sandbox_path), "%s/%s", nibble_exec_path, NIBBLE_SANDBOX_PATH);
@@ -86,7 +73,7 @@ void nibble_change_to_sandbox_directory(const char *path) {
         perror("Failed to change directory to sandbox");
         exit(1);
     } else {
-        DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
+        //DEBUG_LOG("Changed directory to %s", nibble_sandbox_path);
     }
 }
 #endif
@@ -204,7 +191,7 @@ char *nibble_api_ls(char *path)
     }
 
     closedir(dir);
-    DEBUG_LOG("LS: %s", buf);
+    //DEBUG_LOG("LS: %s", buf);
     return buf;
 }
 
@@ -298,7 +285,7 @@ int nibble_load_rom()
 {
     char romPath[1024];
     snprintf(romPath, sizeof(romPath), "%s/rom.zip", nibble_exec_path);
-    DEBUG_LOG("Loading rom from: %s", romPath);
+    //DEBUG_LOG("Loading rom from: %s", romPath);
 
     // Allocate memory for the ROM archive
     rom = (mz_zip_archive *)malloc(sizeof(mz_zip_archive));

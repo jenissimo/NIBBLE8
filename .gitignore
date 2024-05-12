@@ -49,5 +49,6 @@
 # Build folders
 bin/
 obj/
+builds/
 tools/font2bin
 tools/font2bin.exe

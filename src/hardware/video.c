@@ -49,7 +49,7 @@ void nibble_load_palettes()
 {
     char configPath[1024];
     snprintf(configPath, sizeof(configPath), "%s/config.ini", nibble_exec_path);
-    DEBUG_LOG("Config path: %s", configPath);
+    //DEBUG_LOG("Config path: %s", configPath);
     if (!nibble_config_load(configPath))
     {
         DEBUG_LOG("Config loading failed!");

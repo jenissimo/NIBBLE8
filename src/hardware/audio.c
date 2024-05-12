@@ -9,7 +9,7 @@ int modFileBufferSize;
 
 void nibble_audio_init(int freq, uint8_t *modData, int modSize)
 {
-    DEBUG_LOG("Init pocketmod");
+    //DEBUG_LOG("Init pocketmod");
     /* Initialize the renderer */
 
     if (modData == NULL)
@@ -18,7 +18,7 @@ void nibble_audio_init(int freq, uint8_t *modData, int modSize)
     }
     else if (pocketmod_init(&masterContext, modData, modSize, freq))
     {
-        DEBUG_LOG("Initialized PocketMod from cart!");
+        //DEBUG_LOG("Initialized PocketMod from cart!");
     }
     else
     {
@@ -188,8 +188,8 @@ void nibble_audio_reset()
     // Copy pattern data
     memset(memory.soundState.patterns, 0, NIBBLE_PATTERNS_COUNT * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
     memcpy(memory.soundState.patterns, masterContext.patterns, masterContext.num_patterns * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
-    DEBUG_LOG("Memory size: %lu", NIBBLE_PATTERNS_COUNT * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
-    DEBUG_LOG("Patterns size: %lu", masterContext.num_patterns * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
+    //DEBUG_LOG("Memory size: %lu", NIBBLE_PATTERNS_COUNT * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
+    //DEBUG_LOG("Patterns size: %lu", masterContext.num_patterns * NIBBLE_PATTERN_LENGTH * NIBBLE_MUSIC_CHANNELS * NIBBLE_LINE_SIZE);
 
     // Copy sample names and data
     for (int i = 0; i < POCKETMOD_MAX_SAMPLES; i++)
