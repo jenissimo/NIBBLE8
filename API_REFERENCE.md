@@ -63,6 +63,10 @@
 - `mget(x, y):` Get a map value.
 - `mset(x, y, v):` Set a map value.
 
+## Sound Functions
+- `sfx(n, [offset], [length]):` Plays a sound effect (SFX) by `n` pattern
+- `music(n, [length]):` Plays a music starting at `n` pattern
+
 ## Utility Functions
 
 - `add(t, a):` Add an element to a Lua table.
