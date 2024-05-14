@@ -97,8 +97,7 @@ function _error(error_message)
 
     changeWindow(terminal)
 
-    textEditor:switchToTab(tonumber(tabIndex + 1))
-    textEditor:setCursor(0, tonumber(localLine) - 1)
+    textEditor:jumpToLine(tonumber(tabIndex + 1), tonumber(localLine) - 1)
 end
 
 function changeWindow(window)

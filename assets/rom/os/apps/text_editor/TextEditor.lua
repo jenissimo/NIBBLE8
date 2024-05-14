@@ -231,6 +231,13 @@ end
 
 function TextEditor:setCursor(x, y) CursorManager:setCursor(self, x, y) end
 
+function TextEditor:jumpToLine(tabIndex, line)
+    self:switchToTab(tabIndex)
+    self.scroll.x = 0
+    self.scroll.y = 0
+    CursorManager:setCursor(self, 0, line)
+end
+
 -- Selection
 
 function TextEditor:isSelected(x, y)

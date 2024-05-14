@@ -68,34 +68,31 @@ end
 function SelectionManager:isSelected(textEditor, x, y)
     if textEditor.selection.x1 == nil then return false end
 
-    local x1 = textEditor.selection.x1
-    local x2 = textEditor.selection.x2
-    local y1 = textEditor.selection.y1
-    local y2 = textEditor.selection.y2
+    local x1, x2 = textEditor.selection.x1, textEditor.selection.x2
+    local y1, y2 = textEditor.selection.y1, textEditor.selection.y2
 
-    if textEditor.selection.x1 > textEditor.selection.x2 then
-        x1 = textEditor.selection.x2
-        x2 = textEditor.selection.x1 - 1
-    else
-        x2 = textEditor.selection.x2 - 1
+    -- Normalize y1 and y2
+    if y1 > y2 then
+        y1, y2 = y2, y1
     end
 
-    if textEditor.selection.y1 > textEditor.selection.y2 then
-        y1 = textEditor.selection.y2
-        y2 = textEditor.selection.y1
-    end
-
-    if y == y1 and y == y2 then
-        if x >= x1 and x <= x2 then return true end
+    -- Handle multi-line selections
+    if y < y1 or y > y2 then
+        return false
+    elseif y == y1 and y == y2 then
+        -- Single line selection
+        if x1 > x2 then x1, x2 = x2, x1 end
+        return x >= x1 and x <= x2
     elseif y == y1 then
-        if x >= x1 then return true end
+        -- Starting line of multi-line selection
+        return x >= x1
     elseif y == y2 then
-        if x <= x2 then return true end
-    elseif y > y1 and y < y2 then
+        -- Ending line of multi-line selection
+        return x <= x2
+    else
+        -- Middle lines of multi-line selection
         return true
     end
-
-    return false
 end
 
 return SelectionManager

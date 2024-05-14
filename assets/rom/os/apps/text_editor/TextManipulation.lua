@@ -134,24 +134,16 @@ function TextManipulation:removeSelectedText(textEditor)
         return
     end
 
-    local line
-    local line1
-    local line2
-
-    if endY - startY >= 1 then
-        line = textEditor.lines[endY + 1]
-        line1 = sub(line, 1, startX)
-        line2 = sub(line, endX + 1)
-        textEditor.lines[endY + 1] = line1 .. line2
-
-        for i = endY - 1, startY, -1 do
+    if endY > startY then
+        local line1 = textEditor.lines[startY + 1]
+        local line2 = textEditor.lines[endY + 1]
+        textEditor.lines[startY + 1] = string.sub(line1, 1, startX) .. string.sub(line2, endX + 2)
+        for i = endY, startY + 1, -1 do
             table.remove(textEditor.lines, i + 1)
         end
     else
-        line = textEditor.lines[startY + 1]
-        line1 = sub(line, 1, startX)
-        line2 = sub(line, endX + 1)
-        textEditor.lines[startY + 1] = line1 .. line2
+        local line = textEditor.lines[startY + 1]
+        textEditor.lines[startY + 1] = string.sub(line, 1, startX) .. string.sub(line, endX + 2)
     end
 
     textEditor:clearSelection()
@@ -171,10 +163,6 @@ function TextManipulation:removeSelectedText(textEditor)
     else
         textEditor.scroll.x = 0
     end
-    
-    --trace("Selection pos: " .. startX .. "," .. startY)
-    --trace("Cursor pos: " .. textEditor.cursor.x .. "," .. textEditor.cursor.y)
-    --trace("Scroll: " .. textEditor.scroll.x .. "," .. textEditor.scroll.y)
 
     textEditor:setCursor(adjustedX, adjustedY)
 end
@@ -189,7 +177,7 @@ function TextManipulation:copy(textEditor)
     if endY - startY >= 1 then
         -- Handle multi-line selection
         if startX + 1 <= #textEditor.lines[startY + 1] then
-            table.insert(text, string.sub(textEditor.lines[startY + 1], startX))
+            table.insert(text, string.sub(textEditor.lines[startY + 1], startX + 1))
             table.insert(text, "\n")
         end
         for i = startY + 1, endY - 1 do -- Adjusted loop to end at endY - 1
@@ -197,11 +185,11 @@ function TextManipulation:copy(textEditor)
             table.insert(text, "\n")
         end
         if endX > 1 then -- Handle partial line selection at end if any
-            table.insert(text, string.sub(textEditor.lines[endY + 1], 1, endX))
+            table.insert(text, string.sub(textEditor.lines[endY + 1], 1, endX + 1))
         end
     else
         -- Single-line selection
-        table.insert(text, string.sub(textEditor.lines[startY + 1], startX, endX))
+        table.insert(text, string.sub(textEditor.lines[startY + 1], startX + 1, endX + 1))
     end
 
     local finalText = table.concat(text)
@@ -225,7 +213,7 @@ function TextManipulation:paste(textEditor)
     for i, lineText in ipairs(newLines) do
         if i > 1 then
             -- For subsequent lines, insert a new line
-            self:newLine(textEditor, textEditor.cursor.x + 1,
+            self:newLine(textEditor, textEditor.cursor.x,
                          textEditor.cursor.y)
             textEditor:moveCursor(0, 1)
             textEditor:homeCursor()
