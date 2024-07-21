@@ -11,6 +11,7 @@
 
 #include "nibble8.h"
 #include "debug/debug.h"
+#include "hardware/config_manager.h"
 #include "png.h"
 
 int find_closest_palette_index(Palette *palette, uint8_t gray_value)

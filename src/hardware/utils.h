@@ -10,7 +10,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-extern int nibble_frame_count;
+extern uint32_t nibble_frame_count;
 
 double nibble_api_rnd(int x);
 char nibble_api_chr(int x);

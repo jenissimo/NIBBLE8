@@ -1,5 +1,5 @@
-#ifndef nibble_png_h
-#define nibble_png_h
+#ifndef NIBBLE_PNG_H
+#define NIBBLE_PNG_H
 
 #include <png.h>
 #ifdef DOS
@@ -8,6 +8,7 @@
 #include <stdint.h>
 #endif
 #include "miniz.h"
+#include "hardware/config_manager.h"
 #include "hardware/video.h"
 
 typedef struct {

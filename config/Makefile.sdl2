@@ -55,7 +55,7 @@ font2bin: $(TOOLSDIR)/font2bin.c
 rom: $(ROMFILES:%=$(ROMDIR)/%)
 	@mkdir -p $(BUILDDIR)
 	@cp $(ASSETSDIR)/icon.png $(BUILDDIR)
-	@cp $(ASSETSDIR)/config.ini $(BUILDDIR)
+	@cp $(ROMDIR)/config_default.ini $(BUILDDIR)/config.ini
 	@cp -R $(ASSETSDIR)/drive_c $(BUILDDIR)
 	@rm -f $(BUILDDIR)/rom.zip
 	@cd $(ROMDIR) && zip -r ../../$(BUILDDIR)/rom.zip $(ROMFILES)

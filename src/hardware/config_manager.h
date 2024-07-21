@@ -10,6 +10,7 @@
 #include <stdint.h>
 #endif
 #include <string.h>
+#include "ram.h"
 #include "utils/ini.h"
 
 typedef struct
@@ -27,6 +28,8 @@ typedef struct
 extern NibbleConfig nibbleConfig;
 
 int nibble_config_load(const char *filename);
+int nibble_config_load_default();
+
 int nibble_config_handler(void *user, const char *section, const char *name,
                           const char *value);
 void nibble_config_calculate_argb(Palette *palette);

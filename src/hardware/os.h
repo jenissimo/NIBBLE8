@@ -11,9 +11,11 @@
 #endif
 #include <unistd.h>
 #include "api/lua.h"
+#include "hardware/ram.h"
+#include "hardware/cart.h"
+#include "hardware/config_manager.h"
 #include "utils/png.h"
 #include "utils/error_handling.h"
-#include "hardware/ram.h"
 #include "nibble8.h"
 
 // Platform independent clipboard functions
@@ -39,5 +41,6 @@ int nibble_api_set_clipboard_text(const uint8_t *text);
 const char *nibble_api_get_code();
 void nibble_api_run_code(uint8_t *code);
 int nibble_load_rom(void);
+int nibble_init_rom(const unsigned char *rom_data, size_t rom_size);
 
 #endif

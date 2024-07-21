@@ -105,6 +105,11 @@
         "libgen.h": "c",
         "config_manager.h": "c",
         "ini.h": "c",
-        "base64.h": "c"
+        "base64.h": "c",
+        "libretro.h": "c",
+        "retroarch_adapter.h": "c",
+        "time.h": "c",
+        "rom.h": "c",
+        "cart.h": "c"
     }
 }

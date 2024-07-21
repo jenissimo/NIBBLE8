@@ -49,11 +49,16 @@ void nibble_load_palettes()
 {
     char configPath[1024];
     snprintf(configPath, sizeof(configPath), "%s/config.ini", nibble_exec_path);
-    //DEBUG_LOG("Config path: %s", configPath);
+    // DEBUG_LOG("Config path: %s", configPath);
     if (!nibble_config_load(configPath))
     {
-        DEBUG_LOG("Config loading failed!");
-        exit(1);
+        DEBUG_LOG("Config not found, loading default");
+        if (!nibble_config_load_default())
+        {
+            DEBUG_LOG("Default config load failed. Check rom.zip");
+            exit(1);
+        }
+        // exit(1);
     }
 }
 

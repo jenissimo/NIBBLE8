@@ -1,10 +1,23 @@
 #include "config_manager.h"
+#include "cart.h"
 
 NibbleConfig nibbleConfig;
 
 int nibble_config_load(const char *filename)
 {
     if (ini_parse(filename, nibble_config_handler, &nibbleConfig) < 0)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int nibble_config_load_default()
+{
+    char *iniFile = NULL;
+    load_text_from_zip(rom, "config_default.ini", &iniFile);
+    if (ini_parse_string(iniFile, nibble_config_handler, &nibbleConfig) < 0)
     {
         return 0;
     }

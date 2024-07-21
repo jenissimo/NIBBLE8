@@ -1,0 +1,26 @@
+display_name = "NIBBLE8"
+authors = "Jenissimo"
+supported_extensions = "n8"
+corename = "NIBBLE8"
+license = "MIT"
+permissions = ""
+display_version = "0.1.1"
+categories = "Emulator"
+
+# Hardware Information
+manufacturer = "NIBBLE8"
+systemname = "NIBBLE8"
+systemid = "nibble8"
+
+# Libretro Features
+supports_no_game = "false"
+database = "NIBBLE8 Inc - NIBBLE8"
+savestate = "false"
+cheats = "false"
+core_options = "false"
+disk_control = "false"
+needs_fullpath = "false"
+is_experimental = "false"
+
+# Firmware / BIOS
+firmware_count = 0
