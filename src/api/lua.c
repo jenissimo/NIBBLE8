@@ -73,6 +73,7 @@ void nibble_lua_init_api()
     nibble_lua_register_function("palt", l_palt);
     nibble_lua_register_function("pget", l_pget);
     nibble_lua_register_function("pset", l_pset);
+    nibble_lua_register_function("points", l_points);
     nibble_lua_register_function("circ", l_circ);
     nibble_lua_register_function("circfill", l_circfill);
     nibble_lua_register_function("line", l_line);
@@ -354,6 +355,46 @@ static int l_pset(lua_State *L)
         return 0;
     }
 
+    return 0;
+}
+
+// Batch pixel plot: draw many pixels in a single Lua->C call to amortize the
+// call boundary, which dominates when a cart sets hundreds of pixels per frame
+// (one pset() is a full Lua->C round trip). Two flat-array forms:
+//   points{x1,y1,c1, x2,y2,c2, ...}    -- per-pixel colour (triples)
+//   points({x1,y1, x2,y2, ...}, col)   -- uniform colour (pairs + colour arg)
+// A flat array (not an array of tables) keeps the per-point cost to plain
+// integer-indexed reads, which is the whole point of the batch path.
+static int l_points(lua_State *L)
+{
+    if (!lua_istable(L, 1))
+        return 0;
+
+    int n = (int)lua_rawlen(L, 1);
+
+    if (!lua_isnoneornil(L, 2)) // uniform colour: {x,y, x,y, ...}, col
+    {
+        uint8_t col = (uint8_t)lua_tonumber(L, 2) % NIBBLE_PALETTE_SIZE;
+        for (int i = 1; i + 1 <= n; i += 2)
+        {
+            lua_rawgeti(L, 1, i);
+            lua_rawgeti(L, 1, i + 1);
+            nibble_api_pset((int16_t)lua_tonumber(L, -2), (int16_t)lua_tonumber(L, -1), col);
+            lua_pop(L, 2);
+        }
+    }
+    else // per-pixel colour: {x,y,c, x,y,c, ...}
+    {
+        for (int i = 1; i + 2 <= n; i += 3)
+        {
+            lua_rawgeti(L, 1, i);
+            lua_rawgeti(L, 1, i + 1);
+            lua_rawgeti(L, 1, i + 2);
+            nibble_api_pset((int16_t)lua_tonumber(L, -3), (int16_t)lua_tonumber(L, -2),
+                            (uint8_t)lua_tonumber(L, -1) % NIBBLE_PALETTE_SIZE);
+            lua_pop(L, 3);
+        }
+    }
     return 0;
 }
 

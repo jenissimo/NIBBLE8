@@ -41,6 +41,7 @@
 - `palt([c], [t]):` Set transparency for a color. If empty - resets.
 - `pget(x, y):` Get the color of a pixel.
 - `pset(x, y, col):` Set the color of a pixel.
+- `points(t, [col]):` Batch pixel plot — draws many pixels in one call (far faster than calling `pset` in a loop, which pays the Lua→C overhead per pixel). `t` is a *flat* array. With `col`: `t = {x1,y1, x2,y2, ...}` and all pixels use `col`. Without `col`: `t = {x1,y1,c1, x2,y2,c2, ...}` (per-pixel color).
 - `circ(x, y, r, col):` Draw a circle.
 - `circfill(x, y, r, col):` Draw a filled circle.
 - `line(x0, y0, x1, y1, col):` Draw a line.

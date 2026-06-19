@@ -55,6 +55,7 @@ static int l_color(lua_State *L);
 static int l_split(lua_State *L);
 static int l_trace(lua_State *L);
 static int l_pset(lua_State *L);
+static int l_points(lua_State *L);
 static int l_pget(lua_State *L);
 static int l_circ(lua_State *L);
 static int l_circfill(lua_State *L);
