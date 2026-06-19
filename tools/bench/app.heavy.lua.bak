@@ -1,0 +1,60 @@
+-- NIBBLE8 drawing stress test (headless benchmark workload).
+-- Renders a fixed, deterministic mixed scene every frame so the per-frame cost
+-- is constant and comparable across runs/optimizations. Run with the engine's
+-- --bench flag, which loops this cart uncapped for N frames and times it.
+--
+-- Exercises every hot path: fills, sprites, lines, per-pixel, and text.
+
+-- Counts per primitive class per frame. Tune to keep a 386-class run a few
+-- seconds for ~600 frames.
+local N_RECT = 120   -- rectfill
+local N_CIRC = 80    -- circfill
+local N_LINE = 120   -- line
+local N_PSET = 400   -- pset (per-pixel + Lua call overhead)
+local N_SPR  = 150   -- spr (sprite blit)
+local N_TEXT = 16    -- print (4x5 glyph blits)
+
+local W, H = 160, 120
+
+-- Deterministic LCG so every frame draws the identical scene.
+local seed = 1
+local function rnd(n)
+  seed = (seed * 1103515245 + 12345) % 2147483648
+  return seed % n
+end
+
+function _init()
+  -- nothing; workload lives in _draw
+end
+
+function _update()
+end
+
+function _draw()
+  seed = 1            -- reset so the scene is identical every frame
+  cls(0)
+
+  for i = 1, N_RECT do
+    rectfill(rnd(W), rnd(H), 4 + rnd(20), 4 + rnd(20), rnd(4))
+  end
+
+  for i = 1, N_CIRC do
+    circfill(rnd(W), rnd(H), 2 + rnd(10), rnd(4))
+  end
+
+  for i = 1, N_LINE do
+    line(rnd(W), rnd(H), rnd(W), rnd(H), rnd(4))
+  end
+
+  for i = 1, N_PSET do
+    pset(rnd(W), rnd(H), rnd(4))
+  end
+
+  for i = 1, N_SPR do
+    spr(rnd(64), rnd(W), rnd(H))
+  end
+
+  for i = 1, N_TEXT do
+    print("NIBBLE8 386 BENCH", rnd(W), rnd(H), rnd(4))
+  end
+end

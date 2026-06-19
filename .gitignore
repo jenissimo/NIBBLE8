@@ -52,3 +52,19 @@ obj/
 builds/
 tools/font2bin
 tools/font2bin.exe
+
+# Headless benchmark harness artifacts (downloaded base image + generated)
+# Keep tracked: tools/bench/app.lua, the bench_*.sh scripts.
+tools/bench/*.img
+tools/bench/*.vmdk
+tools/bench/*.zip
+tools/bench/bench.n8
+tools/bench/FDAUTO.BAT
+tools/bench/*.log
+tools/bench/*.stdout
+tools/bench/*.mod
+tools/bench/readme.txt
+config/.bochsrc.bench.gen
+config/.bochsrc.prof.gen
+config/.dosbox-x.*.conf
+bench_dosbox.log
