@@ -3,13 +3,24 @@ DJGPP_PATH = /usr/local/djgpp/
 
 CC = gcc
 # Adjust the include and lib paths as necessary for your Allegro installation
-CFLAGS += -w -D DOS -fgnu89-inline -I$(DJGPP_PATH)include -I$(SRCDIR)
+# Allegro 4.2.2's djgpp headers "guess" the fixed-width int types with macros
+# (#define int32_t signed int), which collide with the real typedefs in modern
+# DJGPP's <stdint.h> (gcc 12). Force Allegro to use <stdint.h> and pre-define
+# LONG_LONG so alconfig.h skips its guessed int64_t macro.
+# POCKETMOD_NO_INTERPOLATION drops pocketmod's per-sample float lerp — the
+# hottest FP in the MOD renderer — on the DOS/486 target (web/SDL keep it).
+CFLAGS += -w -D DOS -DPOCKETMOD_NO_INTERPOLATION -fgnu89-inline -DALLEGRO_HAVE_STDINT_H -DLONG_LONG="long long" -I$(DJGPP_PATH)include -I$(SRCDIR)
 LIBS =  -L$(DJGPP_PATH)lib -lalleg -lpng -lm -lz
 # If you have more Allegro libraries (like allegro_image, allegro_font, etc.), add them here
 
 
-OBJDIR = obj/dos
-BUILDDIR = bin/dos
+# OBJDIR/BUILDDIR/MARCH are overridable so alternate ISA targets (e.g. a 486
+# build for Bochs profiling) can be produced without clobbering the default
+# pentium-mmx build. Example: make -f config/Makefile.dos MARCH=i486 \
+#   OBJDIR=obj/dos486 BUILDDIR=bin/dos486
+OBJDIR ?= obj/dos
+BUILDDIR ?= bin/dos
+MARCH ?= pentium-mmx
 TARGET = nibble8.exe
 
 # Using wildcard to specify source files. Adjust or add paths as needed for your project structure.
@@ -25,8 +36,31 @@ COMMON_SOURCES += $(wildcard $(SRCDIR)/utils/*.c)
 SOURCES := $(COMMON_SOURCES)
 OBJECTS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-all: CFLAGS += -O3 -march=pentium-mmx -ffunction-sections -fdata-sections -funroll-all-loops -ffloat-store
+# PG=1 builds a gprof-instrumented binary (-pg) for hot-function profiling:
+# drops -flto (LTO erases per-function symbols gprof needs) and uses -O2 +
+# frame pointers so samples attribute to real functions. Example:
+#   make -f config/Makefile.dos MARCH=i486 PG=1 OBJDIR=obj/dos486prof BUILDDIR=bin/dos486prof
+ifeq ($(PG),1)
+all: CFLAGS  += -O2 -march=$(MARCH) -funroll-all-loops -ffloat-store -pg -fno-omit-frame-pointer
+all: LDFLAGS += -pg
+else
+# OPTFLAGS is overridable so the optimization set can be A/B'd on the bench
+# without editing the recipe, e.g. a 486-tuned set:
+#   OPTFLAGS="-O2 -ffunction-sections -fdata-sections -mtune=i486 -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1"
+# Default tuned for the 486 (validated on the Bochs bench, deterministic):
+#  * -O2, NOT -O3: -O3's aggressive inlining/unrolling bloats code and thrashed
+#    the 486's 8KB L1; -O2 cut the fixed per-frame floor ~5x (and shrank the exe).
+#  * -ffloat-store is LOAD-BEARING, not just perf: carts do integer math in Lua
+#    doubles past 2^53 (e.g. LCG RNG), and x87's 80-bit registers otherwise change
+#    rounding vs strict 64-bit -> different results. Dropping it changed the bench
+#    framebuffer checksum. Keep it.
+#  * dropped -funroll-all-loops (code bloat for no win on a cache-starved 486).
+# (tuning follows -march, so no explicit -mtune here — it would wrongly override
+#  the pentium build's tuning since OPTFLAGS is shared across MARCH targets.)
+OPTFLAGS ?= -O2 -ffunction-sections -fdata-sections -ffloat-store -fno-math-errno -falign-functions=1 -falign-loops=1 -falign-jumps=1
+all: CFLAGS  += $(OPTFLAGS) -march=$(MARCH)
 all: LDFLAGS += -flto
+endif
 all: rom $(BUILDDIR)/$(TARGET)
 
 debug: CFLAGS += -g
@@ -48,7 +82,6 @@ font2bin: $(TOOLSDIR)/font2bin.c
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/font2bin $^ $(LIBS)
 
 rom: $(ROMFILES:%=$(ROMDIR)/%)
-	@echo $(PATH)
 	@mkdir -p $(BUILDDIR)
 	@cp $(ASSETSDIR)/CWSDPMI.EXE $(BUILDDIR)
 	@cp $(ASSETSDIR)/nibble8.bat $(BUILDDIR)
