@@ -1033,12 +1033,21 @@ static void _pocketmod_render_channel_u8(pocketmod_context *c,
     const int loop_end = loop_length > 2 ? loop_start + loop_length : sample->length;
     const float sample_end = 1 + _pocketmod_min(loop_end, sample->length);
 
-    /* Calculate left/right levels */
+    /* Calculate left/right levels. Pre-fold the 127.5 output scale and an 8.8
+     * fixed-point shift into them: the sample data is already int8, so the per
+     * sample scaling becomes one integer multiply + shift instead of two x87
+     * multiplies and a float->int. This inner loop is the audio hot spot on the
+     * 486 (pocketmod was ~76% of audio frame time). */
     const float volume = chan->real_volume / (float)(128 * 64 * 2);
     const float level_l = volume * (1.0f - chan->balance / 255.0f);
     const float level_r = volume * (chan->balance / 255.0f);
+    const int32_t ll8 = (int32_t)(level_l * (127.5f * 256.0f));
+    const int32_t lr8 = (int32_t)(level_r * (127.5f * 256.0f));
 
-    /* Write samples */
+    /* Write samples. Position is tracked in 20.12 fixed-point locally so the
+     * inner loop drops the per-sample x87 (int)position and position+=increment.
+     * int32 holds a full-length MOD sample (<=131070, x4096 < 2^31) with margin. */
+    enum { PSH = 12 };
     int i, num;
     do
     {
@@ -1046,13 +1055,16 @@ static void _pocketmod_render_channel_u8(pocketmod_context *c,
         num = (sample_end - chan->position) / chan->increment;
         num = _pocketmod_min(num, samples_to_write);
 
+        int32_t pos = (int32_t)(chan->position * (float)(1 << PSH));
+        const int32_t inc = (int32_t)(chan->increment * (float)(1 << PSH));
+
         /* Resample and write 'num' samples */
         for (i = 0; i < num; i++)
         {
-            int x0 = (int)chan->position;
+            int x0 = pos >> PSH;
 
 #ifdef POCKETMOD_NO_INTERPOLATION
-            float s = sample->data[x0];
+            int s = sample->data[x0];
 #else
             int x1 = x0 + 1;
             if (x0 + 1 >= loop_end)
@@ -1064,22 +1076,18 @@ static void _pocketmod_render_channel_u8(pocketmod_context *c,
                 continue;
             }
 
-            float t = chan->position - x0;
-            float s = (1.0f - t) * sample->data[x0] + t * sample->data[x1];
+            float t = (pos & ((1 << PSH) - 1)) * (1.0f / (1 << PSH));
+            int s = (int)((1.0f - t) * sample->data[x0] + t * sample->data[x1]);
 #endif
-            chan->position += chan->increment;
+            pos += inc;
 
-            // Convert float sample to 8-bit unsigned integer
-            uint8_t sample_left = (int)((level_l * s) * 127.5f);
-            uint8_t sample_right = (int)((level_r * s) * 127.5f);
-
-            // Clamp values to the uint8_t range
-            sample_left = _pocketmod_clamp_int(sample_left, 0, 255);
-            sample_right = _pocketmod_clamp_int(sample_right, 0, 255);
-
-            *output++ += sample_left;
-            *output++ += sample_right;
+            /* level is 8.8 fixed; (uint8_t) keeps the original wrap-on-negative
+             * behaviour the downstream mixer is tuned around. */
+            *output++ += (uint8_t)((ll8 * s) >> 8);
+            *output++ += (uint8_t)((lr8 * s) >> 8);
         }
+
+        chan->position = (float)pos * (1.0f / (1 << PSH));
 
         /* Rewind the sample when reaching the loop point */
         if (chan->position >= loop_end)

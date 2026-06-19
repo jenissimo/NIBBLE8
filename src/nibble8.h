@@ -78,7 +78,14 @@
 
 #define NIBBLE_KEY_PRESS_DELAY   60 // 15 frames delay before key repeat
 #define NIBBLE_KEY_BUFFER        4
-#define NIBBLE_SAMPLERATE        44100
+// pocketmod's float mixing is the dominant audio cost, and it scales with the
+// sample rate. On the DOS/486 target that cost visibly steals frame time, so we
+// run a lower rate there; fast platforms keep the higher-quality rate.
+#ifdef DOS
+#define NIBBLE_SAMPLERATE        11025
+#else
+#define NIBBLE_SAMPLERATE        22050
+#endif
 #define NIBBLE_SAMPLE_CHANNELS   2
 #define NIBBLE_SAMPLES           NIBBLE_SAMPLERATE / 30
 #define NIBBLE_PATTERNS_COUNT    100

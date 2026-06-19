@@ -17,7 +17,7 @@ void audio_init()
         exit(1);
     }
     voice_set_priority(audio_stream->voice, 255);
-    DEBUG_LOG("Audio initialized: %d Hz, 16-bit stereo", NIBBLE_SAMPLERATE);
+    DEBUG_LOG("Audio initialized: %d Hz, 8-bit stereo", NIBBLE_SAMPLERATE);
     nibble_audio_init(NIBBLE_SAMPLERATE, NULL, 0);
 }
 

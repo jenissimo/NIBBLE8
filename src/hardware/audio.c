@@ -7,6 +7,14 @@ pocketmod_context sfxContexts[NIBBLE_SFX_CHANNELS];
 uint8_t *modFileBuffer;
 int modFileBufferSize;
 
+#ifdef NIBBLE_AUDIO_PROFILE
+#include <time.h>
+// Per-section uclock accumulators (emulated ticks) — gated, off in normal builds.
+// Logged at bench end (see main_dos.c) to show where audio frame time goes.
+unsigned long long g_aud_music = 0, g_aud_sfx = 0, g_aud_note = 0, g_aud_mix = 0;
+unsigned long g_aud_frames = 0;
+#endif
+
 void nibble_audio_init(int freq, uint8_t *modData, int modSize)
 {
     //DEBUG_LOG("Init pocketmod");
@@ -63,62 +71,91 @@ void nibble_audio_update(uint8_t *buffer, int bytes)
         return;
     }
 
-    memset(music_buffer, 127, bytes);
-    for (int i = 0; i < NIBBLE_SFX_CHANNELS; i++)
-    {
-        memset(sfx_buffers[i], 127, bytes);
-    }
-    memset(mix_buffer, 0, bytes);
+#ifdef NIBBLE_AUDIO_PROFILE
+    uclock_t _ab;
+    g_aud_frames++;
+#endif
 
-    // Render music if active
-    if (memory.soundState.music_active)
+    // Render the music/note buffer only when something needs it (centre = 127).
+    bool musicOn = memory.soundState.music_active || memory.soundState.triggered_note.active;
+    if (musicOn)
     {
-        int i = 0;
-        while (i < bytes)
+        memset(music_buffer, 127, bytes);
+
+        if (memory.soundState.music_active)
         {
-            i += pocketmod_render_u8(&musicContext, music_buffer + i, bytes - i);
-            if (musicContext.pattern >= (memory.soundState.music_start_pattern + memory.soundState.music_length))
+#ifdef NIBBLE_AUDIO_PROFILE
+            _ab = uclock();
+#endif
+            int i = 0;
+            while (i < bytes)
             {
-                nibble_api_music(-1, 0);
-                break;
+                i += pocketmod_render_u8(&musicContext, music_buffer + i, bytes - i);
+                if (musicContext.pattern >= (memory.soundState.music_start_pattern + memory.soundState.music_length))
+                {
+                    nibble_api_music(-1, 0);
+                    break;
+                }
             }
+            memory.soundState.current_pattern = musicContext.pattern;
+            memory.soundState.current_line = musicContext.line;
+#ifdef NIBBLE_AUDIO_PROFILE
+            g_aud_music += (unsigned long long)(uclock() - _ab);
+#endif
         }
-        memory.soundState.current_pattern = musicContext.pattern;
-        memory.soundState.current_line = musicContext.line;
-    }
 
-    for (int sfxChannelId = 0; sfxChannelId < NIBBLE_SFX_CHANNELS; sfxChannelId++)
-    {
-        if (memory.soundState.sfx_channels[sfxChannelId].sfxId > -1)
+        if (memory.soundState.triggered_note.active)
         {
-            nibble_audio_update_sfx(sfxChannelId, &sfx_buffers[sfxChannelId], bytes);
+#ifdef NIBBLE_AUDIO_PROFILE
+            _ab = uclock();
+#endif
+            nibble_audio_play_note(&musicContext, &memory.soundState.triggered_note, music_buffer, bytes);
+#ifdef NIBBLE_AUDIO_PROFILE
+            g_aud_note += (unsigned long long)(uclock() - _ab);
+#endif
         }
     }
 
-    // Mix in any active notes into mixBuffer
-    if (memory.soundState.triggered_note.active)
+    // Render ONLY active SFX channels (and remember which). Silent channels used
+    // to be cleared-to-127 and summed anyway, injecting a +127 DC bias each.
+    int activeSfx[NIBBLE_SFX_CHANNELS];
+    int numActiveSfx = 0;
+#ifdef NIBBLE_AUDIO_PROFILE
+    _ab = uclock();
+#endif
+    for (int ch = 0; ch < NIBBLE_SFX_CHANNELS; ch++)
     {
-        // DEBUG_LOG("triggered note: %d", memory.soundState.triggered_note.note_index);
-        nibble_audio_play_note(&musicContext, &memory.soundState.triggered_note, music_buffer, bytes);
+        if (memory.soundState.sfx_channels[ch].sfxId > -1)
+        {
+            memset(sfx_buffers[ch], 127, bytes);
+            nibble_audio_update_sfx(ch, sfx_buffers[ch], bytes);
+            activeSfx[numActiveSfx++] = ch;
+        }
     }
+#ifdef NIBBLE_AUDIO_PROFILE
+    g_aud_sfx += (unsigned long long)(uclock() - _ab);
+    _ab = uclock();
+#endif
 
-    // Mix music buffer into the mix buffer
+    // Mix only active sources, summed around the 127 centre in signed space so
+    // multiple sources can't stack DC / overflow the uint8 before clamping.
     for (int i = 0; i < bytes; i++)
     {
-        mix_buffer[i] += music_buffer[i];
+        int acc = 0;
+        if (musicOn)
+            acc += (int)music_buffer[i] - 127;
+        for (int k = 0; k < numActiveSfx; k++)
+            acc += (int)sfx_buffers[activeSfx[k]][i] - 127;
+        acc += 127;
+        if (acc < 0)
+            acc = 0;
+        else if (acc > NIBBLE_AUDIO_LIMITER_THRESHOLD)
+            acc = NIBBLE_AUDIO_LIMITER_THRESHOLD;
+        buffer[i] = (uint8_t)acc;
     }
-
-    // Mix sound effect buffers into the mix buffer
-    for (int sfx_channel = 0; sfx_channel < NIBBLE_SFX_CHANNELS; sfx_channel++)
-    {
-        uint8_t *sfx_buffer = sfx_buffers[sfx_channel];
-        for (int i = 0; i < bytes; i++)
-        {
-            mix_buffer[i] += sfx_buffer[i];
-        }
-    }
-    nibble_audio_apply_limiter(mix_buffer, bytes);
-    memcpy(buffer, mix_buffer, bytes);
+#ifdef NIBBLE_AUDIO_PROFILE
+    g_aud_mix += (unsigned long long)(uclock() - _ab);
+#endif
 }
 
 void nibble_audio_apply_limiter(uint8_t *mix_buffer, int bytes_to_limit)
