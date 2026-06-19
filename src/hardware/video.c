@@ -91,6 +91,7 @@ void nibble_destroy_video()
 void nibble_api_cls(uint8_t col)
 {
     memset(memory.screenData, fullByteColors[col], NIBBLE_SCREEN_DATA_SIZE);
+    frame_dirty = true; // a cls-only frame must still be presented
 }
 
 void nibble_api_cpal(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
@@ -300,24 +301,42 @@ void nibble_api_hline(int16_t x1, int16_t x2, int16_t y, uint8_t color)
     if (x2 >= NIBBLE_WIDTH)
         x2 = NIBBLE_WIDTH - 1;
 
-    /*
-    // Stage 1: Draw remaining pixels at the beginning of the line
-    while (x1 < x2 && x1 % 4 != 0)
+    // Fast path: when the camera is unshifted, fill the byte-aligned middle of
+    // the span with whole bytes (4 packed pixels per store) instead of a
+    // read-modify-write pset per pixel. fullByteColors[color] is the byte with
+    // all four 2-bit fields = color (same value cls uses). The unaligned head
+    // and tail still go through pset so clipping/packing stay identical. With a
+    // shifted camera the byte index would not match pset's layout, so fall back.
+    if (memory.drawState.camera_x == 0 && memory.drawState.camera_y == 0)
     {
-        nibble_api_pset(x1, y, color);
-        x1++;
+        int row = y * NIBBLE_WIDTH;
+        while ((x1 & 3) != 0 && x1 <= x2) // head: partial byte, inline masked RMW
+        {
+            int idx = (row + x1) >> 2, sh = (3 - (x1 & 3)) << 1;
+            memory.screenData[idx] = (memory.screenData[idx] & ~(3 << sh)) | (color << sh);
+            x1++;
+        }
+        uint32_t dword = (uint32_t)fullByteColors[color] * 0x01010101u; // 16 px
+        while (x1 + 15 <= x2) // body: whole dwords (WBUF, 16 px per store)
+        {
+            *(uint32_t *)&memory.screenData[(row + x1) >> 2] = dword;
+            x1 += 16;
+        }
+        while (x1 + 3 <= x2) // leftover whole bytes (4 px)
+        {
+            memory.screenData[(row + x1) >> 2] = fullByteColors[color];
+            x1 += 4;
+        }
+        while (x1 <= x2) // tail: partial byte, inline masked RMW (no pset call)
+        {
+            int idx = (row + x1) >> 2, sh = (3 - (x1 & 3)) << 1;
+            memory.screenData[idx] = (memory.screenData[idx] & ~(3 << sh)) | (color << sh);
+            x1++;
+        }
+        frame_dirty = true; // a fully-aligned span may skip every store above
+        return;
     }
 
-    // Stage 2: Draw full bytes for the aligned portion of the line
-    while (x1 < x2 && (x2 - x1) >= 4)
-    {
-        int idx = ((y * NIBBLE_WIDTH) + x1) / 4;
-        memory.screenData[idx] = fullByteColors[color];
-        x1 += 4;
-    }
-
-    // Stage 3: Draw remaining pixels at the end of the line
-    */
     while (x1 <= x2)
     {
         nibble_api_pset(x1, y, color);
@@ -472,6 +491,137 @@ inline void nibble_api_spr(int16_t sprIndex, int16_t x, int16_t y, uint8_t flipX
 {
     uint16_t spriteX = (sprIndex % (NIBBLE_SPRITE_SHEET_WIDTH / NIBBLE_TILE_SIZE)) * NIBBLE_TILE_SIZE;
     uint16_t spriteY = (sprIndex / (NIBBLE_SPRITE_SHEET_WIDTH / NIBBLE_TILE_SIZE)) * NIBBLE_TILE_SIZE;
+    /* Fast path for the common unflipped blit (every map tile, most sprites):
+     * clip the 8x8 to the screen ONCE instead of per pixel, read the packed
+     * sprite row inline, and fold the transparency test and palette remap into a
+     * single drawPaletteMap lookup. This is the hot path for tile-heavy scenes
+     * (a full screen of map tiles is ~19200 of these pixels per frame). */
+    if (!flipX && !flipY)
+    {
+        const int sx0 = x - memory.drawState.camera_x;
+        const int sy0 = y - memory.drawState.camera_y;
+        int px0 = 0, py0 = 0, px1 = NIBBLE_TILE_SIZE, py1 = NIBBLE_TILE_SIZE;
+        if (sx0 < 0) px0 = -sx0;
+        if (sy0 < 0) py0 = -sy0;
+        if (sx0 + NIBBLE_TILE_SIZE > NIBBLE_WIDTH)  px1 = NIBBLE_WIDTH - sx0;
+        if (sy0 + NIBBLE_TILE_SIZE > NIBBLE_HEIGHT) py1 = NIBBLE_HEIGHT - sy0;
+
+        const uint8_t *pmap = memory.drawState.drawPaletteMap;
+
+        // Common case: camera 4px-aligned and the tile fully on screen. No head/
+        // tail and one source byte per group — keeps the non-scrolling path at
+        // full speed (the general path below adds head/tail handling for the
+        // scrolled/clipped case).
+        if ((sx0 & 3) == 0 && px0 == 0 && px1 == NIBBLE_TILE_SIZE)
+        {
+            for (int py = py0; py < py1; py++)
+            {
+                int srcByte = ((spriteY + py) * NIBBLE_SPRITE_SHEET_WIDTH + spriteX) >> 2;
+                uint8_t *dst = &memory.screenData[(((sy0 + py) * NIBBLE_WIDTH) + sx0) >> 2];
+                for (int g = 0; g < NIBBLE_TILE_SIZE / 4; g++)
+                {
+                    uint8_t sb = memory.spriteSheetData[srcByte + g];
+                    uint8_t m0 = pmap[(sb >> 6) & 3], m1 = pmap[(sb >> 4) & 3];
+                    uint8_t m2 = pmap[(sb >> 2) & 3], m3 = pmap[sb & 3];
+                    if (!((m0 | m1 | m2 | m3) & 0xf0))
+                        dst[g] = ((m0 & 3) << 6) | ((m1 & 3) << 4) | ((m2 & 3) << 2) | (m3 & 3);
+                    else
+                    {
+                        uint8_t b = dst[g];
+                        if (!(m0 & 0xf0)) b = (b & ~(3 << 6)) | ((m0 & 3) << 6);
+                        if (!(m1 & 0xf0)) b = (b & ~(3 << 4)) | ((m1 & 3) << 4);
+                        if (!(m2 & 0xf0)) b = (b & ~(3 << 2)) | ((m2 & 3) << 2);
+                        if (!(m3 & 0xf0)) b = (b & ~3) | (m3 & 3);
+                        dst[g] = b;
+                    }
+                }
+            }
+            frame_dirty = true;
+            return;
+        }
+
+        const int srcAligned = ((sx0 & 3) == 0); // does a dest byte map to one source byte?
+
+        // Per dest byte: collapse the four read-modify-writes of a 2bpp byte into
+        // a single store when all four pixels are opaque. The byte-aligned middle
+        // is alignment-INDEPENDENT (the leading run advances dest to a 4px byte
+        // boundary); only the unaligned head/tail go pixel-at-a-time. When the
+        // source is co-aligned (camera_x % 4 == 0) the four source pixels are one
+        // byte read, otherwise they straddle two source bytes.
+        for (int py = py0; py < py1; py++)
+        {
+            const int sbase = (spriteY + py) * NIBBLE_SPRITE_SHEET_WIDTH + spriteX;
+            const int drow = (sy0 + py) * NIBBLE_WIDTH;
+            int px = px0;
+
+#define NIBBLE_SPR_PIXEL(PX)                                                                       \
+    do                                                                                            \
+    {                                                                                             \
+        int sp_ = sbase + (PX);                                                                   \
+        uint8_t m_ = pmap[(memory.spriteSheetData[sp_ >> 2] >> ((3 - (sp_ & 3)) << 1)) & 3];      \
+        if (!(m_ & 0xf0))                                                                         \
+        {                                                                                         \
+            int dp_ = drow + sx0 + (PX);                                                          \
+            int sh_ = (3 - (dp_ & 3)) << 1;                                                       \
+            uint8_t *b_ = &memory.screenData[dp_ >> 2];                                           \
+            *b_ = (*b_ & ~(3 << sh_)) | ((m_ & 0x0f) << sh_);                                     \
+        }                                                                                         \
+    } while (0)
+
+            // head: until the destination pixel is on a 4px byte boundary
+            while (px < px1 && ((sx0 + px) & 3) != 0)
+            {
+                NIBBLE_SPR_PIXEL(px);
+                px++;
+            }
+
+            // middle: whole dest bytes (4 pixels) at a time
+            while (px + 4 <= px1)
+            {
+                int sp = sbase + px;
+                uint8_t m0, m1, m2, m3;
+                if (srcAligned)
+                {
+                    uint8_t sb = memory.spriteSheetData[sp >> 2];
+                    m0 = pmap[(sb >> 6) & 3]; m1 = pmap[(sb >> 4) & 3];
+                    m2 = pmap[(sb >> 2) & 3]; m3 = pmap[sb & 3];
+                }
+                else
+                {
+                    m0 = pmap[(memory.spriteSheetData[sp >> 2] >> ((3 - (sp & 3)) << 1)) & 3];
+                    m1 = pmap[(memory.spriteSheetData[(sp + 1) >> 2] >> ((3 - ((sp + 1) & 3)) << 1)) & 3];
+                    m2 = pmap[(memory.spriteSheetData[(sp + 2) >> 2] >> ((3 - ((sp + 2) & 3)) << 1)) & 3];
+                    m3 = pmap[(memory.spriteSheetData[(sp + 3) >> 2] >> ((3 - ((sp + 3) & 3)) << 1)) & 3];
+                }
+                uint8_t *b = &memory.screenData[(drow + sx0 + px) >> 2];
+                if (!((m0 | m1 | m2 | m3) & 0xf0)) // all opaque -> single store
+                {
+                    *b = ((m0 & 3) << 6) | ((m1 & 3) << 4) | ((m2 & 3) << 2) | (m3 & 3);
+                }
+                else
+                {
+                    uint8_t v = *b;
+                    if (!(m0 & 0xf0)) v = (v & ~(3 << 6)) | ((m0 & 3) << 6);
+                    if (!(m1 & 0xf0)) v = (v & ~(3 << 4)) | ((m1 & 3) << 4);
+                    if (!(m2 & 0xf0)) v = (v & ~(3 << 2)) | ((m2 & 3) << 2);
+                    if (!(m3 & 0xf0)) v = (v & ~3) | (m3 & 3);
+                    *b = v;
+                }
+                px += 4;
+            }
+
+            // tail: leftover pixels past the last whole byte
+            while (px < px1)
+            {
+                NIBBLE_SPR_PIXEL(px);
+                px++;
+            }
+#undef NIBBLE_SPR_PIXEL
+        }
+        frame_dirty = true;
+        return;
+    }
+
     int8_t incX = flipX ? -1 : 1;
     int8_t incY = flipY ? -1 : 1;
     uint16_t startX = flipX ? spriteX + NIBBLE_TILE_SIZE - 1 : spriteX;
@@ -565,33 +715,39 @@ uint8_t nibble_api_sget(int16_t x, int16_t y)
 
 void nibble_api_map(int celx, int cely, int sx, int sy, int celw, int celh, uint8_t layer)
 {
-    uint16_t mapStartIndex = cely * NIBBLE_MAP_WIDTH + celx;
-    uint16_t mapEndIndex = (cely + celh) * NIBBLE_MAP_WIDTH + (celx + celw);
-    uint16_t mapIndex;
-    int drawX, drawY;
+    // Iterate the requested celw x celh region directly (cx/cy), so:
+    //  * off-screen tiles are culled on ALL FOUR sides (the old check only caught
+    //    right/bottom, so a camera scrolled right still blitted every left tile
+    //    fully and clipped it per-pixel — the map_ex hot spot),
+    //  * whole off-screen rows are skipped without touching their columns,
+    //  * no per-tile divide/modulo for the cell coordinates (~40 cycles each on a 486).
+    const int cam_x = memory.drawState.camera_x;
+    const int cam_y = memory.drawState.camera_y;
 
-    for (mapIndex = mapStartIndex; mapIndex < mapEndIndex; mapIndex++)
+    for (int cy = 0; cy < celh; cy++)
     {
-        int x = (mapIndex - mapStartIndex) % NIBBLE_MAP_WIDTH;
-        int y = (mapIndex - mapStartIndex) / NIBBLE_MAP_WIDTH;
+        int drawY = sy + cy * NIBBLE_TILE_SIZE;
+        int spy = drawY - cam_y;
+        if (spy <= -NIBBLE_TILE_SIZE || spy >= NIBBLE_HEIGHT)
+            continue; // entire row above/below the screen
 
-        uint16_t spriteIndex = memory.mapData[mapIndex];
-        uint8_t spriteFlags = memory.spriteFlagsData[spriteIndex];
+        int mapRow = (cely + cy) * NIBBLE_MAP_WIDTH + celx;
 
-        if (layer > 0 && (spriteFlags & layer) != layer)
+        for (int cx = 0; cx < celw; cx++)
         {
-            continue; // Skip this sprite if not on the specified layer
+            int drawX = sx + cx * NIBBLE_TILE_SIZE;
+            int spx = drawX - cam_x;
+            if (spx <= -NIBBLE_TILE_SIZE || spx >= NIBBLE_WIDTH)
+                continue; // tile left/right of the screen
+
+            uint16_t spriteIndex = memory.mapData[mapRow + cx];
+            uint8_t spriteFlags = memory.spriteFlagsData[spriteIndex];
+
+            if (layer > 0 && (spriteFlags & layer) != layer)
+                continue; // not on the requested layer
+
+            nibble_api_spr(spriteIndex, drawX, drawY, 0, 0);
         }
-
-        drawX = sx + x * NIBBLE_TILE_SIZE;
-        drawY = sy + y * NIBBLE_TILE_SIZE;
-
-        if ((drawX - memory.drawState.camera_x) >= NIBBLE_WIDTH || (drawY - memory.drawState.camera_y) >= NIBBLE_HEIGHT)
-        {
-            continue; // Skip drawing if out of screen bounds
-        }
-
-        nibble_api_spr(spriteIndex, drawX, drawY, 0, 0);
     }
 }
 
@@ -616,20 +772,41 @@ int16_t nibble_api_mget(uint16_t x, uint16_t y)
 
 inline void draw_char(int charIndex, int16_t x, int16_t y, uint8_t fgCol, uint8_t bgCol)
 {
-    for (int j = charIndex * 8; j < (charIndex * 8 + NIBBLE_FONT_HEIGHT); j++)
+    // Clip the glyph once (not per pixel), hoist the background-transparency test
+    // out of the loop, and write the 2bpp pixel inline. draw_char writes colours
+    // raw (no palette remap), so this matches the old per-pixel pset path exactly.
+    const int sx0 = x - memory.drawState.camera_x;
+    const int sy0 = y - memory.drawState.camera_y;
+    const bool bgOpaque = !is_color_transparent(bgCol);
+
+    for (int row = 0; row < NIBBLE_FONT_HEIGHT; row++)
     {
-        for (int i = 7; i >= 8 - NIBBLE_FONT_WIDTH; i--)
+        int py = sy0 + row;
+        if ((unsigned int)py >= NIBBLE_HEIGHT)
+            continue; // glyph row off-screen
+        uint8_t bits = nibble_font[charIndex * 8 + row];
+        int rowBase = py * NIBBLE_WIDTH;
+        for (int cx = 0; cx < NIBBLE_FONT_WIDTH; cx++)
         {
-            if ((nibble_font[j] >> i) & 1)
-            {
-                nibble_api_pset(x + (7 - i), y + (j % 8), fgCol);
-            }
-            else if (!is_color_transparent(bgCol))
-            {
-                nibble_api_pset(x + (7 - i), y + (j % 8), bgCol);
-            }
+            int px = sx0 + cx;
+            if ((unsigned int)px >= NIBBLE_WIDTH)
+                continue;
+
+            uint8_t col;
+            if ((bits >> (7 - cx)) & 1)
+                col = fgCol;
+            else if (bgOpaque)
+                col = bgCol;
+            else
+                continue; // transparent background pixel
+
+            int dp = rowBase + px;
+            int sh = (3 - (dp & 3)) << 1;
+            uint8_t *b = &memory.screenData[dp >> 2];
+            *b = (*b & ~(3 << sh)) | ((col & 3) << sh);
         }
     }
+    frame_dirty = true;
 }
 
 void nibble_api_draw_fps(int fps)
@@ -686,9 +863,6 @@ void set_and_get_camera(int16_t x, int16_t y, int16_t *prev_x, int16_t *prev_y)
 
 void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
 {
-    uint16_t index;
-    uint8_t bitPairIndex;
-
     x -= memory.drawState.camera_x;
     y -= memory.drawState.camera_y;
 
@@ -697,13 +871,14 @@ void set_pixel_from_sprite(int16_t x, int16_t y, uint8_t col)
 
     col = memory.drawState.drawPaletteMap[col & 0x0f] & 0x0f;
 
-    index = nibble_get_vram_byte_index(x, y, NIBBLE_WIDTH);
-    bitPairIndex = nibble_get_vram_bitpair_index(x, y, NIBBLE_WIDTH);
+    // Compute the packed-pixel position once, unsigned, so >>2 / &3 replace the
+    // signed /4 and %4 in the vram index helpers (which also recomputed y*W+x
+    // twice). Hot path: every opaque sprite pixel.
+    unsigned int p = (unsigned int)y * NIBBLE_WIDTH + (unsigned int)x;
+    unsigned int index = p >> 2;
+    int shift = (3 - (p & 3)) << 1;
 
-    int shift = ((3 - bitPairIndex) * 2);
-
-    memory.screenData[index] &= ~(3 << shift);
-    memory.screenData[index] |= (col << shift);
+    memory.screenData[index] = (memory.screenData[index] & ~(3 << shift)) | (col << shift);
 }
 
 inline bool is_color_transparent(uint8_t color)

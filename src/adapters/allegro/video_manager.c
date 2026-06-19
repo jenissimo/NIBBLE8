@@ -3,6 +3,12 @@
 // The native resolution buffer
 BITMAP *native_buffer;
 
+// When set (by --bench), skip presenting to the host display (stretch_blit +
+// show_video_bitmap). The headless benchmark only cares about the CPU cost of
+// drawing + the framebuffer unpack; the host present is both irrelevant there
+// and misbehaves under DOSBox-X when frames are pushed without 30 FPS pacing.
+int nibble_bench_no_present = 0;
+
 // The scaled resolution
 const int SCREEN_SCALE = 2;
 const int SCALED_WIDTH = NIBBLE_WIDTH * SCREEN_SCALE;
@@ -39,6 +45,8 @@ int video_init()
 
 void video_setup_palette()
 {
+    static PALETTE lastPalette;
+    static int paletteCached = 0;
     PALETTE allegPalette;
 
     // Convert and set colors
@@ -65,8 +73,17 @@ void video_setup_palette()
         allegPalette[i].r = allegPalette[i].g = allegPalette[i].b = 0;
     }
 
-    // Apply the palette
+    // Pushing all 256 colors to the VGA DAC is expensive on slow hardware (a
+    // 386), so only re-program the palette when it actually changed since the
+    // last frame instead of every frame.
+    if (paletteCached && memcmp(allegPalette, lastPalette, sizeof(PALETTE)) == 0)
+    {
+        return;
+    }
+
     set_palette(allegPalette);
+    memcpy(lastPalette, allegPalette, sizeof(PALETTE));
+    paletteCached = 1;
 }
 
 inline void video_update()
@@ -88,6 +105,12 @@ inline void video_update()
     // Perform drawing operations on native_buffer
     video_update_frame_allgero(); // Assuming this function draws the current frame
 
+    // In benchmark mode we measure CPU cost only; skip the host present.
+    if (nibble_bench_no_present)
+    {
+        return;
+    }
+
     // Update the display (not needed for every version of Allegro, but here for completeness)
     // vsync();
 
@@ -100,32 +123,50 @@ inline void video_update()
     show_video_bitmap(screen);
 }
 
+// Lookup table: each 2bpp source byte (4 packed pixels) expands to the four
+// 8bpp destination bytes, pre-packed as one little-endian uint32 so the unpack
+// loop writes a whole dword per source byte instead of four byte stores with
+// four shift/mask pairs. Built once on first use.
+static uint32_t unpack_lut[256];
+static int unpack_lut_ready = 0;
+
+static void build_unpack_lut(void)
+{
+    for (int v = 0; v < 256; v++)
+    {
+        // little-endian: low byte -> row[x] (leftmost pixel = bits 7..6)
+        unpack_lut[v] = ((uint32_t)((v >> 6) & 0x03)) |
+                        ((uint32_t)((v >> 4) & 0x03) << 8) |
+                        ((uint32_t)((v >> 2) & 0x03) << 16) |
+                        ((uint32_t)((v)      & 0x03) << 24);
+    }
+    unpack_lut_ready = 1;
+}
+
 void video_update_frame_allgero()
 {
-    int pixelIndex = 0;
-    uint8_t value;
-    uint8_t col;
-    int x, y;
+    // Unpack the 2-bit packed framebuffer into the 8bpp native_buffer.
+    // Hot path: runs every frame for all 19200 pixels (it is the fixed per-frame
+    // floor under every cart). WBUF: write one 32-bit word (4 pixels) per source
+    // byte via unpack_lut instead of four byte stores. Rows are NIBBLE_WIDTH (160,
+    // a multiple of 4) wide so each dest row is exactly NIBBLE_WIDTH/4 dwords.
+    const uint8_t *src = memory.screenData;
+    int i = 0;
 
-    // Lock the bitmap before direct pixel access
+    if (!unpack_lut_ready)
+        build_unpack_lut();
+
     acquire_bitmap(native_buffer);
 
-    for (int i = 0; i < NIBBLE_SCREEN_DATA_SIZE; i++)
+    for (int y = 0; y < NIBBLE_HEIGHT; y++)
     {
-        value = memory.screenData[i];
-        for (int bit = 7; bit >= 0; bit -= 2)
+        uint32_t *row = (uint32_t *)native_buffer->line[y];
+        for (int x = 0; x < NIBBLE_WIDTH / 4; x++)
         {
-            col = (((value >> bit) & 0x01) << 1) | ((value >> (bit - 1)) & 0x01);
-            x = pixelIndex % NIBBLE_WIDTH;
-            y = pixelIndex / NIBBLE_WIDTH;
-            //_putpixel32(native_buffer, x, y, palette->argb[col]);
-            // DEBUG_LOG("x: %d, y: %d, col: %d", x, y, col);
-            _putpixel(native_buffer, x, y, col);
-            pixelIndex++;
+            row[x] = unpack_lut[src[i++]];
         }
     }
 
-    // Unlock the bitmap after modifications
     release_bitmap(native_buffer);
 }
 
