@@ -58,6 +58,13 @@ Immerse yourself in the irresistible charm of nostalgia while exploring the capa
    ```bash
    make -f config/Makefile.dos
    ```
+
+#### Advanced (DOS):
+- Overridable build knobs: `MARCH` (target ISA, e.g. `MARCH=i486`), `OPTFLAGS`
+  (optimization flags), `PG=1` (gprof-instrumented build), `OBJDIR`/`BUILDDIR`.
+- A deterministic, headless benchmark & profiling harness (Bochs i486 / DOSBox)
+  lives in [tools/bench/README.md](tools/bench/README.md).
+
 ## License
 
 NIBBLE8 is licensed under the [MIT License](https://github.com/jenissimo/NIBBLE8/blob/main/LICENSE).
